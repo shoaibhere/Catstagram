@@ -2,10 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./db/index.js");
 
-console.log("Before dotenv config: ", process.env.MONGODB_URI);
-dotenv.config({ path: ".env.local" });
-console.log("After dotenv config: ", process.env.MONGODB_URI);
-
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 app.get("/", (req, res) => res.send("hello world"));
