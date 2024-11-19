@@ -1,14 +1,16 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: '.env.local' });
+
 const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(
-      "mongodb+srv://shoaibakhtar1827:imshoaib@catstagram.6dtsx.mongodb.net/?retryWrites=true&w=majority&appName=catstagram"
-    );
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.log(error.message);
-    process.exit(1);
-  }
+    try {
+        const connectionInstance = await mongoose.connect(process.env.MONGODB_URI);
+        console.log(`\n MongoDB connected !! DB HOST: ${connectionInstance.connection.host}`);
+    } catch (error) {
+        console.log("MONGODB connection FAILED ", error);
+        process.exit(1);
+    }
 };
 
 module.exports = connectDB;
