@@ -1,0 +1,57 @@
+step 1:
+    make the folder structure.
+        Public folder
+        src
+          -controllers
+          -db
+          -routes
+          -models
+          -middlewares
+          -utils
+          app.js
+          index.js
+          constants.js
+        packagejson
+        gitkeep
+        gitignore
+        prettier files
+step 2:
+    write the express server
+                      way1=
+                                   import express 
+                                   initialize the server
+                                   get the request
+                                   listen on port
+
+                      way2=
+                            1-  make the express server and cors in the app.js file
+                            2-  connect db
+                                   make a index.js file in db folder
+                                       function of connectDb
+                                           try catch
+                                           mongoose.connect
+                                           consolelog->connect , fail+exitprocess
+                                           export function
+                                  in index.js in src folder 
+                                       connectdb import \
+                                       .then
+                                             lisen the server
+                                       .catch 
+                                           consolelog if get error   
+                    
+                            3-  make the routes    
+                                      in app.js file import the routes and give the name in import and use in the app server 
+                                                app.use("/api/v1/users", userRouter)
+
+                                      in router folder make te routes for which api
+                                          import the controllers which contain logic for that route
+                                          import { Router } from "express";
+                                          const router = Router();                                      
+                                          router.route("").post();    in post put the controller for that route                                      
+                                          export default router
+
+                                      in controller folder make  the file for user and write the all controollers for user
+
+                            4- initialize the mongo db model and write schema for it 
+
+          
