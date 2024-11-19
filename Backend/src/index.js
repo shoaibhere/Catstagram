@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 8000;
 app.use("/user", userRouter);
 console.log(
   "MongoDB URI: ",
-  "mongodb+srv://shoaibakhtar1827:imshoaib@catstagram.6dtsx.mongodb.net/?retryWrites=true&w=majority&appName=catstagram"
+  "mongodb+srv://shoaibakhtar1827:imshoaib@catstagram.6dtsx.mongodb.net/admin?retryWrites=true&w=majority&appName=catstagram"
 );
 
 app.listen(PORT, () => {

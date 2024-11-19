@@ -7,7 +7,7 @@ const generateTokenSetCookie = (res, userId) => {
   }
 
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1d", // Default to 1 day if not defined
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "7d",
   });
 
   res.cookie("token", token, {

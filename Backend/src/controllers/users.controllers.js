@@ -1,7 +1,7 @@
 const user = require("../models/users.model");
 const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
-const generateTokenSetCookie = require("../utils/cookie");
+const generateTokenSetCookie = require("../utils/cookie.js");
 
 const signup = async (req, res) => {
   const { email, password, name } = req.body;
