@@ -36,7 +36,7 @@ const navbar = () => {
                 </a>
                 <a
                   href="/jobs.html"
-                  className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                  className="text-white bg-purple-800  hover:bg-purple-600 hover:text-white rounded-md px-3 py-2"
                 >
                   Jobs
                 </a>
