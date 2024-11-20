@@ -4,7 +4,7 @@ const connectDB = require("./db/index.js");
 
 const userRouter = require("./routes/users.routes.js");
 
-dotenv.config();
+dotenv.config({ path: "./.env.local" });
 
 const app = express();
 app.use(express.json());
@@ -12,10 +12,6 @@ const jwt = require("jsonwebtoken");
 console.log("jwt=" + jwt);
 const PORT = process.env.PORT || 8000;
 app.use("/user", userRouter);
-console.log(
-  "MongoDB URI: ",
-  "mongodb+srv://shoaibakhtar1827:imshoaib@catstagram.6dtsx.mongodb.net/admin?retryWrites=true&w=majority&appName=catstagram"
-);
 
 app.listen(PORT, () => {
   connectDB();

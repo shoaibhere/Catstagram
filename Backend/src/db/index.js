@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(
-      "mongodb+srv://shoaibakhtar1827:imshoaib@catstagram.6dtsx.mongodb.net/?retryWrites=true&w=majority&appName=catstagram"
-    );
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.log(error.message);

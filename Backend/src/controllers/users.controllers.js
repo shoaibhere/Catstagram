@@ -1,7 +1,11 @@
-const user = require("../models/users.model");
+const { User } = require("../models/users.model.js");
 const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
 const generateTokenSetCookie = require("../utils/cookie.js");
+const {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} = require("../../mailtrap/email.js");
 
 const signup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -12,7 +16,7 @@ const signup = async (req, res) => {
       throw new Error("All fields are required");
     }
 
-    const userAlreadyExists = await user.findOne({ email });
+    const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
       throw new Error("User already exists");
     }
@@ -32,7 +36,7 @@ const signup = async (req, res) => {
       profileImageUrl = result.secure_url;
     }
 
-    const newUser = new user({
+    const newUser = new User({
       email,
       password: hashedPassword,
       name,
@@ -43,6 +47,8 @@ const signup = async (req, res) => {
 
     await newUser.save();
     generateTokenSetCookie(res, newUser._id);
+
+    await sendVerificationEmail(newUser.email, verificationToken);
 
     res.status(201).json({
       success: true,
