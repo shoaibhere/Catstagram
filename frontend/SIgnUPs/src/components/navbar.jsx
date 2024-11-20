@@ -1,17 +1,12 @@
 import React from "react";
-import logo from "../assets//images/logo.jpg";
+import logo from "../assets/images/logo.jpg";
 
-const navbar = () => {
+const Navbar = () => {
   return (
-    <nav
-      className="bg-black
- border-b border-indigo-500"
-    >
+    <nav className="bg-black border-b border-gray-500">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           <div className="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
-            {/* <!-- Logo --> */}
-
             <a
               className="flex flex-shrink-0 items-center mr-4"
               href="/index.html"
@@ -29,22 +24,24 @@ const navbar = () => {
             <div className="md:ml-auto">
               <div className="flex space-x-2">
                 <a
-                  href="/index.html"
-                  className="text-white bg-purple-800 hover:bg-purple-600 hover:text-white rounded-md px-3 py-2"
+                  href="/add-job.html"
+                  className="text-white bg-black hover:bg-gray-600 hover:text-white rounded-full px-3 py-2"
                 >
                   Home
                 </a>
-                <a
-                  href="/jobs.html"
-                  className="text-white bg-purple-800  hover:bg-purple-600 hover:text-white rounded-md px-3 py-2"
-                >
-                  Jobs
-                </a>
+
                 <a
                   href="/add-job.html"
-                  className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                  className="text-white bg-black hover:bg-gray-600 hover:text-white rounded-full px-3 py-2"
                 >
-                  Add Job
+                  Website
+                </a>
+
+                <a
+                  href="/add-job.html"
+                  className="text-white bg-black hover:bg-gray-600 hover:text-white rounded-full px-3 py-2"
+                >
+                  Logout
                 </a>
               </div>
             </div>
@@ -55,4 +52,4 @@ const navbar = () => {
   );
 };
 
-export default navbar;
+export default Navbar;
