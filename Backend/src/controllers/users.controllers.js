@@ -5,8 +5,10 @@ const generateTokenSetCookie = require("../utils/cookie.js");
 const {
   sendVerificationEmail,
   sendWelcomeEmail,
+  sendResetPasswordEmail,
+  sendResetSuccessEmail,
 } = require("../../mailtrap/email.js");
-
+const crypto = require("crypto");
 const signup = async (req, res) => {
   const { email, password, name } = req.body;
   const file = req.file; // Access uploaded file
@@ -88,4 +90,109 @@ const verifyEmail = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-module.exports = { signup, verifyEmail };
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+    generateTokenSetCookie(res, user._id);
+
+    user.lastLogin = new Date();
+    await user.save();
+    res
+      .status(200)
+      .json({ message: "Login successful", ...user._doc, password: undefined });
+  } catch (error) {
+    console.log("Login Function Error: " + error.message);
+    throw new Error("Failed to login: " + error.message);
+  }
+};
+const logout = async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logout successful" });
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpire = resetTokenExpiresAt;
+    await user.save();
+
+    await sendResetPasswordEmail(
+      user.email,
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+    );
+    res.status(200).json({ message: "Password reset email sent" });
+  } catch (error) {
+    console.log("Forgot Password Function Error: " + error.message);
+    res.status(400).json({ message: "Failed to reset password" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid  token" + token });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+    await sendResetSuccessEmail(user.email);
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.log("Reset Password Function Error: " + error.message);
+    res.status(400).json({ message: "Failed to reset password" });
+  }
+};
+
+const checkAuth = async (req, res) => {
+  try {
+    console.log("before");
+    const user = await User.findById(req.user.id).select("-password"); //select shows everything in user minus
+    console.log("helloooooooo");
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.log("Check Auth Function Error: " + error.message);
+    res
+      .status(400)
+      .json({ message: "Failed to check authentication" + error.message });
+  }
+};
+module.exports = {
+  signup,
+  verifyEmail,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+  checkAuth,
+};
