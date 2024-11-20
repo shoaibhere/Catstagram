@@ -49,7 +49,11 @@ const signup = async (req, res) => {
     const savedUser = await newUser.save();
     console.log("User saved successfully:", savedUser);
 
+<<<<<<< Updated upstream
     generateTokenSetCookie(res, newUser._id);
+=======
+    // await sendVerificationEmail(newUser.email, verificationToken);
+>>>>>>> Stashed changes
 
     res.status(201).json({
       success: true,
