@@ -28,7 +28,6 @@ const signup = async (req, res) => {
     let profileImageUrl = "";
     if (file) {
       const result = await cloudinary.uploader.upload(file.path, {
-        folder: "profile_pictures",
         width: 150,
         height: 150,
         crop: "fill",
@@ -42,7 +41,7 @@ const signup = async (req, res) => {
       name,
       verificationToken,
       verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000,
-      profileImage: profileImageUrl, // Save profile picture URL
+      profileImage: profileImageUrl,
     });
 
     await newUser.save();
@@ -63,4 +62,30 @@ const signup = async (req, res) => {
   }
 };
 
-module.exports = signup;
+const verifyEmail = async (req, res) => {
+  const { code } = req.body;
+  try {
+    const user = await User.findOne({
+      verificationToken: code,
+      verificationTokenExpire: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid verification code" });
+    }
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpire = undefined;
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.name);
+    res.status(200).json({
+      message: "Email verified successfully",
+      ...user._doc,
+      password: undefined,
+    });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+module.exports = { signup, verifyEmail };
