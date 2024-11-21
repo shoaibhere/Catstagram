@@ -2,7 +2,8 @@ import React from "react";
 
 const SideNav = () => {
   return (
-    <div className="bg-black text-white w-64 pl-1 py-4 space-y-6 h-screen">
+      <div className="bg-black h-screen text-white w-64 pl-1 py-4 space-y-6 h-full">
+
       {/* Profile section */}
       <div className="flex flex-col items-center mb-6">
         <a href="#" className="mb-2">
