@@ -1,6 +1,5 @@
 const { name } = require("ejs");
 const mongoose = require("mongoose");
-
 const signupSchema = new mongoose.Schema(
   {
     email: {
@@ -36,6 +35,6 @@ const signupSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("user", signupSchema);
+const User = mongoose.model("User", signupSchema);
 
 module.exports = { User };
