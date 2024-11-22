@@ -31,12 +31,6 @@ const signupSchema = new mongoose.Schema(
     resetPasswordExpire: Date,
     verificationToken: String,
     verificationTokenExpire: Date,
-    friends: [
-      {
-        email: { type: String, required: false },
-        name: { type: String, required: false },
-      },
-    ],
   },
   { timestamps: true }
 );
