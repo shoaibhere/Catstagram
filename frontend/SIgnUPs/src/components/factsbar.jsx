@@ -7,11 +7,8 @@ const Factsbar = () => {
   useEffect(() => {
     const fetchFacts = async () => {
       try {
-        const response = await axios.get(
-          "https://catfact.ninja/facts?limit=100"
-        );
+        const response = await axios.get("http://localhost:8000/api/catfacts");
         const allFacts = response.data.data;
-
         // Randomly shuffle facts and select the first 10
         const randomFacts = allFacts
           .sort(() => Math.random() - 0.5)

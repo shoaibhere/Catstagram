@@ -1,54 +1,87 @@
-import React from "react";
-import SideNav from "./components/sideNav";
-import Navbar from "./components/navbar";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import SideNav from "./components/sideNav";
-import Navbar from "./components/navbar";
-import Factsbar from "./components/Factsbar";
-import PostCard from "./components/postCard";
-import CreateAcc from "./components/CreateAcc";
+import { Route, Routes, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import SignUpPage from "./pages/SignupPage";
+import LoginPage from "./pages/LoginPage";
+import React, { useEffect } from "react"; // Added useEffect import
+import FloatingShape from "../src/components/floatingShape";
+import DashboardPage from "./pages/DashboardPage";
+import { useAuthStore } from "./store/authStore";
+import LoadingSpinner from "./components/LoadingSpinner";
 
-const App = () => {
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!user.isVerified) {
+    return <Navigate to="/verify-email" replace />;
+  }
+
+  return children;
+};
+const RedirectAuthenticatedUser = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (isAuthenticated && user.isVerified) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+
+
+function App() {
+  const { isCheckingAuth, checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth(); // Perform authentication check
+  }, [checkAuth]);
+
+  if (isCheckingAuth) return <LoadingSpinner />; // Show loading spinner while checking auth
+
   return (
     <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Billabong&display=swap"
-        rel="stylesheet"
-      ></link>
-      <Navbar />
-      <SideNav />
-    <div className="h-screen flex flex-col bg-gray-900 text-white">
-      {/* Top Navbar (Fixed) */}
-      <div className="fixed top-0 left-0 right-0 z-20">
-        <Navbar />
-      </div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black flex items-center justify-center relative overflow-hidden">
+        <FloatingShape
+          color="bg-pink-300"
+          size="w-64 h-64"
+          top="-5%"
+          left="10%"
+          delay={0}
+        />
+        <FloatingShape
+          color="bg-pink-200"
+          size="w-48 h-48"
+          top="70%"
+          left="80%"
+          delay={5}
+        />
+        <FloatingShape
+          color="bg-pink-400"
+          size="w-32 h-32"
+          top="40%"
+          left="10%"
+          delay={2}
+        />
 
-      {/* Main Content Area */}
-      <div className="flex h-full pt-16">
-        {" "}
-        {/* pt-16 adds padding to avoid overlap with navbar */}
-        {/* Left Sidebar (Fixed on the Left Side) */}
-        <div className="fixed left-0 top-16 bottom-0 w-1/5 bg-black p-4 z-10">
-          <SideNav />
-        </div>
-        {/* Main Content Area (Scrollable, filling remaining space) */}
-        <div className="flex-grow ml-[20%] mr-[20%] p-4 overflow-y-auto bg-gray-900">
-          <div className="mt-8">
-            {/* Posts Timeline */}
-            {posts.map((post) => (
-              <PostCard key={post._id} post={post} />
-            ))}
-          </div>
-        </div>
-        {/* Right Sidebar (Fixed on the Right Side) */}
-        <div className="fixed right-7 top-16 bottom-0 w-1/5 p-4 bg-gray-800 z-10">
-          <Factsbar />
-        </div>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/signup"
+            element={
+              <RedirectAuthenticatedUser>
+                <SignUpPage />
+              </RedirectAuthenticatedUser>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
       </div>
-    </div>
     </>
   );
-};
+}
 
 export default App;
