@@ -42,7 +42,7 @@ const signup = async (req, res) => {
     await user.save();
 
     // jwt
-    generateTokenAndSetCookie(res, user._id);
+    generateTokenSetCookie(res, user._id);
 
     await sendVerificationEmail(user.email, verificationToken);
 
