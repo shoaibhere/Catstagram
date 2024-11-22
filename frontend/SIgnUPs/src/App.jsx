@@ -1,20 +1,16 @@
-<<<<<<< Updated upstream
 import React from "react";
 import SideNav from "./components/sideNav";
 import Navbar from "./components/navbar";
-=======
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import SideNav from "./components/SideNav";
-import Navbar from "./components/Navbar";
+import SideNav from "./components/sideNav";
+import Navbar from "./components/navbar";
 import Factsbar from "./components/Factsbar";
 import PostCard from "./components/postCard";
 import CreateAcc from "./components/CreateAcc";
->>>>>>> Stashed changes
 
 const App = () => {
   return (
-<<<<<<< Updated upstream
     <>
       <link
         href="https://fonts.googleapis.com/css2?family=Billabong&display=swap"
@@ -22,8 +18,6 @@ const App = () => {
       ></link>
       <Navbar />
       <SideNav />
-    </>
-=======
     <div className="h-screen flex flex-col bg-gray-900 text-white">
       {/* Top Navbar (Fixed) */}
       <div className="fixed top-0 left-0 right-0 z-20">
@@ -53,7 +47,7 @@ const App = () => {
         </div>
       </div>
     </div>
->>>>>>> Stashed changes
+    </>
   );
 };
 
