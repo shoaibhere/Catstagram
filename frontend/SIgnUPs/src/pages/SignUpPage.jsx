@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Hello from "../components/Hello";
-import { Loader, Lock, Mail, User } from "lucide-react";
+import { Cat, Loader, Lock, Mail, User } from "lucide-react";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { useAuthStore } from "../store/authStore";
 import { Link, useNavigate } from "react-router-dom";
@@ -41,21 +41,21 @@ const SignUpPage = () => {
             type="text"
             placeholder="User Name"
             value={name}
-            onChange={(e) => setName(e.target.value)} // Update the state with input
+            onChange={(e) => setName(e.target.value)} //
           />
           <Hello
-            icon={Mail}
+            icon={Cat}
             type="text"
             placeholder="Email Address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)} // Update the state with input
+            onChange={(e) => setEmail(e.target.value)}
           />
           <Hello
             icon={Lock}
             type="password"
             placeholder="Enter Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)} // Update the state with input
+            onChange={(e) => setPassword(e.target.value)}
           />
           {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
           <PasswordStrengthMeter password={password} />

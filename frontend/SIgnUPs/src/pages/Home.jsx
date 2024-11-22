@@ -4,10 +4,16 @@ import SideNav from "../components/SideNav";
 import Navbar from "../components/Navbar";
 import Factsbar from "../components/factsbar";
 import PostCard from "../components/postCard";
+import { useAuthStore } from "../store/authStore";
+import { formatDate } from "../utils/date";
 
 const Home = () => {
+  const { user, logout } = useAuthStore();
   const [posts, setPosts] = useState([]);
 
+  const handleLogout = () => {
+    logout();
+  };
   // Demo post data for testing
   useEffect(() => {
     // You can replace this with actual API data
@@ -85,12 +91,13 @@ const Home = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex h-full pt-16"> {/* pt-16 adds padding to avoid overlap with navbar */}
+      <div className="flex h-full pt-16">
+        {" "}
+        {/* pt-16 adds padding to avoid overlap with navbar */}
         {/* Left Sidebar (Fixed on the Left Side) */}
         <div className="fixed left-0 top-16 bottom-0 w-1/5 bg-black p-4 z-10">
-          <SideNav />
+          <SideNav name={user?.name || "Guest"} />
         </div>
-
         {/* Main Content Area (Scrollable, filling remaining space) */}
         <div className="flex-grow ml-[20%] mr-[20%] p-4 overflow-y-auto bg-gray-900">
           <div className="mt-8">
@@ -100,7 +107,6 @@ const Home = () => {
             ))}
           </div>
         </div>
-
         {/* Right Sidebar (Fixed on the Right Side) */}
         <div className="fixed right-7 top-16 bottom-0 w-1/5 p-4 bg-gray-800 z-10">
           <Factsbar />
