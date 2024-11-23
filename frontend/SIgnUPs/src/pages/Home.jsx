@@ -9,6 +9,7 @@ import { formatDate } from "../utils/date";
 
 const Home = () => {
   const { user, logout } = useAuthStore();
+  console.log(user);
   const [posts, setPosts] = useState([]);
 
   const handleLogout = () => {
@@ -96,10 +97,11 @@ const Home = () => {
         {/* pt-16 adds padding to avoid overlap with navbar */}
         {/* Left Sidebar (Fixed on the Left Side) */}
         <div className="fixed left-0 top-16 bottom-0 w-1/5 bg-black p-4 z-10">
-          <SideNav name={user?.name || "Guest"} />
+          <SideNav user={user} />
         </div>
         {/* Main Content Area (Scrollable, filling remaining space) */}
-        <div className="flex-grow ml-[20%] mr-[20%] p-4 overflow-y-auto bg-gray-900">
+        <div className="flex-grow ml-[20%] mr-[20%] p-4 overflow-y-auto">
+        {/* bg-gray-900 */}
           <div className="mt-8">
             {/* Posts Timeline */}
             {posts.map((post) => (
@@ -108,7 +110,7 @@ const Home = () => {
           </div>
         </div>
         {/* Right Sidebar (Fixed on the Right Side) */}
-        <div className="fixed right-7 top-16 bottom-0 w-1/5 p-4 bg-gray-800 z-10">
+        <div className="fixed right-7 top-16 h-full bottom-0 w-1/5 p-4 bg-gray-800 z-10">
           <Factsbar />
         </div>
       </div>

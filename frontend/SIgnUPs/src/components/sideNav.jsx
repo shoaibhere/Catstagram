@@ -2,18 +2,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const SideNav = ({ name }) => {
+const SideNav = ({ user }) => {
   return (
     <div className="bg-black text-white w-64 pl-1 py-4 space-y-6 h-screen">
       {/* Profile section */}
-      <Link to={`/profile`}>
+      <Link to={`/profile?id=${user._id}`}>
         <div className="flex flex-col items-center mb-6 gap-2">
           <img
             src="https://via.placeholder.com/50"
             alt="Profile"
             className="w-16 h-16 rounded-full mb-2"
           />
-          <h3 className="text-lg font-semibold">{name}</h3>{" "}
+          <h3 className="text-lg font-semibold">{user.name}</h3>{" "}
           {/* Display the name here */}
         </div>
       </Link>

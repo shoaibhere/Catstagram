@@ -10,6 +10,7 @@ import { useAuthStore } from "./store/authStore";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import UserProfile from "./pages/userProfile";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -111,7 +112,14 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+            path="/profile"
+            element={
+              <UserProfile></UserProfile>
+            }
+          />
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+
         </Routes>
       </div>
     </>

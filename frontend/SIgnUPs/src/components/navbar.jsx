@@ -31,7 +31,7 @@ const Navbar = () => {
             <div className="md:ml-auto">
               <div className="flex space-x-2">
                 <Link
-                  to="/home"
+                  to="/"
                   className="text-white bg-black hover:bg-gray-600 hover:text-white rounded-full px-3 py-2"
                 >
                   Home

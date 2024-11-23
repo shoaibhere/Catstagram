@@ -1,4 +1,6 @@
 import React from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment, faSave, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 const PostCard = ({ post }) => {
   return (
@@ -32,18 +34,20 @@ const PostCard = ({ post }) => {
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           <button className="text-xl text-gray-500 hover:text-red-500 mr-4">
-            <i className="fa fa-heart"></i>
+            <FontAwesomeIcon icon={faHeart} />
+
           </button>
           <span className="text-gray-400">{post.likes || 0} Likes</span>
         </div>
         <div className="flex items-center">
           <button className="text-xl text-gray-500 hover:text-blue-500 mr-4">
-            <i className="fa fa-comment"></i>
+            <FontAwesomeIcon icon={faComment} />
           </button>
           <span className="text-gray-400">{post.comments?.length || 0} Comments</span>
         </div>
         <button className="text-xl text-gray-500 hover:text-green-500">
-          <i className="fa fa-save"></i>
+          <FontAwesomeIcon icon={faSave} />
+
         </button>
       </div>
     </div>
