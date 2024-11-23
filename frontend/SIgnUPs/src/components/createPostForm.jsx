@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";  // Import useNavigate
+import axios from "axios";
 
-const CreatePostForm = () => {
+const CreatePostForm = ({ user }) => {
   const [image, setImage] = useState(null);
   const [caption, setCaption] = useState("");
   const navigate = useNavigate(); // Initialize navigate function
@@ -12,14 +12,39 @@ const CreatePostForm = () => {
     setImage(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would handle the post submission logic (e.g., API call)
-    // For now, we'll assume the post is created successfully.
-
-    // After posting, redirect to the homepage
-    navigate("/"); // Redirect to the homepage ("/")
+  
+    if (!image || !caption.trim()) {
+      alert("Please provide both an image and a caption.");
+      return;
+    }
+  
+    // Create a FormData object to handle the file and text data
+    const formData = new FormData();
+    formData.append("profileImage", image); // Must match the field name expected in the backend
+    formData.append("caption", caption);
+    formData.append("userId", user._id); // Add user ID to the request
+  
+    try {
+      const response = await axios.post("http://localhost:8000/api/posts", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Necessary for file uploads
+        },
+      });
+  
+      if (response.data.success) {
+        alert("Post created successfully!");
+        navigate("/"); // Redirect after successful post creation
+      } else {
+        alert("Failed to create post: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Error uploading post:", error);
+      alert("An error occurred while creating the post.");
+    }
   };
+  
 
   return (
     <motion.div
@@ -33,7 +58,7 @@ const CreatePostForm = () => {
           Create Post
         </h2>
 
-        <form onSubmit={handleSubmit}>
+        <form encType="multipart/form-data" onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="caption" className="block text-white mb-2">
               Insert Caption
@@ -51,13 +76,14 @@ const CreatePostForm = () => {
           </div>
 
           <div className="mb-6">
-            <label htmlFor="imageurl" className="block text-white mb-2">
+            <label htmlFor="profileImage" className="block text-white mb-2">
               Insert Image
             </label>
             <div className="flex items-center border border-gray-400 rounded-md p-2">
               <input
-                id="imageurl"
+                id="profileImage"
                 type="file"
+                name="profileImage"
                 onChange={handleImageChange}
                 className="w-full bg-transparent text-white placeholder-gray-400 focus:outline-none"
               />

@@ -27,7 +27,7 @@ const createPost = () => {
         {/* Main Content Area (Scrollable, filling remaining space) */}
         <div className="flex-grow ml-[20%] mr-[20%] p-4 overflow-y-auto">
           <div className="flex justify-center h-full items-center">
-            <CreatePostForm/>
+            <CreatePostForm user={user}/>
           </div>
         </div>
 

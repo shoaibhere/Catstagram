@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./db/index.js");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/users.routes.js");
+const postRouter = require("./routes/posts.routes.js");
 const cors = require("cors");
 const axios = require("axios");
 
@@ -30,15 +31,7 @@ app.get("/api/catfacts", async (req, res) => {
 // console.log("jwt=" + jwt);
 const PORT = process.env.PORT || 8000;
 app.use("/api/user", userRouter);
-app.post("/api/posts", async (req, res) => {
-  try {
-    const { caption, imageUrl } = req.body;
-    const newPost = await Post.create({ caption, imageUrl, user: req.user._id }); // Assuming you use mongoose and have user info
-    res.status(201).json(newPost);
-  } catch (err) {
-    res.status(400).json({ message: "Error creating post" });
-  }
-});
+app.use("/api/posts", postRouter);
 
 app.listen(PORT, () => {
   connectDB();

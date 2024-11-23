@@ -7,9 +7,9 @@ const postSchema = new mongoose.Schema(
       required: true,
       maxLength: 500, // Optional: Limit the caption length
     },
-    imageUrl: {
+    image: {
       type: String,
-      required: false, // The post can also be text-only, so image is optional
+      required: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

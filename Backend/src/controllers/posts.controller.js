@@ -1,19 +1,31 @@
 const { Post } = require("../models/posts.model");
-const { User } = require("../models/users.model");
+const cloudinary = require("cloudinary").v2;
+const dotenv = require("dotenv");
+
+dotenv.config({ path: ".env.local" });
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Create a new post
 const createPost = async (req, res) => {
-  const { caption, imageUrl } = req.body;
-  const userId = req.userId; // Assuming the user ID is available in the request after authentication
+  const { caption, profileImage } = req.body;
+  console.log(req.body);
+  const userId = req.userId;
+  const imageUrl = req.file.path;// Assuming the user ID is available in the request after authentication
 
   try {
-    if (!caption) {
-      throw new Error("Caption is required");
+    if (!imageUrl) {
+      throw new Error("Image is required"); // Handle case where file is missing
     }
-
+    // Create a new post
     const newPost = new Post({
       caption,
-      imageUrl,
+      image: imageUrl,
       user: userId,
     });
 
@@ -30,6 +42,8 @@ const createPost = async (req, res) => {
   }
 };
 
+
+
 // Like a post
 const likePost = async (req, res) => {
   const { postId } = req.params;
@@ -44,10 +58,11 @@ const likePost = async (req, res) => {
 
     // If the user already liked the post, do nothing
     if (post.likes.includes(userId)) {
-      return res.status(400).json({ success: false, message: "You already liked this post" });
+      post.likes = post.likes.filter((like) => like.toString() !== userId.toString());
     }
-
-    post.likes.push(userId);
+    else{
+      post.likes.push(userId);
+    }
     await post.save();
 
     res.status(200).json({
@@ -57,38 +72,6 @@ const likePost = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in likePost:", error);
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-
-// Unlike a post
-const unlikePost = async (req, res) => {
-  const { postId } = req.params;
-  const userId = req.userId;
-
-  try {
-    const post = await Post.findById(postId);
-
-    if (!post) {
-      return res.status(404).json({ success: false, message: "Post not found" });
-    }
-
-    // If the user hasn't liked the post, return an error
-    if (!post.likes.includes(userId)) {
-      return res.status(400).json({ success: false, message: "You haven't liked this post yet" });
-    }
-
-    // Remove userId from the likes array
-    post.likes = post.likes.filter((like) => like.toString() !== userId.toString());
-    await post.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Post unliked successfully",
-      post,
-    });
-  } catch (error) {
-    console.error("Error in unlikePost:", error);
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -143,10 +126,11 @@ const savePost = async (req, res) => {
 
     // If the user has already saved the post, do nothing
     if (post.savedBy.includes(userId)) {
-      return res.status(400).json({ success: false, message: "You already saved this post" });
+      post.savedBy = post.savedBy.filter((savedUser) => savedUser.toString() !== userId.toString());
     }
-
-    post.savedBy.push(userId);
+    else{
+      post.savedBy.push(userId);
+    }
     await post.save();
 
     res.status(200).json({
@@ -160,43 +144,9 @@ const savePost = async (req, res) => {
   }
 };
 
-// Remove saved post
-const removeSavedPost = async (req, res) => {
-  const { postId } = req.params;
-  const userId = req.userId;
-
-  try {
-    const post = await Post.findById(postId);
-
-    if (!post) {
-      return res.status(404).json({ success: false, message: "Post not found" });
-    }
-
-    // If the user hasn't saved the post, return an error
-    if (!post.savedBy.includes(userId)) {
-      return res.status(400).json({ success: false, message: "You haven't saved this post" });
-    }
-
-    // Remove the userId from the savedBy array
-    post.savedBy = post.savedBy.filter((savedUser) => savedUser.toString() !== userId.toString());
-    await post.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Post removed from saved list",
-      post,
-    });
-  } catch (error) {
-    console.error("Error in removeSavedPost:", error);
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-
 module.exports = {
   createPost,
   likePost,
-  unlikePost,
   addComment,
   savePost,
-  removeSavedPost,
 };
