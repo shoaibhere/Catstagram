@@ -11,6 +11,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserProfile from "./pages/userProfile";
+import CreatePost from "./pages/createPost";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -118,6 +119,7 @@ function App() {
               <UserProfile></UserProfile>
             }
           />
+          <Route path="/create-post" element={<CreatePost />} />
           {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
         </Routes>

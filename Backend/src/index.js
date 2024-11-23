@@ -30,6 +30,15 @@ app.get("/api/catfacts", async (req, res) => {
 // console.log("jwt=" + jwt);
 const PORT = process.env.PORT || 8000;
 app.use("/api/user", userRouter);
+app.post("/api/posts", async (req, res) => {
+  try {
+    const { caption, imageUrl } = req.body;
+    const newPost = await Post.create({ caption, imageUrl, user: req.user._id }); // Assuming you use mongoose and have user info
+    res.status(201).json(newPost);
+  } catch (err) {
+    res.status(400).json({ message: "Error creating post" });
+  }
+});
 
 app.listen(PORT, () => {
   connectDB();
