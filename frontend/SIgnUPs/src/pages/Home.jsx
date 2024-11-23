@@ -19,72 +19,13 @@ const Home = () => {
   };
    // Demo post data for testing
   useEffect(() => {
-    // You can replace this with actual API data
-    const demoPosts = [
-      {
-        _id: "1",
-        user: {
-          name: "John Doe",
-          profilePicture: "https://via.placeholder.com/50",
-        },
-        caption: "Exploring the city!",
-        imageUrl: "https://via.placeholder.com/600x400",
-        likes: 120,
-        comments: [
-          { user: "Jane", text: "Looks awesome!" },
-          { user: "Tom", text: "Nice shot!" },
-        ],
-        createdAt: "2024-11-21 10:00",
-      },
-      {
-        _id: "2",
-        user: {
-          name: "Sarah Lee",
-          profilePicture: "https://via.placeholder.com/50",
-        },
-        caption: "My favorite meal!",
-        imageUrl: "https://via.placeholder.com/600x400",
-        likes: 95,
-        comments: [
-          { user: "Alice", text: "Yum!" },
-          { user: "Bob", text: "Looks delicious!" },
-        ],
-        createdAt: "2024-11-21 12:30",
-      },
-      {
-        _id: "3",
-        user: {
-          name: "Sarah Lee",
-          profilePicture: "https://via.placeholder.com/50",
-        },
-        caption: "My favorite meal!",
-        imageUrl: "https://via.placeholder.com/600x400",
-        likes: 95,
-        comments: [
-          { user: "Alice", text: "Yum!" },
-          { user: "Bob", text: "Looks delicious!" },
-        ],
-        createdAt: "2024-11-21 12:30",
-      },
-      {
-        _id: "4",
-        user: {
-          name: "Sarah Lee",
-          profilePicture: "https://via.placeholder.com/50",
-        },
-        caption: "My favorite meal!",
-        imageUrl: "https://via.placeholder.com/600x400",
-        likes: 95,
-        comments: [
-          { user: "Alice", text: "Yum!" },
-          { user: "Bob", text: "Looks delicious!" },
-        ],
-        createdAt: "2024-11-21 12:30",
-      },
-    ];
-
-    setPosts(demoPosts);
-  }, []);
+    async function fetchPosts(){
+      const response = await axios.get("http://localhost:8000/api/posts");
+      const allPosts = response.data.data;
+      setPosts(allPosts);
+    }
+    fetchPosts();
+  },[]);
 
   return (
     <div className="h-screen w-full flex flex-col  text-white">
@@ -93,12 +34,12 @@ const Home = () => {
         <Navbar />
         <Link
         to={`/create-post?id=${user._id}`}>
-        <button class="overflow-hidden float-right fixed right-[22%] top-[565px] w-32 p-2 h-12 bg-black text-white border-none rounded-md text-xl font-bold cursor-pointer relative z-10 group">
+        <button className="overflow-hidden float-right fixed right-[22%] top-[565px] w-32 p-2 h-12 bg-black text-white border-none rounded-md text-xl font-bold cursor-pointer relative z-10 group">
           Create Post
-          <span class="absolute w-36 h-32 -top-8 -left-2 bg-white rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
-          <span class="absolute w-36 h-32 -top-8 -left-2 bg-purple-400 rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
-          <span class="absolute w-36 h-32 -top-8 -left-2 bg-purple-600 rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
-          <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+          <span className="absolute w-36 h-32 -top-8 -left-2 bg-white rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+          <span className="absolute w-36 h-32 -top-8 -left-2 bg-purple-400 rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+          <span className="absolute w-36 h-32 -top-8 -left-2 bg-purple-600 rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+          <span className="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
             <FontAwesomeIcon icon={faPlus} />
           </span>
         </button>

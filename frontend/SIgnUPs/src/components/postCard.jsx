@@ -1,6 +1,9 @@
 import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faSave, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { format } from 'date-fns';
+
+
 
 const PostCard = ({ post }) => {
   return (
@@ -8,20 +11,20 @@ const PostCard = ({ post }) => {
       {/* User Info */}
       <div className="flex items-center mb-4">
         <img
-          src={post.user.profilePicture || 'https://via.placeholder.com/50'}
+          src={post.user.profile || 'https://via.placeholder.com/50'}
           alt="profile"
           className="w-10 h-10 rounded-full mr-3"
         />
         <div>
           <h2 className="text-md font-semibold">{post.user.name || 'User Name'}</h2>
-          <p className="text-sm text-gray-400">{post.createdAt || 'Just Now'}</p>
+          <p className="text-sm text-gray-400">{format(new Date(post.createdAt), 'dd-MMMM, yyyy, yyyy hh:mm a') || 'Just Now'}</p>
         </div>
       </div>
 
       {/* Post Image */}
       <div className="mb-4">
         <img
-          src={post.imageUrl || 'https://via.placeholder.com/600x400'}
+          src={post.image || 'https://via.placeholder.com/600x400'}
           alt="post"
           className="w-full h-64 object-cover rounded-lg"
         />
