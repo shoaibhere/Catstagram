@@ -1,5 +1,5 @@
-const { name } = require("ejs");
 const mongoose = require("mongoose");
+
 const signupSchema = new mongoose.Schema(
   {
     email: {
@@ -31,6 +31,20 @@ const signupSchema = new mongoose.Schema(
     resetPasswordExpire: Date,
     verificationToken: String,
     verificationTokenExpire: Date,
+    // List of friends as references to other users
+    friends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    // List of saved posts as references to Post documents
+    savedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",  // Reference to the Post collection (ensure you have this model defined)
+      },
+    ],
   },
   { timestamps: true }
 );

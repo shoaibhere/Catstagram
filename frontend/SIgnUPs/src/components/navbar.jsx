@@ -1,8 +1,14 @@
 import React from "react";
 import logo from "../assets/images/logo.jpg";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 const Navbar = () => {
+  const { user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+  };
   return (
     <nav className="bg-black border-b border-gray-500">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -25,7 +31,7 @@ const Navbar = () => {
             <div className="md:ml-auto">
               <div className="flex space-x-2">
                 <Link
-                  to="/home"
+                  to="/"
                   className="text-white bg-black hover:bg-gray-600 hover:text-white rounded-full px-3 py-2"
                 >
                   Home
@@ -41,6 +47,7 @@ const Navbar = () => {
                 <a
                   href="/"
                   className="text-white bg-black hover:bg-gray-600 hover:text-white rounded-full px-3 py-2"
+                  onClick={handleLogout}
                 >
                   Logout
                 </a>

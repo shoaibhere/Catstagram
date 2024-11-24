@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./db/index.js");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/users.routes.js");
+const postRouter = require("./routes/posts.routes.js");
 const cors = require("cors");
 const axios = require("axios");
 
@@ -30,6 +31,7 @@ app.get("/api/catfacts", async (req, res) => {
 // console.log("jwt=" + jwt);
 const PORT = process.env.PORT || 8000;
 app.use("/api/user", userRouter);
+app.use("/api/posts", postRouter);
 
 app.listen(PORT, () => {
   connectDB();

@@ -2,11 +2,16 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import SignUpPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
-import React, { useEffect } from "react"; // Added useEffect import
+import EmailVerificationPage from "./pages/EmailVerificationPage";
+import React, { useEffect } from "react";
 import FloatingShape from "../src/components/floatingShape";
 import DashboardPage from "./pages/DashboardPage";
 import { useAuthStore } from "./store/authStore";
 import LoadingSpinner from "./components/LoadingSpinner";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import UserProfile from "./pages/userProfile";
+import CreatePost from "./pages/createPost";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -30,8 +35,6 @@ const RedirectAuthenticatedUser = ({ children }) => {
 
   return children;
 };
-
-
 
 function App() {
   const { isCheckingAuth, checkAuth } = useAuthStore();
@@ -68,7 +71,14 @@ function App() {
         />
 
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/signup"
             element={
@@ -77,7 +87,41 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/login"
+            element={
+              <RedirectAuthenticatedUser>
+                <LoginPage />
+              </RedirectAuthenticatedUser>
+            }
+          />
+          <Route path="/verify-email" element={<EmailVerificationPage />} />
+          <Route
+            path="/forgot-password"
+            element={
+              <RedirectAuthenticatedUser>
+                <ForgotPasswordPage />
+              </RedirectAuthenticatedUser>
+            }
+          />
+
+          <Route
+            path="/reset-password/:token"
+            element={
+              <RedirectAuthenticatedUser>
+                <ResetPasswordPage />
+              </RedirectAuthenticatedUser>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <UserProfile></UserProfile>
+            }
+          />
+          <Route path="/create-post" element={<CreatePost />} />
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+
         </Routes>
       </div>
     </>

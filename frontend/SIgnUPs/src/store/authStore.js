@@ -52,7 +52,8 @@ export const useAuthStore = create((set) => ({
       });
     } catch (error) {
       set({
-        error: error.response?.data?.message || "Error logging in",
+        error:
+          error.response?.data?.message || "Error Invalid Email or Password",
         isLoading: false,
       });
       throw error;
@@ -102,6 +103,7 @@ export const useAuthStore = create((set) => ({
         isCheckingAuth: false,
       });
     } catch (error) {
+      console.log("error in check auth: " + error);
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
     }
   },
@@ -127,8 +129,11 @@ export const useAuthStore = create((set) => ({
       const response = await axios.post(`${API_URL}/reset-password/${token}`, {
         password,
       });
+      console.log("Request URL:", `${API_URL}/reset-password/${token}`);
+      console.log("Request data:", { password });
       set({ message: response.data.message, isLoading: false });
     } catch (error) {
+      console.error(error.message);
       set({
         isLoading: false,
         error: error.response.data.message || "Error resetting password",
