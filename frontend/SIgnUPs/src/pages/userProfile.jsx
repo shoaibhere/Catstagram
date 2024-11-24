@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import SideNav from "../components/SideNav";
+import SideNav from "../components/sideNav";
 import Navbar from "../components/Navbar";
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
-import { format } from 'date-fns';
-import axios from 'axios';
+import { format } from "date-fns";
+import axios from "axios";
 
 const UserProfile = () => {
   const { user, logout } = useAuthStore();
@@ -25,7 +25,6 @@ const UserProfile = () => {
     ];
     setPosts(demoPosts);
   }, []);
-  
 
   const handleDeleteAccount = () => {
     console.log("Account Deleted");
@@ -47,9 +46,7 @@ const UserProfile = () => {
   const handleSaveEdit = () => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
-        post._id === editingPostId
-          ? { ...post, caption: editedCaption }
-          : post
+        post._id === editingPostId ? { ...post, caption: editedCaption } : post
       )
     );
     setEditingPostId(null);
@@ -85,7 +82,9 @@ const UserProfile = () => {
             />
             <h2 className="text-2xl font-semibold">{user.name}</h2>
             <p className="text-gray-400">@{user.email}</p>
-            <p className="text-gray-400">Date Joined: {format(new Date(user.createdAt), 'dd-MMMM, yyyy')}</p>
+            <p className="text-gray-400">
+              Date Joined: {format(new Date(user.createdAt), "dd-MMMM, yyyy")}
+            </p>
             <div className="mt-4 flex gap-4">
               <button
                 onClick={handleEditAccount}
