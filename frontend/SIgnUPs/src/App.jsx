@@ -5,15 +5,13 @@ import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import React, { useEffect } from "react";
 import FloatingShape from "../src/components/floatingShape";
-import DashboardPage from "./pages/DashboardPage";
 import { useAuthStore } from "./store/authStore";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserProfile from "./pages/userProfile";
 import CreatePost from "./pages/createPost";
-import Friends from "./pages/Friends";  
-
+import Friends from "./pages/Friends";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -115,12 +113,7 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-          <Route
-            path="/profile"
-            element={
-              <UserProfile></UserProfile>
-            }
-          />
+          <Route path="/profile" element={<UserProfile></UserProfile>} />
           <Route path="/create-post" element={<CreatePost />} />
           {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
@@ -133,7 +126,6 @@ function App() {
             }
           />
         </Routes>
-
       </div>
     </>
   );

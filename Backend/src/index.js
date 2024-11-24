@@ -13,10 +13,12 @@ const axios = require("axios");
 dotenv.config({ path: ".env.local" });
 
 const app = express();
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(express.json()); //parse incoming json request
 app.use(cookieParser()); //parse incoming cookie
 
@@ -34,8 +36,7 @@ app.get("/api/catfacts", async (req, res) => {
 const PORT = process.env.PORT || 8000;
 app.use("/api/user", userRouter);
 app.use("/api/posts", postRouter);
-app.use("/api/friends", friendRoutes); 
-
+app.use("/api/friends", friendRoutes);
 
 app.listen(PORT, () => {
   connectDB();

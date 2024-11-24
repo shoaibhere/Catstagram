@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { verifyToken } = require("../middlewares/verifyToken"); 
-const { 
-    addFriend,
-    removeFriend,
-    getFriends,
-    getPotentialFriends 
+const { verifyToken } = require("../middlewares/verifyToken");
+const {
+  addFriend,
+  removeFriend,
+  getFriends,
+  getPotentialFriends,
 } = require("../controllers/friends.controller");
 
 router.post("/add/:id", verifyToken, addFriend);

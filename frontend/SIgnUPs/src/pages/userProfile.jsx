@@ -3,8 +3,10 @@ import SideNav from "../components/sideNav";
 import Navbar from "../components/Navbar";
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
-import { format } from 'date-fns';
-import axios from 'axios';
+import { format } from "date-fns";
+import axios from "axios";
+import { User } from "lucide-react";
+
 
 const UserProfile = () => {
   const { user, logout } = useAuthStore();
@@ -25,7 +27,6 @@ const UserProfile = () => {
     ];
     setPosts(demoPosts);
   }, []);
-  
 
   const handleDeleteAccount = () => {
     console.log("Account Deleted");
@@ -47,9 +48,7 @@ const UserProfile = () => {
   const handleSaveEdit = () => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
-        post._id === editingPostId
-          ? { ...post, caption: editedCaption }
-          : post
+        post._id === editingPostId ? { ...post, caption: editedCaption } : post
       )
     );
     setEditingPostId(null);
@@ -78,14 +77,21 @@ const UserProfile = () => {
         {/* Main Content Area (Scrollable, filling remaining space) */}
         <div className="flex-grow ml-[20%] mr-[20%] p-4 overflow-y-auto">
           <div className="flex flex-col items-center mb-10">
+          {user.profileImage ? (
             <img
-              src={user.profilePicture || "https://via.placeholder.com/100"}
-              alt="Profile"
-              className="w-24 h-24 rounded-full mb-4"
+              src={user.profileImage}
+              className="w-20 h-20 rounded-full object-cover ring-2 ring-purple-200"
             />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center">
+              <User className="w-10 h-10 text-purple-600" />
+            </div>
+          )}
             <h2 className="text-2xl font-semibold">{user.name}</h2>
             <p className="text-gray-400">@{user.email}</p>
-            <p className="text-gray-400">Date Joined: {format(new Date(user.createdAt), 'dd-MMMM, yyyy')}</p>
+            <p className="text-gray-400">
+              Date Joined: {format(new Date(user.createdAt), "dd-MMMM, yyyy")}
+            </p>
             <div className="mt-4 flex gap-4">
               <button
                 onClick={handleEditAccount}
