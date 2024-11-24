@@ -30,48 +30,49 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   };
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border-l-2 border-purple-500 ml-2">
-      <div className="p-4">
-        <div className="flex items-center gap-4">
-          {/* Avatar */}
-          {user.profileImage ? (
-            <img
-              src={user.profileImage}
-              alt={user.name}
-              className="w-14 h-14 rounded-full object-cover ring-2 ring-purple-200"
-            />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center">
-              <User className="w-7 h-7 text-purple-600" />
-            </div>
-          )}
+    <div className="w-full bg-gradient-to-br from-gray-900 via-purple-900 to-black rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-purple-600 p-6 transform hover:scale-105 transition-transform duration-300">
+      <div className="flex flex-col md:flex-row items-center gap-4">
+        {/* Avatar */}
+        {user.profileImage ? (
+          <img
+            src={user.profileImage}
+            alt={user.name}
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover ring-4 ring-purple-400 shadow-md"
+          />
+        ) : (
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-purple-300 flex items-center justify-center ring-4 ring-purple-400 shadow-md">
+            <User className="w-8 h-8 md:w-10 md:h-10 text-purple-800" />
+          </div>
+        )}
 
-          {/* User Details */}
-          <div className="flex-grow">
-            <h3 className="text-lg font-medium text-gray-900">{user.name}</h3>
-            <p className="text-sm text-gray-500 mb-2">{user.email}</p>
+        {/* User Details */}
+        <div className="flex-grow text-center md:text-left">
+          <h3 className="text-xl font-bold text-white">{user.name}</h3>
+          <p className="text-sm text-gray-400 mb-2">{user.email}</p>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => navigate(`/profile/${user._id}`)}
-                className="px-3 py-1.5 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors duration-200"
-                disabled={isLoading}
-              >
-                View Profile
-              </button>
-              <button
-                onClick={handleFriendAction}
-                className={`px-3 py-1.5 text-sm border rounded transition-colors duration-200 ${
-                  isFriend
-                    ? "border-red-500 text-red-500 hover:bg-red-50"
-                    : "border-green-500 text-green-500 hover:bg-green-50"
-                }`}
-                disabled={isLoading}
-              >
-                {isLoading ? "..." : isFriend ? "Remove Friend" : "Add Friend"}
-              </button>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex flex-col md:flex-row gap-2 mt-4">
+            {/* View Profile Button with Blue Gradient */}
+            <button
+              onClick={() => navigate(`/profile/${user._id}`)}
+              className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white font-semibold rounded-full hover:from-blue-600 hover:to-blue-800 transition-all duration-200"
+              disabled={isLoading}
+            >
+              View Profile
+            </button>
+
+            {/* Add/Remove Friend Button with Distinct Gradient */}
+            <button
+              onClick={handleFriendAction}
+              className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                isFriend
+                  ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
+                  : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading ? "..." : isFriend ? "Remove Friend" : "Add Friend"}
+            </button>
           </div>
         </div>
       </div>
