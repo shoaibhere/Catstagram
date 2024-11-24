@@ -12,6 +12,8 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserProfile from "./pages/userProfile";
 import CreatePost from "./pages/createPost";
+import Friends from "./pages/Friends";  
+
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -122,7 +124,16 @@ function App() {
           <Route path="/create-post" element={<CreatePost />} />
           {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
+          <Route
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <Friends />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
+
       </div>
     </>
   );

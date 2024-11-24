@@ -29,11 +29,11 @@ const SideNav = ({ user }) => {
           Saved
         </button>
       </Link>
-      <Link to={`/find-friends`}>
+      {/* <Link to={`/find-friends`}>
         <button className="bg-black hover:bg-gray-600 text-white w-full text-center rounded-l-full px-4 py-3 mb-2">
           Find People
         </button>
-      </Link>
+      </Link> */}
     </div>
   );
 };
