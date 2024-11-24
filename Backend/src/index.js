@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./db/index.js");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/users.routes.js");
+const friendRoutes = require("./routes/friends.routes.js");
 const cors = require("cors");
 const axios = require("axios");
 
@@ -10,10 +11,12 @@ const axios = require("axios");
 dotenv.config({ path: ".env.local" });
 
 const app = express();
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(express.json()); //parse incoming json request
 app.use(cookieParser()); //parse incoming cookie
 
@@ -26,10 +29,12 @@ app.get("/api/catfacts", async (req, res) => {
     res.status(500).json({ error: "Error fetching cat facts" });
   }
 });
-// const jwt = require("jsonwebtoken");
-// console.log("jwt=" + jwt);
-const PORT = process.env.PORT || 8000;
+
+// Add your routes
 app.use("/api/user", userRouter);
+app.use("/api/friends", friendRoutes); 
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   connectDB();
