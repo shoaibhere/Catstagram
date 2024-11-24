@@ -1,39 +1,58 @@
-// SideNav.js
 import React from "react";
 import { Link } from "react-router-dom";
+import { Users, Bookmark, MessageCircle } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const SideNav = ({ user }) => {
   return (
-    <div className="bg-black text-white w-64 pl-1 py-4 space-y-6 h-screen">
-      {/* Profile section */}
+    <div className="bg-black text-white h-screen pt-8 flex flex-col items-center overflow-hidden">
       <Link to={`/profile?id=${user._id}`}>
-        <div className="flex flex-col items-center mb-6 gap-2">
+        <div className="flex flex-col items-center mb-8">
           <img
             src="https://via.placeholder.com/50"
             alt="Profile"
             className="w-16 h-16 rounded-full mb-2"
           />
-          <h3 className="text-lg font-semibold">{user.name}</h3>{" "}
-          {/* Display the name here */}
+          <h3 className="text-lg font-semibold hidden md:block">{user.name}</h3>
         </div>
       </Link>
+      <Link to={`/create-post?id=${user._id}`}>
+        <button className="relative w-12 md:w-44 bg-purple-600 text-white p-3 mb-6 rounded-full text-lg font-bold flex items-center justify-center gap-2 group overflow-hidden">
+          <span className="absolute w-0 h-full bg-purple-400 group-hover:w-full transition-all duration-500 left-0 top-0"></span>
+          <span className="absolute w-0 h-full bg-purple-500 group-hover:w-full transition-all duration-700 left-0 top-0"></span>
+          <span className="absolute w-0 h-full bg-purple-300 group-hover:w-full transition-all duration-1000 left-0 top-0"></span>
+          <FontAwesomeIcon
+            icon={faPlus}
+            className="text-lg relative z-10 group-hover:text-purple-800 transition-colors duration-500"
+          />
+          <span className="relative z-10 group-hover:text-purple-800 transition-colors duration-500 hidden md:block">
+            Create Post
+          </span>
+        </button>
+      </Link>
+      <div className="flex flex-col items-center space-y-4 w-full">
+        <Link to={`/friends`}>
+          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
+            <Users className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />{" "}
+            <span className="hidden md:block text-white">Friends</span>{" "}
+          </button>
+        </Link>
 
-      {/* Buttons */}
-      <Link to={`/friends`}>
-        <button className="bg-black hover:bg-gray-600 text-white w-full text-center rounded-l-full px-4 py-3 mb-2">
-          Friends
-        </button>
-      </Link>
-      <Link to={`/saved`}>
-        <button className="bg-black hover:bg-gray-600 text-white w-full text-center rounded-l-full px-4 py-3 mb-2">
-          Saved
-        </button>
-      </Link>
-      <Link to={`/find-friends`}>
-        <button className="bg-black hover:bg-gray-600 text-white w-full text-center rounded-l-full px-4 py-3 mb-2">
-          Find People
-        </button>
-      </Link>
+        <Link to={`/chat`}>
+          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
+            <MessageCircle className="w-10 h-10 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />{" "}
+            <span className="hidden md:block text-white">Chat</span>{" "}
+          </button>
+        </Link>
+
+        <Link to={`/saved`}>
+          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
+            <Bookmark className="w-10 h-10 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />{" "}
+            <span className="hidden md:block text-white">Saved</span>{" "}
+          </button>
+        </Link>
+      </div>
     </div>
   );
 };
