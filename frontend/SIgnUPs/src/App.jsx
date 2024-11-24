@@ -11,8 +11,10 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserProfile from "./pages/userProfile";
 import CreatePost from "./pages/createPost";
-import Friends from "./pages/Friends";
+import Friends from "./pages/FriendsList";
+import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Friends page
 
+// Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
@@ -26,6 +28,8 @@ const ProtectedRoute = ({ children }) => {
 
   return children;
 };
+
+// Redirect Authenticated Users away from login/signup if they are already logged in
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
@@ -71,6 +75,7 @@ function App() {
         />
 
         <Routes>
+          {/* Protected Home Route */}
           <Route
             path="/"
             element={
@@ -79,6 +84,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Signup and Login Routes */}
           <Route
             path="/signup"
             element={
@@ -95,7 +102,11 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
+
+          {/* Email Verification */}
           <Route path="/verify-email" element={<EmailVerificationPage />} />
+
+          {/* Password Reset Routes */}
           <Route
             path="/forgot-password"
             element={
@@ -104,7 +115,6 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-
           <Route
             path="/reset-password/:token"
             element={
@@ -113,10 +123,28 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-          <Route path="/profile" element={<UserProfile></UserProfile>} />
-          <Route path="/create-post" element={<CreatePost />} />
-          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
+          {/* Profile Page */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Create Post Page */}
+          <Route
+            path="/create-post"
+            element={
+              <ProtectedRoute>
+                <CreatePost />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Friends Page */}
           <Route
             path="/friends"
             element={
@@ -125,6 +153,19 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Explore Friends Page */}
+          <Route
+            path="/explore-friends"
+            element={
+              <ProtectedRoute>
+                <ExploreFriends />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Default Route */}
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         </Routes>
       </div>
     </>
