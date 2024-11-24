@@ -1,41 +1,61 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
-import axios from "axios";
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Cropper from 'react-cropper';
+import 'cropperjs/dist/cropper.css';
 
 const CreatePostForm = ({ user }) => {
   const [image, setImage] = useState(null);
   const [caption, setCaption] = useState("");
-  const navigate = useNavigate(); // Initialize navigate function
+  const [croppedImage, setCroppedImage] = useState(null);
+  const [isImageCropped, setIsImageCropped] = useState(false); // Track if the image is cropped
+  const cropperRef = useRef(null); // Use useRef to store the cropper reference
+  const navigate = useNavigate();
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    setImage(URL.createObjectURL(file)); // Display the image preview
+    setIsImageCropped(false); // Reset crop status when a new image is selected
+    setCroppedImage(null); // Reset cropped image
+  };
+
+  const handleCrop = () => {
+    if (cropperRef.current) {
+      const cropper = cropperRef.current.cropper; // Access the cropper instance
+      const croppedData = cropper.getCroppedCanvas().toDataURL(); // Get the cropped image as a data URL
+      setCroppedImage(croppedData); // Store the cropped image
+      setIsImageCropped(true); // Mark the image as cropped
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (!image || !caption.trim()) {
+
+    if (!croppedImage || !caption.trim()) {
       alert("Please provide both an image and a caption.");
       return;
     }
-  
-    // Create a FormData object to handle the file and text data
+
+    // Convert the base64 cropped image to a File object
+    const blob = await fetch(croppedImage).then(res => res.blob());
+    const file = new File([blob], "cropped-image.png", { type: 'image/png' });
+
     const formData = new FormData();
-    formData.append("profileImage", image); // Must match the field name expected in the backend
+    formData.append("profileImage", file);
     formData.append("caption", caption);
-    formData.append("userId", user._id); // Add user ID to the request
-  
+    formData.append("userId", user._id);
+
     try {
       const response = await axios.post("http://localhost:8000/api/posts", formData, {
         headers: {
-          "Content-Type": "multipart/form-data", // Necessary for file uploads
+          "Content-Type": "multipart/form-data",
         },
       });
-  
+
       if (response.data.success) {
         alert("Post created successfully!");
-        navigate("/"); // Redirect after successful post creation
+        navigate("/");
       } else {
         alert("Failed to create post: " + response.data.message);
       }
@@ -44,7 +64,6 @@ const CreatePostForm = ({ user }) => {
       alert("An error occurred while creating the post.");
     }
   };
-  
 
   return (
     <motion.div
@@ -88,20 +107,84 @@ const CreatePostForm = ({ user }) => {
                 className="w-full bg-transparent text-white placeholder-gray-400 focus:outline-none"
               />
             </div>
-            {image && (
-              <div className="mt-4 text-white">
-                <p>Selected Image: {image.name}</p>
+
+            {image && !isImageCropped && (
+              <div className="mt-4">
+                <Cropper
+                  src={image}
+                  style={{ width: '100%', height: 'auto' }}
+                  initialAspectRatio={1}
+                  aspectRatio={1}
+                  preview=".img-preview"
+                  guides={false}
+                  ref={cropperRef} // Assign the ref here
+                />
+                <button
+                  type="button"
+                  onClick={handleCrop}
+                  className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md"
+                >
+                  Crop Image
+                </button>
               </div>
             )}
           </div>
 
+          {caption && croppedImage && (
+            <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-6 max-w-xl mx-auto">
+              <div className="flex items-center mb-4">
+                <img
+                  src={user.profileImage || 'https://via.placeholder.com/50'}
+                  alt="profile"
+                  className="w-10 h-10 rounded-full mr-3"
+                />
+                <div>
+                  <h2 className="text-md font-semibold">{user.name || 'User Name'}</h2>
+                  <p className="text-sm text-gray-400">{'Just Now'}</p>
+                </div>
+              </div>
+
+              {/* Post Image */}
+              <div className="mb-4">
+                <img
+                  src={croppedImage}
+                  alt="post"
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              </div>
+
+              {/* Caption */}
+              <p className="text-sm text-white mb-4">{caption || 'This is a caption for the post.'}</p>
+
+              {/* Like & Comment Section */}
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <button className="text-xl text-gray-500 hover:text-red-500 mr-4">
+                    {/* Add heart icon here */}
+                  </button>
+                  <span className="text-gray-400">0 Likes</span>
+                </div>
+                <div className="flex items-center">
+                  <button className="text-xl text-gray-500 hover:text-blue-500 mr-4">
+                    {/* Add comment icon here */}
+                  </button>
+                  <span className="text-gray-400">0 Comments</span>
+                </div>
+                <button className="text-xl text-gray-500 hover:text-green-500">
+                  {/* Add save icon here */}
+                </button>
+              </div>
+            </div>
+          )}
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
+            className={`w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 ${!isImageCropped || !caption ? 'opacity-50 cursor-not-allowed' : ''}`}
             type="submit"
+            disabled={!isImageCropped || !caption} // Disable the button if image is not cropped or caption is empty
           >
-            Create Post
+            {isImageCropped ? 'Create Post' : 'Crop Image and Post'}
           </motion.button>
         </form>
       </div>
