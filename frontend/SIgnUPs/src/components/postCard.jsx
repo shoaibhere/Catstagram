@@ -1,17 +1,23 @@
 import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faSave, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { User } from "lucide-react";
 import { format } from 'date-fns';
 
 const PostCard = ({ post }) => {
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-4 max-w-md mx-auto">
       <div className="flex items-center mb-3">
-        <img
-          src={post.user.profile || 'https://via.placeholder.com/50'}
-          alt="profile"
-          className="w-10 h-10 rounded-full mr-3"
-        />
+      {post.user.profileImage ? (
+            <img
+              src={post.user.profileImage}
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-purple-200 mr-3"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-purple-100 mr-3 flex items-center justify-center">
+              <User className="w-7 h-7 text-purple-600" />
+            </div>
+          )}
         <div>
           <h2 className="text-md font-semibold text-white">{post.user.name || 'User Name'}</h2>
           <p className="text-sm text-gray-400">{format(new Date(post.createdAt), 'dd-MMMM, yyyy, hh:mm a') || 'Just Now'}</p>

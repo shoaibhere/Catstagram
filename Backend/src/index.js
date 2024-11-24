@@ -4,7 +4,7 @@ const connectDB = require("./db/index.js");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/users.routes.js");
 const postRouter = require("./routes/posts.routes.js");
-const friendRoutes = require("./routes/friends.route.js");
+const friendRoutes = require("./routes/friends.routes.js");
 
 const cors = require("cors");
 const axios = require("axios");
