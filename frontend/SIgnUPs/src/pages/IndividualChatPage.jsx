@@ -1,122 +1,56 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom"; // For reading the friendId from the URL
-import { useAuthStore } from "../store/authStore"; // Auth store to get user info
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:8000"); // Adjust backend URL if necessary
 
 const IndividualChatPage = () => {
-  const [friends, setFriends] = useState([]);
-  const { user } = useAuthStore(); // Get the authenticated user
-  const [messages, setMessages] = useState([]); // State to store chat messages
-  const [newMessage, setNewMessage] = useState(""); // State for the new message input
-  const [loading, setLoading] = useState(false); // State for loading indicator
-  const messagesEndRef = useRef(null); // Ref to scroll to the newest message
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const { userId, friendId } = useParams(); // Get userId and friendId for 1-on-1 chat
 
-  const API_URL =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:8000"
-      : "/api/messages"; // Adjust as per your backend URL
-
-  // Fetch messages for the specific chat
   useEffect(() => {
-    fetchMessages();
-  }, [friends._id]);
+    // Join the chat room (use userId + friendId as room ID)
+    const room = `${userId}-${friendId}`;
+    socket.emit("join-room", room);
 
-  // Scroll to the latest message whenever the messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    // Listen for incoming messages
+    socket.on("receive-message", (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
 
-  const fetchMessages = async () => {
-    setLoading(true); // Set loading to true while fetching
-    try {
-      const response = await axios.get(`${API_URL}/chat/${friends._id}`, {
-        params: { userId: user._id }, // Fetch messages for the current user and the friend
-      });
-      setMessages(response.data); // Set messages from the response
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    } finally {
-      setLoading(false); // Set loading to false after fetch is complete
-    }
-  };
+    // Clean up on component unmount
+    return () => {
+      socket.off("receive-message");
+    };
+  }, [userId, friendId]);
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim()) return; // Don't send empty messages
+  const sendMessage = () => {
+    if (!newMessage.trim()) return;
 
-    try {
-      const response = await axios.post(`${API_URL}/send`, {
-        userId: user._id,
-        friendID: friends._id,
-        message: newMessage,
-      });
+    // Emit the message to the server
+    const room = `${userId}-${friendId}`;
+    socket.emit("message", { room, message: newMessage });
 
-      setMessages((prevMessages) => [...prevMessages, response.data]); // Add the new message to the messages state
-      setNewMessage(""); // Clear the input field
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+    // Clear the input after sending
+    setNewMessage("");
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white">
-      <div className="fixed top-0 left-0 right-0 z-20">
-        {/* You can reuse your Navbar or create a new one for this page */}
+    <div>
+      <div className="chat-window">
+        {messages.map((message, index) => (
+          <div key={index}>
+            <p>{message}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="flex h-full pt-16">
-        {/* Chat Window */}
-        <div className="flex flex-col flex-1 p-6 overflow-y-auto">
-          {/* Messages Section */}
-          <div className="flex-1 space-y-4 overflow-y-auto">
-            {loading ? (
-              <div className="flex justify-center items-center">
-                <div className="loader">Loading...</div>
-              </div>
-            ) : (
-              messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.senderId === user._id
-                      ? "justify-end"
-                      : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-xs p-4 rounded-lg text-sm ${
-                      message.senderId === user._id
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-700 text-white"
-                    }`}
-                  >
-                    {message.text}
-                  </div>
-                </div>
-              ))
-            )}
-
-            {/* Scroll to the latest message */}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Send Message Section */}
-          <div className="flex items-center mt-4 space-x-4">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <button
-              onClick={handleSendMessage}
-              className="p-3 bg-purple-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      </div>
+      <input
+        type="text"
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+      />
+      <button onClick={sendMessage}>Send</button>
     </div>
   );
 };

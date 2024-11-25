@@ -4,7 +4,7 @@ import { User } from "lucide-react"; // Importing Lucide User icon
 
 const ChatCard = ({ friend, lastMessage, hasUnreadMessages }) => {
   return (
-    <Link to={`/chat/${friend._id}`} key={friend._id}>
+    <Link to={`/chat/${friend._id}`} className="block" key={friend._id}>
       <div className="flex items-center space-x-4 p-4 rounded-lg hover:bg-purple-800 transition duration-300 cursor-pointer">
         {/* Profile picture or default User icon */}
         <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden flex items-center justify-center">
@@ -31,7 +31,7 @@ const ChatCard = ({ friend, lastMessage, hasUnreadMessages }) => {
 
         {/* Unread message indicator */}
         {hasUnreadMessages && (
-          <div className="text-blue-400 text-xl">●</div> // Show a dot for unread messages
+          <div className="text-blue-400 text-xl animate-pulse">●</div> // Optional: Add a pulsating effect for unread messages
         )}
       </div>
     </Link>

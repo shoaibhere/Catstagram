@@ -5,7 +5,10 @@ const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/users.routes.js");
 const postRouter = require("./routes/posts.routes.js");
 const friendRoutes = require("./routes/friends.routes.js");
-const chatRoutes = require("./routes/chat.routes.js"); // Import your chat routes
+const chatRoutes = require("./routes/chat.routes.js");
+const messageRoutes = require("./routes/message.routes.js");
+const Message = require("./models/message.model.js"); // Import Message model (assuming you have this)
+const { createServer } = require("http");
 
 const cors = require("cors");
 const axios = require("axios");
@@ -15,15 +18,7 @@ const socketIo = require("socket.io");
 dotenv.config({ path: ".env.local" });
 
 const app = express();
-const server = http.createServer(app); // Create an HTTP server to support socket.io
-const io = socketIo(server, {
-  cors: {
-    origin: process.env.CLIENT_URL, // Make sure your client can connect to the server
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
+const server = createServer(app);
 // Middlewares
 app.use(
   cors({
@@ -31,8 +26,8 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json()); // parse incoming JSON requests
-app.use(cookieParser()); // parse incoming cookies
+app.use(express.json()); // Parse incoming JSON requests
+app.use(cookieParser()); // Parse incoming cookies
 
 // Cat Facts API Route
 app.get("/api/catfacts", async (req, res) => {
@@ -49,40 +44,51 @@ app.get("/api/catfacts", async (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/friends", friendRoutes);
-app.use("/api/chat", chatRoutes); // Add the chat routes to handle message sending and history
+app.use("/api/chat", chatRoutes);
+app.use("/api/message", messageRoutes);
 
-// Socket.io for real-time chat functionality
-io.on("connection", (socket) => {
-  console.log("A user connected");
-
-  // Handle receiving chat messages
-  socket.on("chatMessage", async (messageContent) => {
-    const { sender, receiver, content } = messageContent;
-    try {
-      const newMessage = new Message({
-        sender,
-        receiver,
-        content,
-      });
-
-      await newMessage.save(); // Save the message to the database
-
-      // Emit the new message to the client
-      io.emit("message", newMessage);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  });
-
-  // Handle disconnection
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:8000",
+    // credentials: true,
+  },
 });
 
+io.on("connection", (socket) => {
+  console.log("Connected to socket.io");
+  socket.on("setup", (userData) => {
+    socket.join(userData._id);
+    socket.emit("connected");
+  });
+
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("User Joined Room: " + room);
+  });
+  socket.on("typing", (room) => socket.in(room).emit("typing"));
+  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
+  socket.on("new message", (newMessageRecieved) => {
+    var chat = newMessageRecieved.chat;
+
+    if (!chat.users) return console.log("chat.users not defined");
+
+    chat.users.forEach((user) => {
+      if (user._id == newMessageRecieved.sender._id) return;
+
+      socket.in(user._id).emit("message recieved", newMessageRecieved);
+    });
+  });
+
+  socket.off("setup", () => {
+    console.log("USER DISCONNECTED");
+    socket.leave(userData._id);
+  });
+});
 // Start the server and connect to the database
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
-  connectDB();
+  connectDB(); // Ensure your database connection happens when the server starts
   console.log(`Server is running on port ${PORT}`);
 });

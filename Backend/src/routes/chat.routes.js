@@ -1,12 +1,21 @@
 const express = require("express");
 const {
-  sendMessage,
-  getChatHistory,
+  accessChat,
+  fetchChats,
+  createGroupChat,
+  removeFromGroup,
+  addToGroup,
+  renameGroup,
 } = require("../controllers/chat.controller");
+const { protect } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
-router.post("/send", sendMessage);
-router.get("/history/:userId/:friendId", getChatHistory);
+router.route("/").post(protect, accessChat);
+router.route("/").get(protect, fetchChats);
+router.route("/group").post(protect, createGroupChat);
+router.route("/rename").put(protect, renameGroup);
+router.route("/groupremove").put(protect, removeFromGroup);
+router.route("/groupadd").put(protect, addToGroup);
 
 module.exports = router;
