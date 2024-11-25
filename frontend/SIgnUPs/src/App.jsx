@@ -13,6 +13,8 @@ import UserProfile from "./pages/userProfile";
 import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Friends page
+import ChatPage from "./pages/chatPage";
+import IndividualChatPage from "./pages/IndividualChatPage"; // Import the individual chat page component
 
 // Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
@@ -84,7 +86,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Signup and Login Routes */}
           <Route
             path="/signup"
@@ -102,10 +103,8 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-
           {/* Email Verification */}
           <Route path="/verify-email" element={<EmailVerificationPage />} />
-
           {/* Password Reset Routes */}
           <Route
             path="/forgot-password"
@@ -123,7 +122,6 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-
           {/* Profile Page */}
           <Route
             path="/profile"
@@ -133,7 +131,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Create Post Page */}
           <Route
             path="/create-post"
@@ -143,7 +140,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Friends Page */}
           <Route
             path="/friends"
@@ -153,7 +149,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Explore Friends Page */}
           <Route
             path="/explore-friends"
@@ -163,7 +158,26 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Chat Page */}
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          {/* Individual Chat with a Specific Friend */}
+          <Route
+            path="/chat/:friendId"
+            element={
+              <ProtectedRoute>
+                <IndividualChatPage />
+              </ProtectedRoute>
+            }
+          />
 
+          {/* Add this route for the chat */}
           {/* Default Route */}
           {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         </Routes>

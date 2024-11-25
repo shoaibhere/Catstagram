@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Cropper from 'react-cropper';
-import 'cropperjs/dist/cropper.css';
+import React, { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
 
 const CreatePostForm = ({ user }) => {
   const [image, setImage] = useState(null);
@@ -38,8 +38,8 @@ const CreatePostForm = ({ user }) => {
     }
 
     // Convert the base64 cropped image to a File object
-    const blob = await fetch(croppedImage).then(res => res.blob());
-    const file = new File([blob], "cropped-image.png", { type: 'image/png' });
+    const blob = await fetch(croppedImage).then((res) => res.blob());
+    const file = new File([blob], "cropped-image.png", { type: "image/png" });
 
     const formData = new FormData();
     formData.append("profileImage", file);
@@ -47,11 +47,15 @@ const CreatePostForm = ({ user }) => {
     formData.append("userId", user._id);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/posts",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.data.success) {
         alert("Post created successfully!");
@@ -112,7 +116,7 @@ const CreatePostForm = ({ user }) => {
               <div className="mt-4">
                 <Cropper
                   src={image}
-                  style={{ width: '100%', height: 'auto' }}
+                  style={{ width: "100%", height: "auto" }}
                   initialAspectRatio={1}
                   aspectRatio={1}
                   preview=".img-preview"
@@ -134,13 +138,15 @@ const CreatePostForm = ({ user }) => {
             <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-6 max-w-xl mx-auto">
               <div className="flex items-center mb-4">
                 <img
-                  src={user.profileImage || 'https://via.placeholder.com/50'}
+                  src={user.profileImage || "https://via.placeholder.com/50"}
                   alt="profile"
                   className="w-10 h-10 rounded-full mr-3"
                 />
                 <div>
-                  <h2 className="text-md font-semibold">{user.name || 'User Name'}</h2>
-                  <p className="text-sm text-gray-400">{'Just Now'}</p>
+                  <h2 className="text-md font-semibold">
+                    {user.name || "User Name"}
+                  </h2>
+                  <p className="text-sm text-gray-400">{"Just Now"}</p>
                 </div>
               </div>
 
@@ -154,7 +160,9 @@ const CreatePostForm = ({ user }) => {
               </div>
 
               {/* Caption */}
-              <p className="text-sm text-white mb-4">{caption || 'This is a caption for the post.'}</p>
+              <p className="text-sm text-white mb-4">
+                {caption || "This is a caption for the post."}
+              </p>
 
               {/* Like & Comment Section */}
               <div className="flex justify-between items-center">
@@ -180,11 +188,13 @@ const CreatePostForm = ({ user }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 ${!isImageCropped || !caption ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 ${
+              !isImageCropped || !caption ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             type="submit"
             disabled={!isImageCropped || !caption} // Disable the button if image is not cropped or caption is empty
           >
-            {isImageCropped ? 'Create Post' : 'Crop Image and Post'}
+            {isImageCropped ? "Create Post" : "Crop Image and Post"}
           </motion.button>
         </form>
       </div>

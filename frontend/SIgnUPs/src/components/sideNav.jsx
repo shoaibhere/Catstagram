@@ -61,6 +61,7 @@ const SideNav = ({ user }) => {
         </Link>
 
         {/* Chat Button */}
+        {/* Chat Button */}
         <Link to={`/chat`}>
           <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
             <MessageCircle className="w-10 h-10 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />

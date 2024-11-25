@@ -9,7 +9,7 @@ const LoadingSpinner = () => {
         src={logo} // Your logo image
         alt="Loading Logo"
         className="w-16 h-16"
-        animate={{ scale: [2.5,2.45,2.5] }} // Scale animation: small -> big -> small
+        animate={{ scale: [2.5, 2.45, 2.5] }} // Scale animation: small -> big -> small
         transition={{
           duration: 1, // Animation duration
           repeat: Infinity, // Infinite repetition
