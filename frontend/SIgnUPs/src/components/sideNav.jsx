@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Users, Bookmark, MessageCircle, Compass } from "lucide-react"; // Icons
+import { Users,User, Bookmark, MessageCircle, Compass } from "lucide-react"; // Icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,12 +9,17 @@ const SideNav = ({ user }) => {
     <div className="bg-black text-white h-screen pt-8 flex flex-col items-center overflow-hidden">
       {/* Profile Section */}
       <Link to={`/profile?id=${user._id}`}>
-        <div className="flex flex-col items-center mb-8">
-          <img
-            src="https://via.placeholder.com/50"
-            alt="Profile"
-            className="w-16 h-16 rounded-full mb-2"
-          />
+        <div className="flex flex-col items-center content-center gap-2 mb-8">
+        {user.profileImage ? (
+            <img
+              src={user.profileImage}
+              className="w-20 h-20 rounded-full object-cover ring-2 ring-purple-200"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center">
+              <User className="w-10 h-10 text-purple-600" />
+            </div>
+          )}
           <h3 className="text-lg font-semibold hidden md:block">{user.name}</h3>
         </div>
       </Link>
