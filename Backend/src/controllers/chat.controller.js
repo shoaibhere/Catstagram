@@ -1,7 +1,7 @@
 const Message = require("../models/message.model");
-const User = require("../models/users.model"); // Import the User model
+const User = require("../models/users.model");
 
-// Create a new message
+// Send a new message
 exports.sendMessage = async (req, res) => {
   const { sender, receiver, content } = req.body;
 
@@ -13,7 +13,7 @@ exports.sendMessage = async (req, res) => {
     });
 
     await newMessage.save();
-    return res.status(201).json(newMessage); // Respond with the created message
+    res.status(201).json(newMessage);
   } catch (error) {
     console.error("Error sending message:", error.message);
     res.status(500).send("Server error");
@@ -22,27 +22,22 @@ exports.sendMessage = async (req, res) => {
 
 // Get chat history between two users
 exports.getChatHistory = async (req, res) => {
-  const { user_id, friend_id } = req.params; // userId and friendId are passed in the URL params
+  const { userId, friendId } = req.params;
 
   try {
-    // Fetch messages between the two users
     const messages = await Message.find({
       $or: [
-        { sender: user_id, receiver: friend._id },
-        { sender: friend_id, receiver: user._id },
+        { sender: userId, receiver: friendId },
+        { sender: friendId, receiver: userId },
       ],
-    }).sort({ timestamp: 1 }); // Sort by timestamp to maintain conversation order
+    }).sort({ timestamp: 1 });
 
-    // Fetch the user document using _id to get the friends list
-    const user = await User.findById(user._id); // Using _id as per MongoDB's default
+    const user = await User.findById(userId);
+    const friends = user?.friends || [];
 
-    // Check if the user has friends, and extract their friend data
-    const friends = user ? user.friends : [];
-
-    // Respond with both chat history and the friends list
-    return res.status(200).json({ messages, friends });
+    res.status(200).json({ messages, friends });
   } catch (error) {
-    console.error("Error fetching chat history:", error);
+    console.error("Error fetching chat history:", error.message);
     res.status(500).send("Server error");
   }
 };

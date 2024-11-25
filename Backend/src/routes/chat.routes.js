@@ -1,14 +1,12 @@
 const express = require("express");
-const router = express.Router();
 const {
   sendMessage,
   getChatHistory,
 } = require("../controllers/chat.controller");
 
-// POST route for sending a new message
-router.post("/send", sendMessage);
+const router = express.Router();
 
-// GET route for fetching chat history between two users
+router.post("/send", sendMessage);
 router.get("/history/:userId/:friendId", getChatHistory);
 
 module.exports = router;
