@@ -1,11 +1,13 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chat.model");
-const User = require("../models/users.model");
+const { User } = require("../models/users.model");
 
 //@description     Create or fetch One to One Chat
 //@route           POST /api/chat/
 //@access          Protected
 const accessChat = asyncHandler(async (req, res) => {
+  console.log("Request user:", req.user); // Log to ensure user is available
+
   const { userId } = req.body;
 
   if (!userId) {
@@ -13,6 +15,7 @@ const accessChat = asyncHandler(async (req, res) => {
     return res.sendStatus(400);
   }
 
+  // Find if a chat already exists between the authenticated user and the requested user
   var isChat = await Chat.find({
     isGroupChat: false,
     $and: [
@@ -23,14 +26,10 @@ const accessChat = asyncHandler(async (req, res) => {
     .populate("users", "-password")
     .populate("latestMessage");
 
-  isChat = await User.populate(isChat, {
-    path: "latestMessage.sender",
-    select: "name pic email",
-  });
-
   if (isChat.length > 0) {
     res.send(isChat[0]);
   } else {
+    // Create a new chat if none exists
     var chatData = {
       chatName: "sender",
       isGroupChat: false,
@@ -38,12 +37,21 @@ const accessChat = asyncHandler(async (req, res) => {
     };
 
     try {
+      // Create the chat in the database
       const createdChat = await Chat.create(chatData);
-      const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
-        "users",
-        "-password"
-      );
-      res.status(200).json(FullChat);
+
+      // Fetch the full chat and populate user information
+      const fullChat = await Chat.findOne({ _id: createdChat._id })
+        .populate("users", "-password")
+        .populate("latestMessage");
+
+      // Fetch the full user data for the sender
+      const sender = await User.findOne(req.user._id).select("name pic email"); // Add any fields you want to include in the response
+
+      // Manually populate the sender info in the latest message
+      fullChat.latestMessage.sender = sender;
+
+      res.status(200).json(fullChat); // Send the populated chat object
     } catch (error) {
       res.status(400);
       throw new Error(error.message);
