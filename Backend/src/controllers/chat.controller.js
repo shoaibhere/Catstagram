@@ -46,7 +46,7 @@ const accessChat = asyncHandler(async (req, res) => {
         .populate("latestMessage");
 
       // Fetch the full user data for the sender
-      const sender = await User.findOne(req.user._id).select("name pic email"); // Add any fields you want to include in the response
+      const sender = await User.findById(req.user._id).select("name pic email"); // Add any fields you want to include in the response
 
       // Manually populate the sender info in the latest message
       fullChat.latestMessage.sender = sender;
