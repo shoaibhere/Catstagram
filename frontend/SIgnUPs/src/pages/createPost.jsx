@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import SideNav from "../components/SideNav";
+import SideNav from "../components/sideNav";
 import Navbar from "../components/Navbar";
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
