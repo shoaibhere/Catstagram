@@ -24,7 +24,7 @@ const Hero = () => {
             <Link
             to='/signup'
             >
-            <button className="bg-purple-600 text-white py-3 px-8 rounded-full text-lg hover:bg-purple-700 transition duration-300 transform hover:scale-105 animate-bounce">
+            <button className="bg-purple-600 text-white py-3 px-8 rounded-full text-lg hover:bg-purple-700 transition duration-550 transform hover:scale-105 animate-bounce">
               Meow to Create Account
             </button>
             </Link>
