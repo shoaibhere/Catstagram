@@ -9,10 +9,11 @@ import { useAuthStore } from "./store/authStore";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import UserProfile from "./pages/userProfile";
+import Profile from "./pages/Profile";
 import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
-import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Friends page
+import ExploreFriends from "./pages/FriendsExplore";
+import Website from "./pages/website";
 
 // Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
@@ -89,9 +90,7 @@ function App() {
           <Route
             path="/signup"
             element={
-              <RedirectAuthenticatedUser>
                 <SignUpPage />
-              </RedirectAuthenticatedUser>
             }
           />
           <Route
@@ -100,6 +99,12 @@ function App() {
               <RedirectAuthenticatedUser>
                 <LoginPage />
               </RedirectAuthenticatedUser>
+            }
+          />
+          <Route
+            path="/website"
+            element={
+                <Website />
             }
           />
 
@@ -126,10 +131,10 @@ function App() {
 
           {/* Profile Page */}
           <Route
-            path="/profile"
+            path="/profile/:id"
             element={
               <ProtectedRoute>
-                <UserProfile />
+                <Profile />
               </ProtectedRoute>
             }
           />

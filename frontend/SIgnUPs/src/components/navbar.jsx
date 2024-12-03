@@ -40,13 +40,13 @@ const Navbar = () => {
                   Home
                 </Link>
 
-                <a
-                  href="/website"
+                <Link
+                  to="/website"
                   className="group flex items-center text-white bg-black hover:bg-gray-600 hover:text-white rounded-full px-3 py-2"
                 >
                   <Cat className="w-5 h-5 mr-1 group-hover:text-black" />
                   Website
-                </a>
+                </Link>
 
                 <a
                   href="/"

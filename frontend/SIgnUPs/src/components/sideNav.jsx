@@ -8,7 +8,7 @@ const SideNav = ({ user }) => {
   return (
     <div className="bg-black text-white h-screen pt-8 flex flex-col items-center overflow-hidden">
       {/* Profile Section */}
-      <Link to={`/profile?id=${user._id}`}>
+      <Link to={`/profile/${user._id}`}>
         <div className="flex flex-col items-center content-center gap-2 mb-8">
         {user.profileImage ? (
             <img

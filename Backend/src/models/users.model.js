@@ -15,6 +15,10 @@ const signupSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    bio: {
+      type: String,
+      required: false,
+    },
     lastLogin: {
       type: Date,
       default: Date.now,
@@ -42,7 +46,7 @@ const signupSchema = new mongoose.Schema(
     savedPosts: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",  // Reference to the Post collection (ensure you have this model defined)
+        ref: "Post", // Reference to the Post collection (ensure you have this model defined)
       },
     ],
   },
