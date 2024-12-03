@@ -44,6 +44,16 @@ export const useAuthStore = create((set) => ({
         email,
         password,
       });
+
+      // Save user data and token to local storage
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify({
+          token: response.data.token, // Assuming the response includes a token
+          user: response.data.user,
+        })
+      );
+
       set({
         isAuthenticated: true,
         user: response.data.user,
@@ -96,7 +106,9 @@ export const useAuthStore = create((set) => ({
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {
-      const response = await axios.get(`${API_URL}/check-auth`);
+      const response = await axios.get(`${API_URL}/check-auth`, {
+        withCredentials: true, // Send cookies with the request
+      });
       set({
         user: response.data.user,
         isAuthenticated: true,

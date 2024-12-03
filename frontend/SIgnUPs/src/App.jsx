@@ -14,23 +14,35 @@ import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Friends page
 import ChatPage from "./pages/chatPage";
-import IndividualChatPage from "./pages/IndividualChatPage"; // Import the individual chat page component
+import { ChatState, ChatProvider } from "./Context/ChatProvider";
 
-// Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { user, loading } = ChatState(); // Get user and loading state from context
+  const { isAuthenticated } = useAuthStore(); // Get authentication state from store
 
+  // If user is not authenticated, redirect to the login page
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!user.isVerified) {
+  // If user exists but is not verified, redirect to email verification
+  if (user && !user.isVerified) {
     return <Navigate to="/verify-email" replace />;
   }
 
+  // If user data is still loading, show a loading message
+  if (loading) {
+    return <div>Loading user data...</div>;
+  }
+
+  // If user data is not available, redirect to login
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Render children if all conditions are met
   return children;
 };
-
 // Redirect Authenticated Users away from login/signup if they are already logged in
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -162,18 +174,11 @@ function App() {
           <Route
             path="/chat"
             element={
-              <ProtectedRoute>
-                <ChatPage />
-              </ProtectedRoute>
-            }
-          />
-          {/* Individual Chat with a Specific Friend */}
-          <Route
-            path="/chat/:friendId"
-            element={
-              <ProtectedRoute>
-                <IndividualChatPage />
-              </ProtectedRoute>
+              <ChatProvider>
+                <ProtectedRoute>
+                  <ChatPage />
+                </ProtectedRoute>
+              </ChatProvider>
             }
           />
 
