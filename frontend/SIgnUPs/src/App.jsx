@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore";
+import Website from "./pages/website";
 
 // Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
@@ -89,9 +90,7 @@ function App() {
           <Route
             path="/signup"
             element={
-              <RedirectAuthenticatedUser>
                 <SignUpPage />
-              </RedirectAuthenticatedUser>
             }
           />
           <Route
@@ -100,6 +99,12 @@ function App() {
               <RedirectAuthenticatedUser>
                 <LoginPage />
               </RedirectAuthenticatedUser>
+            }
+          />
+          <Route
+            path="/website"
+            element={
+                <Website />
             }
           />
 

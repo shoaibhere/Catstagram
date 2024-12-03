@@ -116,7 +116,7 @@ export default function Profile() {
       <div className="fixed left-0 top-16 bottom-0 w-1/5 bg-black p-4 z-10">
         <SideNav user={user} />
       </div>
-      <div className="fixed right-0 top-16 bottom-0 w-1/5 bg-black p-4 z-10">
+      <div className="fixed right-7 top-16 h-full bottom-0 w-1/5 p-4 bg-gray-800 z-10">
         <Factsbar />
       </div>
 
