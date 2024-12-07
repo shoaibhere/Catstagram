@@ -65,7 +65,7 @@ const UserPosts = ({ userId }) => {
 
   if (loading && page === 1) {
     return (
-      <div className="flex justify-center items-center py-10">
+      <div className="flex justify-center items-center py-10 ">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
       </div>
     );
@@ -76,7 +76,7 @@ const UserPosts = ({ userId }) => {
   }
 
   return (
-    <div className="mt-8 bg-gray-800 rounded-lg p-6">
+    <div className="mt-8 bg-gray-800 rounded-lg p-6 mx-[150px]">
       <h2 className="text-2xl font-bold text-white mb-6">User Posts</h2>
       {posts.length === 0 ? (
         <div className="text-center text-gray-400 py-10">No posts yet</div>
