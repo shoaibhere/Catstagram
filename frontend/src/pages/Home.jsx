@@ -23,9 +23,11 @@ const Home = () => {
   return (
     <Layout>
       <div className="mt-8">
-        {posts.map((post) => (
-          <PostCard key={post._id} post={post} />
-        ))}
+        {posts
+          .filter((post) => post.user) // Only render posts with a user
+          .map((post) => (
+            <PostCard key={post._id} post={post} />
+          ))}
       </div>
     </Layout>
   );

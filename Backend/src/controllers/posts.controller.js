@@ -56,25 +56,26 @@ const likePost = async (req, res) => {
       return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    // If the user already liked the post, do nothing
-    if (post.likes.includes(userId)) {
-      post.likes = post.likes.filter((like) => like.toString() !== userId.toString());
-    }
-    else{
+    const alreadyLiked = post.likes.includes(userId);
+    if (alreadyLiked) {
+      post.likes.pull(userId);  // Mongoose method to remove an item from the array
+    } else {
       post.likes.push(userId);
     }
+
     await post.save();
 
     res.status(200).json({
       success: true,
-      message: "Post liked successfully",
+      message: alreadyLiked ? "Like removed" : "Liked successfully",
       post,
     });
   } catch (error) {
     console.error("Error in likePost:", error);
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: "Failed to like post", error: error.toString() });
   }
 };
+
 
 // Comment on a post
 const addComment = async (req, res) => {
