@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import ChatLoading from "../ChatLoading";
+import ChatLoading from "../chat/ChatLoading";
 import ProfileModal from "./ProfileModal";
 import NotificationBadge from "react-notification-badge";
 import { Effect } from "react-notification-badge";

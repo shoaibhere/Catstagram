@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { getSender, getSenderFull } from "../config/ChatLogic";
+import { getSender, getSenderFull } from "../../config/ChatLogic";
 import axios from "axios";
 import { ArrowLeftIcon } from "lucide-react"; // Importing Lucide icons
-import ProfileModal from "./misc/ProfileModal";
+import ProfileModal from "../misc/ProfileModal";
 import ScrollableChat from "./ScrollableChat";
 import Lottie from "react-lottie";
-import animationData from "../animations/typing.json";
+import animationData from "../../animations/typing.json";
 import io from "socket.io-client";
-import UpdateGroupChatModal from "./misc/UpdateGroupChatModal";
-import { ChatState } from "../Context/ChatProvider";
+import UpdateGroupChatModal from "../misc/UpdateGroupChatModal";
+import { ChatState } from "../../Context/ChatProvider";
 import { Dialog } from "@headlessui/react"; // Headless UI dialog for modals
 
 const ENDPOINT = "http://localhost:8000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment

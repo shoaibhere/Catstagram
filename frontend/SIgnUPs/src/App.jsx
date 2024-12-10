@@ -13,7 +13,7 @@ import UserProfile from "./pages/userProfile";
 import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Friends page
-import ChatPage from "./pages/chatPage";
+import ChatPage from "./pages/chat/ChatPage";
 import { ChatState, ChatProvider } from "./Context/ChatProvider";
 
 const ProtectedRoute = ({ children }) => {
@@ -31,9 +31,9 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // If user data is still loading, show a loading message
-  if (loading) {
-    return <div>Loading user data...</div>;
-  }
+  // if (loading) {
+  //   return <div>Loading user data...</div>;
+  // }
 
   // If user data is not available, redirect to login
   if (!user) {

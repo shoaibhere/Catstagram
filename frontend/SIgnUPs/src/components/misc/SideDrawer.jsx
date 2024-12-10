@@ -34,7 +34,7 @@ function SideDrawer() {
 
   const handleSearch = async () => {
     if (!search) {
-      setToastMessage("Please Enter something in search");
+      setToastMessage("Please enter something in search");
       setToastOpen(true);
       return;
     }
@@ -42,18 +42,13 @@ function SideDrawer() {
     try {
       setLoading(true);
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      // Cookies will automatically be sent, no need for Authorization header
+      const { data } = await axios.get(`/api/user?search=${search}`);
 
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
-      setToastMessage("Error Occured! Failed to Load the Search Results");
+      setToastMessage("Error occurred! Failed to load the search results");
       setToastOpen(true);
     }
   };
@@ -61,15 +56,13 @@ function SideDrawer() {
   const accessChat = async (userId) => {
     try {
       setLoadingChat(true);
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.post(`/api/chat`, { userId }, config);
 
-      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      // Cookies will automatically be sent, no need for Authorization header
+      const { data } = await axios.post(`/api/chat`, { userId });
+
+      if (!chats.find((c) => c._id === data._id)) {
+        setChats([data, ...chats]);
+      }
       setSelectedChat(data);
       setLoadingChat(false);
       onClose();

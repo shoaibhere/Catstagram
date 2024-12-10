@@ -8,7 +8,7 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [notification, setNotification] = useState([]);
   const [chats, setChats] = useState();
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ const ChatProvider = ({ children }) => {
       navigate("/"); // Redirect if no user info
     }
 
-    setLoading(false); // Stop loading after userInfo is set
+    // setLoading(false); // Stop loading after userInfo is set
   }, [navigate]);
 
   return (

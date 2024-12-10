@@ -1,8 +1,8 @@
 import React from "react";
-import { ChatState } from "../Context/ChatProvider";
-import SideDrawer from "../components/misc/SideDrawer";
-import MyChats from "../components/MyChats";
-import Chatbox from "../components/Chatbox";
+import { ChatState } from "../../Context/ChatProvider";
+import SideDrawer from "../../components/misc/SideDrawer";
+import MyChats from "../../../src/components/chat/MyChats";
+import Chatbox from "../../../src/components/chat/Chatbox";
 
 const ChatPage = () => {
   const { user, loading } = ChatState();

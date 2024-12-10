@@ -2,10 +2,10 @@ import { Dialog } from "@headlessui/react";
 import { useToast } from "react-toastify"; // You can use react-toastify for toast notifications
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { getSender } from "../config/ChatLogic";
-import ChatLoading from "./ChatLoading";
-import GroupChatModal from "./misc/GroupChatModal";
-import { ChatState } from "../Context/ChatProvider";
+import { getSender } from "../../config/ChatLogic";
+import ChatLoading from "../chat/ChatLoading";
+import GroupChatModal from "../misc/GroupChatModal";
+import { ChatState } from "../../Context/ChatProvider";
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
