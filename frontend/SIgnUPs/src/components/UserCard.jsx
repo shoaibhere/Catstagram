@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
@@ -6,24 +6,38 @@ import { User } from "lucide-react";
 const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [requestSent, setRequestSent] = useState(false); // Track if a friend request has been sent
 
   const API_URL =
     import.meta.env.MODE === "development"
       ? "http://localhost:8000"
       : "/api/friends";
 
-  const handleFriendAction = async () => {
+  // Check localStorage for previous request sent status
+  useEffect(() => {
+    const storedRequestStatus = localStorage.getItem(`requestSent-${user._id}`);
+    if (storedRequestStatus === "true") {
+      setRequestSent(true); // If a request was already sent, update the state
+    }
+  }, [user._id]);
+
+  const handleFriendRequest = async () => {
     try {
       setIsLoading(true);
-      if (isFriend) {
-        await axios.delete(`${API_URL}/api/friends/remove/${user._id}`);
-      } else {
-        await axios.post(`${API_URL}/api/friends/add/${user._id}`);
+      if (requestSent) {
+        return; // Prevent sending the request if it's already sent
       }
+
+      // Send friend request (replace with your actual endpoint)
+      await axios.post(`${API_URL}/api/friends/request/${user._id}`);
+
+      // Set state to reflect that the request has been sent
+      setRequestSent(true);
+      localStorage.setItem(`requestSent-${user._id}`, "true"); // Save the request status to localStorage
       onFriendUpdate();
     } catch (error) {
-      console.error("Error updating friend status:", error);
-      alert("Failed to update friend status. Please try again.");
+      console.error("Error sending friend request:", error);
+      alert("Failed to send friend request. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -61,15 +75,19 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
                 View Profile
               </button>
               <button
-                onClick={handleFriendAction}
+                onClick={handleFriendRequest}
                 className={`px-3 py-1.5 text-sm border rounded transition-colors duration-200 ${
-                  isFriend
-                    ? "border-red-500 text-red-500 hover:bg-red-50"
+                  requestSent
+                    ? "border-gray-500 text-gray-500 hover:bg-gray-50 cursor-not-allowed"
                     : "border-green-500 text-green-500 hover:bg-green-50"
                 }`}
-                disabled={isLoading}
+                disabled={isLoading || requestSent} // Disable button if request is sent
               >
-                {isLoading ? "..." : isFriend ? "Remove Friend" : "Add Friend"}
+                {isLoading
+                  ? "..."
+                  : requestSent
+                  ? "Request Sent"
+                  : "Send Friend Request"}
               </button>
             </div>
           </div>

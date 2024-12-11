@@ -1,6 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Users, Bookmark, MessageCircle, Compass } from "lucide-react"; // Icons
+import {
+  Users,
+  Bookmark,
+  MessageCircle,
+  Compass,
+  UserPlus,
+} from "lucide-react"; // Icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { User } from "lucide-react";
@@ -62,7 +68,7 @@ const SideNav = ({ user }) => {
         {/* Requests Button */}
         <Link to={`/friend-requests`}>
           <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
-            <Users className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
+            <UserPlus className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
             <span className="hidden md:block text-white">Requests</span>
           </button>
         </Link>

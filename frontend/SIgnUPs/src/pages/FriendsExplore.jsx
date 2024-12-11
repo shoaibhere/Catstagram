@@ -44,12 +44,19 @@ const FriendsExplore = () => {
         {/* Main Content */}
         <div className="w-[60%] ml-[20%] min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center">
           <div className="p-4">
-            <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-400 mb-10">
+            {/* Stylish Friends Explore Heading */}
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-teal-500 to-blue-500 drop-shadow-lg mb-10 text-center transition-all hover:scale-105 duration-300">
               Explore Friends
             </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {potentialFriends.map((friend) => (
-                <UserCard key={friend._id} user={friend} isFriend={false} />
+              {potentialFriends.map((user) => (
+                <UserCard
+                  key={user._id}
+                  user={user}
+                  isFriend={false}
+                  onFriendUpdate={fetchPotentialFriends}
+                />
               ))}
             </div>
           </div>
