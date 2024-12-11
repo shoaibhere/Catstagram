@@ -15,6 +15,7 @@ import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Friends page
 import ChatPage from "./pages/chat/ChatPage";
 import { ChatState, ChatProvider } from "./Context/ChatProvider";
+import Requests from "./pages/Requests";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = ChatState(); // Get user and loading state from context
@@ -167,6 +168,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <ExploreFriends />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/friend-requests"
+            element={
+              <ProtectedRoute>
+                <Requests />
               </ProtectedRoute>
             }
           />

@@ -9,6 +9,7 @@ const {
   removeFriend,
   getFriends,
   getPotentialFriends,
+  deleteSentFriendRequest,
 } = require("../controllers/friends.controller");
 
 // Send a friend request
@@ -31,5 +32,7 @@ router.get("/potential", verifyToken, getPotentialFriends);
 
 // Get pending friend requests for the current user
 router.get("/requests", verifyToken, getPendingFriendRequests);
+
+router.delete("/request/:id", verifyToken, deleteSentFriendRequest);
 
 module.exports = router;

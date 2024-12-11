@@ -162,6 +162,32 @@ const getPotentialFriends = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const deleteSentFriendRequest = async (req, res) => {
+  try {
+    const { id: requestId } = req.params; // Friend request ID from params
+    const userId = req.userId; // Authenticated user ID (sender)
+
+    // Find the friend request by its ID
+    const friendRequest = await FriendRequest.findById(requestId);
+    if (!friendRequest) {
+      return res.status(404).json({ message: "Friend request not found" });
+    }
+
+    // Check if the current user is the sender of the friend request
+    if (friendRequest.sentBy.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this request" });
+    }
+
+    // Delete the friend request
+    await FriendRequest.findByIdAndDelete(requestId);
+
+    res.status(200).json({ message: "Friend request deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   sendFriendRequest,
@@ -171,4 +197,5 @@ module.exports = {
   removeFriend,
   getFriends,
   getPotentialFriends,
+  deleteSentFriendRequest,
 };

@@ -8,7 +8,6 @@ import { useAuthStore } from "../store/authStore";
 
 const Friends = () => {
   const [friends, setFriends] = useState([]);
-  const [potentialFriends, setPotentialFriends] = useState([]);
   const [activeTab, setActiveTab] = useState("friends");
   const { user } = useAuthStore();
 
@@ -20,8 +19,6 @@ const Friends = () => {
   useEffect(() => {
     if (activeTab === "friends") {
       fetchFriends();
-    } else {
-      fetchPotentialFriends();
     }
   }, [activeTab]);
 
@@ -31,15 +28,6 @@ const Friends = () => {
       setFriends(response.data);
     } catch (error) {
       console.error("Error fetching friends:", error);
-    }
-  };
-
-  const fetchPotentialFriends = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/friends/potential`);
-      setPotentialFriends(response.data);
-    } catch (error) {
-      console.error("Error fetching potential friends:", error);
     }
   };
 
@@ -73,13 +61,13 @@ const Friends = () => {
               </button>
               <button
                 className={`px-6 py-2 rounded-md transition-colors duration-200 ${
-                  activeTab === "potential"
+                  activeTab === "requests"
                     ? "bg-purple-600 text-white"
                     : "bg-gray-700 hover:bg-gray-600"
                 }`}
-                onClick={() => setActiveTab("potential")}
+                onClick={() => setActiveTab("requests")}
               >
-                Find Friends
+                Friend Requests
               </button>
             </div>
           </div>
@@ -87,23 +75,13 @@ const Friends = () => {
           {/* Cards Grid */}
           <div className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {activeTab === "friends"
-                ? friends.map((friend) => (
-                    <UserCard
-                      key={friend._id}
-                      user={friend}
-                      isFriend={true}
-                      onFriendUpdate={fetchFriends}
-                    />
-                  ))
-                : potentialFriends.map((user) => (
-                    <UserCard
-                      key={user._id}
-                      user={user}
-                      isFriend={false}
-                      onFriendUpdate={fetchPotentialFriends}
-                    />
-                  ))}
+              {activeTab === "friends" ? (
+                friends.map((friend) => (
+                  <UserCard key={friend._id} user={friend} isFriend={true} />
+                ))
+              ) : (
+                <div>Click on the "Friend Requests" tab to manage requests</div>
+              )}
             </div>
           </div>
         </div>

@@ -5,14 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { User } from "lucide-react";
 
-
 const SideNav = ({ user }) => {
   return (
     <div className="bg-black text-white h-screen pt-8 flex flex-col items-center overflow-hidden">
       {/* Profile Section */}
       <Link to={`/profile?id=${user._id}`}>
         <div className="flex flex-col items-center content-center gap-2 mb-8">
-        {user.profileImage ? (
+          {user.profileImage ? (
             <img
               src={user.profileImage}
               className="w-20 h-20 rounded-full object-cover ring-2 ring-purple-200"
@@ -44,7 +43,7 @@ const SideNav = ({ user }) => {
 
       {/* Buttons Section */}
       <div className="flex flex-col items-center space-y-4 w-full">
-        {/* Find Friends Button */}
+        {/* Explore Friends Button */}
         <Link to={`/explore-friends`}>
           <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
             <Compass className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
@@ -52,7 +51,7 @@ const SideNav = ({ user }) => {
           </button>
         </Link>
 
-        {/* Friends Button */}
+        {/* My Friends Button */}
         <Link to={`/friends`}>
           <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
             <Users className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
@@ -60,7 +59,14 @@ const SideNav = ({ user }) => {
           </button>
         </Link>
 
-        {/* Chat Button */}
+        {/* Requests Button */}
+        <Link to={`/friend-requests`}>
+          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
+            <Users className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
+            <span className="hidden md:block text-white">Requests</span>
+          </button>
+        </Link>
+
         {/* Chat Button */}
         <Link to={`/chat`}>
           <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">

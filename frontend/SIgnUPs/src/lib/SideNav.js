@@ -21,10 +21,18 @@ const SideNav = ({ user, setActiveTab }) => {
         My Friends
       </button>
       <button
-        className="px-6 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700"
+        className="px-6 py-2 rounded-md mb-4 bg-purple-600 text-white hover:bg-purple-700"
         onClick={() => setActiveTab("potential")}
       >
         Find Friends
+      </button>
+
+      {/* Friend Requests Button */}
+      <button
+        className="px-6 py-2 rounded-md mb-4 bg-purple-600 text-white hover:bg-purple-700"
+        onClick={() => setActiveTab("requests")}
+      >
+        Friend Requests
       </button>
     </div>
   );
