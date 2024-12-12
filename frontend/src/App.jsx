@@ -1,12 +1,12 @@
 import { Route, Routes, Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useAuthStore } from "./store/authStore";
+import FloatingShape from "../src/components/floatingShape";
+import LoadingSpinner from "./components/LoadingSpinner";
 import Home from "./pages/Home";
 import SignUpPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
-import React, { useEffect } from "react";
-import FloatingShape from "../src/components/floatingShape";
-import { useAuthStore } from "./store/authStore";
-import LoadingSpinner from "./components/LoadingSpinner";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Profile from "./pages/Profile";
@@ -14,6 +14,7 @@ import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore";
 import Website from "./pages/website";
+import SavedPosts from "./components/SavedPosts";
 
 // Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
@@ -23,18 +24,18 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (!user.isVerified) {
+  if (!user || !user.isVerified) {
     return <Navigate to="/verify-email" replace />;
   }
 
   return children;
 };
 
-// Redirect Authenticated Users away from login/signup if they are already logged in
+// Redirect Authenticated Users away from login/signup if already logged in
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
-  if (isAuthenticated && user.isVerified) {
+  if (isAuthenticated && user && user.isVerified) {
     return <Navigate to="/" replace />;
   }
 
@@ -42,7 +43,7 @@ const RedirectAuthenticatedUser = ({ children }) => {
 };
 
 function App() {
-  const { isCheckingAuth, checkAuth } = useAuthStore();
+  const { isCheckingAuth, checkAuth, isAuthenticated, user } = useAuthStore();
 
   useEffect(() => {
     checkAuth(); // Perform authentication check
@@ -87,12 +88,7 @@ function App() {
           />
 
           {/* Signup and Login Routes */}
-          <Route
-            path="/signup"
-            element={
-                <SignUpPage />
-            }
-          />
+          <Route path="/signup" element={<SignUpPage />} />
           <Route
             path="/login"
             element={
@@ -101,12 +97,7 @@ function App() {
               </RedirectAuthenticatedUser>
             }
           />
-          <Route
-            path="/website"
-            element={
-                <Website />
-            }
-          />
+          <Route path="/website" element={<Website />} />
 
           {/* Email Verification */}
           <Route path="/verify-email" element={<EmailVerificationPage />} />
@@ -165,6 +156,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <ExploreFriends />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Saved Posts Page */}
+          <Route
+            path="/saved-posts"
+            element={
+              <ProtectedRoute>
+                <SavedPosts user={user} />
               </ProtectedRoute>
             }
           />

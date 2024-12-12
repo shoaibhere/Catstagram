@@ -1,14 +1,51 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faSave, faHeart } from "@fortawesome/free-solid-svg-icons";
+import {
+  faComment,
+  faSave,
+  faHeart,
+  faCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import { User } from "lucide-react";
 import { format } from "date-fns";
+import {
+  savePost,
+  unsavePost,
+  getSavedPosts,
+} from "../services/savedPosts.services";
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, user, onUnsave }) => {
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (user && user._id) {
+      const fetchSavedPosts = async () => {
+        const savedPosts = await getSavedPosts(user._id);
+        setIsSaved(savedPosts.some((savedPost) => savedPost._id === post._id));
+      };
+      fetchSavedPosts();
+    }
+  }, [user, post._id]);
+
+  const handleSavePost = async () => {
+    if (user && user._id) {
+      if (isSaved) {
+        await unsavePost(user._id, post._id);
+        setIsSaved(false);
+        if (onUnsave) {
+          onUnsave(post._id);
+        }
+      } else {
+        await savePost(user._id, post._id);
+        setIsSaved(true);
+      }
+    }
+  };
+  if (!post || !post.user) return null;
+
   return (
     <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-black rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 mb-4 max-w-xs mx-auto transform hover:scale-105 transition-transform duration-300">
       <div className="flex items-center mb-3">
-        {/* Profile Image */}
         {post.user.profileImage ? (
           <img
             src={post.user.profileImage}
@@ -20,7 +57,6 @@ const PostCard = ({ post }) => {
           </div>
         )}
 
-        {/* User Info */}
         <div>
           <h2 className="text-md font-semibold text-white shadow-md">
             {post.user.name || "User Name"}
@@ -32,7 +68,7 @@ const PostCard = ({ post }) => {
         </div>
       </div>
 
-      {/* Post Image with Smaller Centered Square Aspect Ratio */}
+      {/* Post Image */}
       <div className="mb-3 relative mx-auto w-full aspect-square max-w-[250px] max-h-[250px] overflow-hidden rounded-lg shadow-md">
         <img
           src={post.image || "https://via.placeholder.com/600x600"}
@@ -64,8 +100,13 @@ const PostCard = ({ post }) => {
           </span>
         </div>
 
-        <button className="text-xl text-gray-500 hover:text-green-500 transform hover:scale-110 transition-transform duration-200">
-          <FontAwesomeIcon icon={faSave} />
+        <button
+          className={`text-xl ${
+            isSaved ? "text-green-500" : "text-gray-500"
+          } transform hover:scale-110 transition-transform duration-200`}
+          onClick={handleSavePost}
+        >
+          <FontAwesomeIcon icon={isSaved ? faCheck : faSave} />
         </button>
       </div>
     </div>
