@@ -3,13 +3,13 @@ const mongoose = require("mongoose");
 const friendRequestSchema = new mongoose.Schema(
   {
     sentBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: mongoose.Schema.Types.ObjectId, // Use ObjectId
+      ref: "User", // Reference the User model
       required: true,
     },
     sentTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: mongoose.Schema.Types.ObjectId, // Use ObjectId
+      ref: "User", // Reference the User model
       required: true,
     },
     status: {

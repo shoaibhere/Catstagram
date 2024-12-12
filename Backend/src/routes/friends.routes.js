@@ -10,6 +10,7 @@ const {
   getFriends,
   getPotentialFriends,
   deleteSentFriendRequest,
+  getSentFriendRequests,
 } = require("../controllers/friends.controller");
 
 // Send a friend request
@@ -31,7 +32,9 @@ router.get("/list", verifyToken, getFriends);
 router.get("/potential", verifyToken, getPotentialFriends);
 
 // Get pending friend requests for the current user
-router.get("/requests", verifyToken, getPendingFriendRequests);
+router.get("/requests/pending", verifyToken, getPendingFriendRequests);
+
+router.get("/requests/sent", verifyToken, getSentFriendRequests);
 
 router.delete("/request/:id", verifyToken, deleteSentFriendRequest);
 

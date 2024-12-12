@@ -9,11 +9,13 @@ const sendFriendRequest = async (req, res) => {
 
     // Check if a request already exists or if they are already friends
     const existingRequest = await FriendRequest.findOne({
-      sentBy: userId,
-      sentTo: friendId,
+      "sentBy._id": userId,
+      "sentTo._id": friendId,
     });
 
     const user = await User.findById(userId);
+    const friend = await User.findById(friendId); // Get the friend details
+
     if (user.friends.includes(friendId)) {
       return res.status(400).json({ message: "Already friends" });
     }
@@ -22,10 +24,10 @@ const sendFriendRequest = async (req, res) => {
       return res.status(400).json({ message: "Friend request already sent" });
     }
 
-    // Create and save the friend request
+    // Create and save the friend request with the complete user objects
     const friendRequest = new FriendRequest({
-      sentBy: userId,
-      sentTo: friendId,
+      sentBy: user, // Store the entire user object
+      sentTo: friend, // Store the entire friend object
     });
     await friendRequest.save();
 
@@ -100,12 +102,29 @@ const getPendingFriendRequests = async (req, res) => {
     const userId = req.userId;
 
     // Find friend requests where the user is the recipient
-    const pendingRequests = await FriendRequest.find({
-      sentTo: userId,
-    }).populate("sentBy", "name email profileImage");
+    const pendingRequests = await FriendRequest.find({ sentTo: userId })
+      .populate("sentBy") // Populate the full `User` object for the sender
+      .populate("sentTo"); // Populate the full `User` object for the receiver
 
     res.status(200).json(pendingRequests);
   } catch (error) {
+    console.error("Error fetching pending requests:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getSentFriendRequests = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    // Find friend requests where the user is the recipient
+    const pendingRequests = await FriendRequest.find({ sentBy: userId })
+      .populate("sentBy") // Populate the full `User` object for the sender
+      .populate("sentTo"); // Populate the full `User` object for the receiver
+
+    res.status(200).json(pendingRequests);
+  } catch (error) {
+    console.error("Error fetching pending requests:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -198,4 +217,5 @@ module.exports = {
   getFriends,
   getPotentialFriends,
   deleteSentFriendRequest,
+  getSentFriendRequests,
 };

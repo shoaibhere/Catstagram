@@ -43,6 +43,23 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
     }
   };
 
+  const handleRemoveFriend = async () => {
+    try {
+      setIsLoading(true);
+
+      // Remove friend (replace with your actual endpoint)
+      await axios.delete(`${API_URL}/api/friends/remove/${user._id}`);
+
+      // Trigger parent update to reflect the changes
+      onFriendUpdate();
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      alert("Failed to remove friend. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border-l-2 border-purple-500 ml-2">
       <div className="p-4">
@@ -74,21 +91,32 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
               >
                 View Profile
               </button>
-              <button
-                onClick={handleFriendRequest}
-                className={`px-3 py-1.5 text-sm border rounded transition-colors duration-200 ${
-                  requestSent
-                    ? "border-gray-500 text-gray-500 hover:bg-gray-50 cursor-not-allowed"
-                    : "border-green-500 text-green-500 hover:bg-green-50"
-                }`}
-                disabled={isLoading || requestSent} // Disable button if request is sent
-              >
-                {isLoading
-                  ? "..."
-                  : requestSent
-                  ? "Request Sent"
-                  : "Send Friend Request"}
-              </button>
+
+              {isFriend ? (
+                <button
+                  onClick={handleRemoveFriend}
+                  className="px-3 py-1.5 text-sm border border-red-500 text-red-500 rounded transition-colors duration-200 hover:bg-red-50"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "..." : "Remove Friend"}
+                </button>
+              ) : (
+                <button
+                  onClick={handleFriendRequest}
+                  className={`px-3 py-1.5 text-sm border rounded transition-colors duration-200 ${
+                    requestSent
+                      ? "border-gray-500 text-gray-500 hover:bg-gray-50 cursor-not-allowed"
+                      : "border-green-500 text-green-500 hover:bg-green-50"
+                  }`}
+                  disabled={isLoading || requestSent} // Disable button if request is sent
+                >
+                  {isLoading
+                    ? "..."
+                    : requestSent
+                    ? "Request Sent"
+                    : "Send Friend Request"}
+                </button>
+              )}
             </div>
           </div>
         </div>
