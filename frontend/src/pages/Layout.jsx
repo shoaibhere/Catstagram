@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from "react";
+// src/layouts/Layout.js
+
+import React from "react";
 import SideNav from "../components/sideNav";
 import Navbar from "../components/Navbar";
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
-import CreatePostForm from "../components/createPostForm.jsx";
 
-
-const createPost = () => {
-  const { user, logout } = useAuthStore();
-
+const Layout = ({ children }) => {
+  const { user } = useAuthStore();
 
   return (
-    <div className="h-screen w-full flex flex-col text-white p-4">
+    <div className="h-screen w-full flex flex-col text-white">
       {/* Top Navbar (Fixed) */}
       <div className="fixed top-0 left-0 right-0 z-20">
         <Navbar />
@@ -24,11 +23,9 @@ const createPost = () => {
           <SideNav user={user} />
         </div>
 
-        {/* Main Content Area (Scrollable, filling remaining space) */}
+        {/* Main Content Area (Dynamic children) */}
         <div className="flex-grow ml-[20%] mr-[20%] p-4 overflow-y-auto">
-          <div className="flex justify-center h-full items-center">
-            <CreatePostForm user={user}/>
-          </div>
+          {children}
         </div>
 
         {/* Right Sidebar (Fixed on the Right Side) */}
@@ -40,4 +37,4 @@ const createPost = () => {
   );
 };
 
-export default createPost;
+export default Layout;
