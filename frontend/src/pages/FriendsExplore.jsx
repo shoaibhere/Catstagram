@@ -29,7 +29,6 @@ const FriendsExplore = () => {
   return (
     <Layout>
       <div className="p-4">
-        {/* Stylish Friends Explore Heading */}
         <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-teal-500 to-blue-500 drop-shadow-lg mb-10 text-center transition-all hover:scale-105 duration-300">
           Explore Friends
         </h2>
