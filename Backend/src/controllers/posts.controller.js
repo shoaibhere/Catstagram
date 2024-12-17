@@ -13,8 +13,8 @@ cloudinary.config({
 
 // Create a new post
 const createPost = async (req, res) => {
-  const { caption, profileImage } = req.body;
-  console.log(req.body);
+  const { caption } = req.body;
+  console.log(req.body);  
   const userId = req.userId;
   const imageUrl = req.file.path;// Assuming the user ID is available in the request after authentication
 

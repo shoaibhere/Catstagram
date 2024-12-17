@@ -1,31 +1,51 @@
-import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Cropper from 'react-cropper';
-import 'cropperjs/dist/cropper.css';
+import React, { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment, faSave, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { useAuthStore } from "../store/authStore";
 
-const CreatePostForm = ({ user }) => {
+const CreatePostForm = () => {
   const [image, setImage] = useState(null);
   const [caption, setCaption] = useState("");
   const [croppedImage, setCroppedImage] = useState(null);
-  const [isImageCropped, setIsImageCropped] = useState(false); // Track if the image is cropped
-  const cropperRef = useRef(null); // Use useRef to store the cropper reference
-  const navigate = useNavigate();
+  const [isImageCropped, setIsImageCropped] = useState(false);
+  const cropperRef = useRef(null);
+  const navigate = useNavigate();   
+  const { user } = useAuthStore(); 
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImage(URL.createObjectURL(file)); // Display the image preview
-    setIsImageCropped(false); // Reset crop status when a new image is selected
-    setCroppedImage(null); // Reset cropped image
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result);
+        setIsImageCropped(false);
+        setCroppedImage(null); // Clear previous cropped image
+      };
+      reader.onerror = () => alert("Failed to load image. Please try again.");
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleCrop = () => {
-    if (cropperRef.current) {
-      const cropper = cropperRef.current.cropper; // Access the cropper instance
-      const croppedData = cropper.getCroppedCanvas().toDataURL(); // Get the cropped image as a data URL
-      setCroppedImage(croppedData); // Store the cropped image
-      setIsImageCropped(true); // Mark the image as cropped
+    try {
+      if (cropperRef.current && cropperRef.current.cropper) {
+        const canvas = cropperRef.current.cropper.getCroppedCanvas();
+        if (!canvas) throw new Error("Cropping failed. Canvas is empty.");
+        const croppedData = canvas.toDataURL();
+        setCroppedImage(croppedData);
+        setIsImageCropped(true);
+      } else {
+        throw new Error("Cropper not initialized.");
+      }
+    } catch (err) {
+      console.error("Error cropping image:", err.message);
+      alert("Error cropping the image. Please try again.");
     }
   };
 
@@ -37,21 +57,21 @@ const CreatePostForm = ({ user }) => {
       return;
     }
 
-    // Convert the base64 cropped image to a File object
-    const blob = await fetch(croppedImage).then(res => res.blob());
-    const file = new File([blob], "cropped-image.png", { type: 'image/png' });
+    const blob = await fetch(croppedImage).then((res) => res.blob());
+    const file = new File([blob], "cropped-image.png", { type: "image/png" });
 
     const formData = new FormData();
     formData.append("profileImage", file);
     formData.append("caption", caption);
-    formData.append("userId", user._id);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/posts",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.data.success) {
         alert("Post created successfully!");
@@ -70,7 +90,7 @@ const CreatePostForm = ({ user }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden"
+      className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden mt-8"
     >
       <div className="p-8">
         <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
@@ -78,46 +98,41 @@ const CreatePostForm = ({ user }) => {
         </h2>
 
         <form encType="multipart/form-data" onSubmit={handleSubmit}>
+          {/* Caption Input */}
           <div className="mb-4">
             <label htmlFor="caption" className="block text-white mb-2">
               Insert Caption
             </label>
-            <div className="flex items-center border border-gray-400 rounded-md p-2">
-              <input
-                id="caption"
-                type="text"
-                placeholder="How are you feeling?"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                className="w-full bg-transparent text-white placeholder-gray-400 focus:outline-none"
-              />
-            </div>
+            <input
+              id="caption"
+              type="text"
+              placeholder="How are you feeling?"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              className="w-full p-2 border border-gray-400 rounded-md bg-transparent text-white placeholder-gray-400 focus:outline-none"
+            />
           </div>
 
+          {/* Image Upload */}
           <div className="mb-6">
             <label htmlFor="profileImage" className="block text-white mb-2">
               Insert Image
             </label>
-            <div className="flex items-center border border-gray-400 rounded-md p-2">
-              <input
-                id="profileImage"
-                type="file"
-                name="profileImage"
-                onChange={handleImageChange}
-                className="w-full bg-transparent text-white placeholder-gray-400 focus:outline-none"
-              />
-            </div>
-
+            <input
+              id="profileImage"
+              type="file"
+              onChange={handleImageChange}
+              className="w-full p-2 border border-gray-400 rounded-md bg-transparent text-white placeholder-gray-400 focus:outline-none"
+            />
             {image && !isImageCropped && (
               <div className="mt-4">
                 <Cropper
                   src={image}
-                  style={{ width: '100%', height: 'auto' }}
+                  style={{ width: "100%", height: "auto" }}
                   initialAspectRatio={1}
                   aspectRatio={1}
-                  preview=".img-preview"
                   guides={false}
-                  ref={cropperRef} // Assign the ref here
+                  ref={cropperRef}
                 />
                 <button
                   type="button"
@@ -134,17 +149,20 @@ const CreatePostForm = ({ user }) => {
             <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-6 max-w-xl mx-auto">
               <div className="flex items-center mb-4">
                 <img
-                  src={user.profileImage || 'https://via.placeholder.com/50'}
+                  src={
+                    user?.profileImage || "https://via.placeholder.com/50"
+                  }
                   alt="profile"
                   className="w-10 h-10 rounded-full mr-3"
                 />
                 <div>
-                  <h2 className="text-md font-semibold">{user.name || 'User Name'}</h2>
-                  <p className="text-sm text-gray-400">{'Just Now'}</p>
+                  <h2 className="text-md font-semibold">
+                    {user?.name || "User Name"}
+                  </h2>
+                  <p className="text-sm text-gray-400">{"Just Now"}</p>
                 </div>
               </div>
 
-              {/* Post Image */}
               <div className="mb-4">
                 <img
                   src={croppedImage}
@@ -153,26 +171,38 @@ const CreatePostForm = ({ user }) => {
                 />
               </div>
 
-              {/* Caption */}
-              <p className="text-sm text-white mb-4">{caption || 'This is a caption for the post.'}</p>
-
-              {/* Like & Comment Section */}
-              <div className="flex justify-between items-center">
+              <p className="text-sm text-white mb-4">{caption}</p>
+              {/* Like, Comment, Save Display */}
+              <div className="flex justify-between items-center text-white mt-4">
+                {" "}
                 <div className="flex items-center">
-                  <button className="text-xl text-gray-500 hover:text-red-500 mr-4">
-                    {/* Add heart icon here */}
-                  </button>
-                  <span className="text-gray-400">0 Likes</span>
-                </div>
+                  {" "}
+                  <FontAwesomeIcon
+                    icon={faHeart}
+                    className="text-red-500 mr-2"
+                  />{" "}
+                  <span className="text-gray-400 text-xs">
+                    1 Like
+                  </span>{" "}
+                </div>{" "}
                 <div className="flex items-center">
-                  <button className="text-xl text-gray-500 hover:text-blue-500 mr-4">
-                    {/* Add comment icon here */}
-                  </button>
-                  <span className="text-gray-400">0 Comments</span>
-                </div>
-                <button className="text-xl text-gray-500 hover:text-green-500">
-                  {/* Add save icon here */}
-                </button>
+                  {" "}
+                  <FontAwesomeIcon
+                    icon={faComment}
+                    className="text-blue-400 mr-2"
+                  />{" "}
+                  <span className="text-gray-400 text-xs">
+                    {" "}
+                    0 Comments
+                  </span>{" "}
+                </div>{" "}
+                <div className="flex items-center">
+                  {" "}
+                  <FontAwesomeIcon
+                    icon={faSave}
+                    className="text-green-400 mr-2"
+                  />{" "}
+                </div>{" "}
               </div>
             </div>
           )}
@@ -180,11 +210,15 @@ const CreatePostForm = ({ user }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 ${!isImageCropped || !caption ? 'opacity-50 cursor-not-allowed' : ''}`}
             type="submit"
-            disabled={!isImageCropped || !caption} // Disable the button if image is not cropped or caption is empty
+            className={`w-full py-3 px-4 bg-green-500 text-white font-bold rounded-lg ${
+              !isImageCropped || !caption.trim()
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+            disabled={!isImageCropped || !caption.trim()}
           >
-            {isImageCropped ? 'Create Post' : 'Crop Image and Post'}
+            Create Post
           </motion.button>
         </form>
       </div>

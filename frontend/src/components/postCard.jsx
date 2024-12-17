@@ -90,9 +90,12 @@ const PostCard = ({ post, user }) => {
             </div>
           )}
           <div>
+            <Link
+            to={`/profile/${post.user._id}`}>
             <h2 className="text-md font-semibold text-white shadow-md">
               {post.user.name || "User Name"}
             </h2>
+            </Link>
             <p className="text-xs text-gray-400">
               {format(new Date(post.createdAt), "dd MMMM, yyyy, hh:mm a")}
             </p>

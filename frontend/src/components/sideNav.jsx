@@ -25,7 +25,7 @@ const SideNav = ({ user }) => {
       </Link>
 
       {/* Create Post Button */}
-      <Link to={`/create-post?id=${user._id}`}>
+      <Link to={`/create-post`}>
         <button className="relative w-12 md:w-44 bg-purple-600 text-white p-3 mb-6 rounded-full text-lg font-bold flex items-center justify-center gap-2 group overflow-hidden">
           <span className="absolute w-0 h-full bg-purple-400 group-hover:w-full transition-all duration-500 left-0 top-0"></span>
           <span className="absolute w-0 h-full bg-purple-500 group-hover:w-full transition-all duration-700 left-0 top-0"></span>
