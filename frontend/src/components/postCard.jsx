@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 import {
   faComment,
   faSave,
@@ -109,13 +110,13 @@ const PostCard = ({ post, user }) => {
             </button>
             {showDropdown && (
               <div className="absolute top-8 right-0 w-24 bg-white shadow-lg rounded-lg z-10">
-                <button
-                  className="block px-3 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
-                  onClick={() => alert("Edit functionality coming soon!")}
+                <Link
+                to = {`/edit-post/${post._id}`}
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
                 >
                   <FontAwesomeIcon icon={faEdit} className="mr-2" />
                   Edit
-                </button>
+                </Link>
                 <button
                   className="block px-3 py-2 text-red-700 hover:bg-red-200 w-full text-left"
                   onClick={handleDeletePost}

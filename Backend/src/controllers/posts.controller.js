@@ -56,6 +56,38 @@ const deletePost = async (req,res) =>{
   }
 };
 
+const editPostget = async(req,res)=>{
+  try{
+    const post = await Post.findById(req.params.id).populate('user');
+    res.status(201).json({
+      success: true,
+      post,
+    });
+  }
+  catch(err){
+    console.error(err);
+    res.status(400).json({ success: false, message: err.message });
+  }
+}
+
+const editPost = async(req,res)=>{
+  try{
+    const post = await Post.findById(req.params.id);
+    if (req.file) {
+      post.image = req.file.path;
+    }
+    post.caption = req.body.caption;
+    await post.save();
+    res.status(201).json({
+      success: true,
+      message:"Post Updated Successfully",
+    });
+  }
+  catch(err){
+    console.error(err);
+    res.status(400).json({ success: false, message: err.message });
+  }
+}
 // Comment on a post
 const addComment = async (req, res) => {
   const { postId } = req.params;
@@ -96,4 +128,6 @@ module.exports = {
   createPost,
   addComment,
   deletePost,
+  editPostget,
+  editPost,
 };

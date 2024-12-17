@@ -15,6 +15,7 @@ import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore";
 import Website from "./pages/website";
 import SavedPosts from "./components/SavedPosts";
+import EditPost from "./pages/editPost";
 
 // Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
@@ -136,6 +137,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreatePost />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/edit-post/:id"
+            element={
+              <ProtectedRoute>
+                <EditPost />
               </ProtectedRoute>
             }
           />
