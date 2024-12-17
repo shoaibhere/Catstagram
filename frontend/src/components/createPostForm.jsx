@@ -197,12 +197,16 @@ const CreatePostForm = () => {
                   </span>{" "}
                 </div>{" "}
                 <div className="flex items-center">
+                {" "}
+                <FontAwesomeIcon
+                  icon={faBookmark}
+                  className="text-green-400 mr-2"
+                />{" "}
+                <span className="text-gray-400 text-xs">
                   {" "}
-                  <FontAwesomeIcon
-                    icon={faSave}
-                    className="text-green-400 mr-2"
-                  />{" "}
-                </div>{" "}
+                  Save
+                </span>{" "}
+              </div>{" "}
               </div>
             </div>
           )}

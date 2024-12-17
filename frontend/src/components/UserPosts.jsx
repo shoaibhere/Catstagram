@@ -92,7 +92,7 @@ const UserPosts = ({ userId }) => {
           }}
         >
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} user={user} style={{ width: "100%" }} />
+            <PostCard key={post.id} post={post} user={user} />
           ))}
         </div>
       )}

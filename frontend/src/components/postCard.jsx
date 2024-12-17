@@ -3,13 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import {
   faComment,
-  faSave,
   faHeart,
-  faCheck,
   faEllipsisV,
   faEdit,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark as farBookmark } from "@fortawesome/free-regular-svg-icons"; // Regular bookmark
+import { faBookmark as fasBookmark } from "@fortawesome/free-solid-svg-icons"; // Solid bookmark
 import { User } from "lucide-react";
 import { format } from "date-fns";
 import { savePost, unsavePost } from "../services/savedPosts.services";
@@ -75,7 +75,7 @@ const PostCard = ({ post, user }) => {
   if (!post || !post.user) return null;
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-black rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 mb-4 max-w-xs mx-auto transform hover:scale-105 transition-transform duration-300 relative">
+    <div className="w-[350px] bg-gradient-to-br from-gray-900 via-purple-900 to-black rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 mb-4 max-w-md mx-auto transform hover:scale-105 transition-transform duration-300 relative">
       {/* User Info and Post Meta */}
       <div className="flex items-center mb-3 justify-between">
         <div className="flex items-center">
@@ -83,6 +83,7 @@ const PostCard = ({ post, user }) => {
             <img
               src={post.user.profileImage}
               className="w-10 h-10 rounded-full object-cover ring-4 ring-purple-400 shadow-md mr-3"
+              alt="User Profile"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-purple-300 flex items-center justify-center ring-4 ring-purple-400 shadow-md mr-3">
@@ -90,11 +91,10 @@ const PostCard = ({ post, user }) => {
             </div>
           )}
           <div>
-            <Link
-            to={`/profile/${post.user._id}`}>
-            <h2 className="text-md font-semibold text-white shadow-md">
-              {post.user.name || "User Name"}
-            </h2>
+            <Link to={`/profile/${post.user._id}`}>
+              <h2 className="text-md font-semibold text-white shadow-md">
+                {post.user.name || "User Name"}
+              </h2>
             </Link>
             <p className="text-xs text-gray-400">
               {format(new Date(post.createdAt), "dd MMMM, yyyy, hh:mm a")}
@@ -114,8 +114,8 @@ const PostCard = ({ post, user }) => {
             {showDropdown && (
               <div className="absolute top-8 right-0 w-24 bg-white shadow-lg rounded-lg z-10">
                 <Link
-                to = {`/edit-post/${post._id}`}
-                className="block px-3 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
+                  to={`/edit-post/${post._id}`}
+                  className="block px-3 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
                 >
                   <FontAwesomeIcon icon={faEdit} className="mr-2" />
                   Edit
@@ -134,7 +134,7 @@ const PostCard = ({ post, user }) => {
       </div>
 
       {/* Post Image */}
-      <div className="mb-3 relative mx-auto w-full aspect-square max-w-[250px] max-h-[250px] overflow-hidden rounded-lg shadow-md">
+      <div className="mb-3 relative mx-auto w-full aspect-square max-w-full overflow-hidden rounded-lg shadow-md">
         <img
           src={post.image || "https://via.placeholder.com/600x600"}
           alt="post"
@@ -174,14 +174,17 @@ const PostCard = ({ post, user }) => {
           </span>
         </div>
 
-        <button
-          className={`text-xl ${
+        <div className="flex items-center">
+          <button className={`text-xl ${
             isSaved ? "text-green-500" : "text-gray-500"
-          } transform hover:scale-110 transition-transform duration-200`}
-          onClick={handleSavePost}
-        >
-          <FontAwesomeIcon icon={isSaved ? faCheck : faSave} />
-        </button>
+          }
+          text-gray-500 hover:text-blue-500 mr-3 transform hover:scale-110 transition-transform duration-200`} onClick={handleSavePost}>
+          <FontAwesomeIcon icon={isSaved ? fasBookmark : farBookmark} />
+          </button>
+          <span className="text-gray-400 text-xs">
+            {isSaved? "Saved" : "Save"}
+          </span>
+        </div>
       </div>
     </div>
   );
