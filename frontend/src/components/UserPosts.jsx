@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PostCard from "./postCard";
+import { useAuthStore } from "../store/authStore"; 
 
 const UserPosts = ({ userId }) => {
   const [posts, setPosts] = useState([]);
@@ -10,6 +11,8 @@ const UserPosts = ({ userId }) => {
   const [hasMore, setHasMore] = useState(true);
   const [totalPosts, setTotalPosts] = useState(0);
   const [userDetails, setUserDetails] = useState(null);
+    const { user } = useAuthStore(); 
+  
 
   useEffect(() => {
     const API_URL =
@@ -89,7 +92,7 @@ const UserPosts = ({ userId }) => {
           }}
         >
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} style={{ width: "100%" }} />
+            <PostCard key={post.id} post={post} user={user} style={{ width: "100%" }} />
           ))}
         </div>
       )}
