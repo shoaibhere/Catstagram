@@ -42,41 +42,6 @@ const createPost = async (req, res) => {
   }
 };
 
-
-
-// Like a post
-const likePost = async (req, res) => {
-  const { postId } = req.params;
-  const userId = req.userId; // User's ID from the JWT token
-
-  try {
-    const post = await Post.findById(postId);
-
-    if (!post) {
-      return res.status(404).json({ success: false, message: "Post not found" });
-    }
-
-    const alreadyLiked = post.likes.includes(userId);
-    if (alreadyLiked) {
-      post.likes.pull(userId);  // Mongoose method to remove an item from the array
-    } else {
-      post.likes.push(userId);
-    }
-
-    await post.save();
-
-    res.status(200).json({
-      success: true,
-      message: alreadyLiked ? "Like removed" : "Liked successfully",
-      post,
-    });
-  } catch (error) {
-    console.error("Error in likePost:", error);
-    res.status(400).json({ success: false, message: "Failed to like post", error: error.toString() });
-  }
-};
-
-
 // Comment on a post
 const addComment = async (req, res) => {
   const { postId } = req.params;
@@ -113,41 +78,7 @@ const addComment = async (req, res) => {
   }
 };
 
-// Save a post
-const savePost = async (req, res) => {
-  const { postId } = req.params;
-  const userId = req.userId;
-
-  try {
-    const post = await Post.findById(postId);
-
-    if (!post) {
-      return res.status(404).json({ success: false, message: "Post not found" });
-    }
-
-    // If the user has already saved the post, do nothing
-    if (post.savedBy.includes(userId)) {
-      post.savedBy = post.savedBy.filter((savedUser) => savedUser.toString() !== userId.toString());
-    }
-    else{
-      post.savedBy.push(userId);
-    }
-    await post.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Post saved successfully",
-      post,
-    });
-  } catch (error) {
-    console.error("Error in savePost:", error);
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-
 module.exports = {
   createPost,
-  likePost,
   addComment,
-  savePost,
 };

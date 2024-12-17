@@ -1,12 +1,12 @@
-// src/pages/Home.js
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "../pages/Layout";
 import PostCard from "../components/postCard";
+import { useAuthStore } from "../store/authStore"; 
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const { user } = useAuthStore(); 
 
   useEffect(() => {
     async function fetchPosts() {
@@ -23,11 +23,9 @@ const Home = () => {
   return (
     <Layout>
       <div className="mt-8">
-        {posts
-          .filter((post) => post.user) // Only render posts with a user
-          .map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
+        {posts.map((post) => (
+          <PostCard key={post._id} post={post} user={user} />
+        ))}
       </div>
     </Layout>
   );

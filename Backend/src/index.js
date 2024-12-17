@@ -6,6 +6,8 @@ const userRouter = require("./routes/users.routes.js");
 const postRouter = require("./routes/posts.routes.js");
 const friendRoutes = require("./routes/friends.routes.js");
 const profileRouter = require("./routes/profile.routes.js");
+const savedPostsRouter = require("./routes/savedPosts.routes");
+const likedPostsRouter = require("./routes/likedPosts.routes.js");
 
 const cors = require("cors");
 const axios = require("axios");
@@ -38,7 +40,9 @@ const PORT = process.env.PORT || 8000;
 app.use("/api/user", userRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/friends", friendRoutes);
-app.use("/api/profile", profileRouter); 
+app.use("/api/profile", profileRouter);
+app.use("/api/saved-posts", savedPostsRouter);
+app.use("/api/liked-posts", likedPostsRouter);
 
 app.listen(PORT, () => {
   connectDB();
