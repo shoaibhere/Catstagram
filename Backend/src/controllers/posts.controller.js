@@ -42,6 +42,20 @@ const createPost = async (req, res) => {
   }
 };
 
+const deletePost = async (req,res) =>{
+  try{
+    await Post.findByIdAndDelete(req.params.id);
+    res.status(201).json({
+      success: true,
+      message: "Post deleted successfully",
+    });
+  }
+  catch(err){
+    console.error(err);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 // Comment on a post
 const addComment = async (req, res) => {
   const { postId } = req.params;
@@ -81,4 +95,5 @@ const addComment = async (req, res) => {
 module.exports = {
   createPost,
   addComment,
+  deletePost,
 };
