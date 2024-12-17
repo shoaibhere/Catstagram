@@ -13,38 +13,56 @@ import {
   unsavePost,
   getSavedPosts,
 } from "../services/savedPosts.services";
+import {
+  likePost,
+  unlikePost,
+} from "../services/likedPosts.services";
 
-const PostCard = ({ post, user, onUnsave }) => {
+const PostCard = ({ post, user }) => {
   const [isSaved, setIsSaved] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.likes.length);
 
   useEffect(() => {
     if (user && user._id) {
-      const fetchSavedPosts = async () => {
-        const savedPosts = await getSavedPosts(user._id);
-        setIsSaved(savedPosts.some((savedPost) => savedPost._id === post._id));
-      };
-      fetchSavedPosts();
+      const saved = post.savedBy.some((savedId) => savedId.toString() === user._id.toString());
+      setIsSaved(saved);
+      const liked = post.likes.includes(user._id);
+      setIsLiked(liked);
     }
-  }, [user, post._id]);
+  }, [user, post._id, post.likes, post.savedBy]);
 
   const handleSavePost = async () => {
     if (user && user._id) {
       if (isSaved) {
         await unsavePost(user._id, post._id);
         setIsSaved(false);
-        if (onUnsave) {
-          onUnsave(post._id);
-        }
       } else {
         await savePost(user._id, post._id);
         setIsSaved(true);
       }
     }
   };
+
+  const handleLikePost = async () => {
+    if (user && user._id) {
+      if (isLiked) {
+        await unlikePost(user._id, post._id);
+        setIsLiked(false);
+        setLikeCount(prevCount => prevCount - 1);
+      } else {
+        await likePost(user._id, post._id);
+        setIsLiked(true);
+        setLikeCount(prevCount => prevCount + 1);
+      }
+    }
+  };
+
   if (!post || !post.user) return null;
 
   return (
     <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-black rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 mb-4 max-w-xs mx-auto transform hover:scale-105 transition-transform duration-300">
+      {/* User Info and Post Meta */}
       <div className="flex items-center mb-3">
         {post.user.profileImage ? (
           <img
@@ -85,10 +103,15 @@ const PostCard = ({ post, user, onUnsave }) => {
       {/* Like & Comment Section */}
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <button className="text-xl text-gray-500 hover:text-red-500 mr-3 transform hover:scale-110 transition-transform duration-200">
+          <button
+            className={`text-xl ${isLiked ? "text-red-500" : "text-gray-500"} hover:text-red-500 mr-3 transform hover:scale-110 transition-transform duration-200`}
+            onClick={handleLikePost}
+          >
             <FontAwesomeIcon icon={faHeart} />
           </button>
-          <span className="text-gray-400 text-xs">{post.likes || 0} Likes</span>
+          <span className="text-gray-400 text-xs">
+            {likeCount === 1 ? '1 Like' : `${likeCount} Likes`}
+          </span>
         </div>
 
         <div className="flex items-center">
@@ -96,14 +119,12 @@ const PostCard = ({ post, user, onUnsave }) => {
             <FontAwesomeIcon icon={faComment} />
           </button>
           <span className="text-gray-400 text-xs">
-            {post.comments?.length || 0} Comments
+            {post.comments.length === 1 ? '1 Comment' : `${post.comments.length} Comments`}
           </span>
         </div>
 
         <button
-          className={`text-xl ${
-            isSaved ? "text-green-500" : "text-gray-500"
-          } transform hover:scale-110 transition-transform duration-200`}
+          className={`text-xl ${isSaved ? "text-green-500" : "text-gray-500"} transform hover:scale-110 transition-transform duration-200`}
           onClick={handleSavePost}
         >
           <FontAwesomeIcon icon={isSaved ? faCheck : faSave} />
