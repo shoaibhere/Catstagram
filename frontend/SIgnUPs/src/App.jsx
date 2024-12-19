@@ -3,7 +3,6 @@ import Home from "./pages/Home";
 import SignUpPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
-import React, { useEffect } from "react";
 import FloatingShape from "../src/components/floatingShape";
 import { useAuthStore } from "./store/authStore";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -17,6 +16,8 @@ import ChatPage from "./pages/chat/ChatPage";
 import { ChatState, ChatProvider } from "./Context/ChatProvider";
 import Requests from "./pages/Requests";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import React, { useState, useEffect } from "react";
+import Layout from "./pages/Layout";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = ChatState(); // Get user and loading state from context
@@ -58,6 +59,16 @@ const RedirectAuthenticatedUser = ({ children }) => {
 
 function App() {
   const { isCheckingAuth, checkAuth } = useAuthStore();
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+  useEffect(() => {
+    // Persist theme in localStorage
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const handleThemeSwitch = () => {
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+  };
 
   useEffect(() => {
     checkAuth(); // Perform authentication check
@@ -91,12 +102,14 @@ function App() {
         />
 
         <Routes>
-          {/* Protected Home Route */}
+          {/* Protected Home Route */}{" "}
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <Home />
+                <Layout theme={theme} onThemeSwitch={handleThemeSwitch}>
+                  <Home />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -180,7 +193,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/friend-requests"
             element={
@@ -200,7 +212,6 @@ function App() {
               </ChatProvider>
             }
           />
-
           {/* Add this route for the chat */}
           {/* Default Route */}
           {/* <Route path="*" element={<Navigate to="/" replace />} /> */}

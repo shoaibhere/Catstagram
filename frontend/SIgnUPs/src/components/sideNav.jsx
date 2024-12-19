@@ -6,14 +6,18 @@ import {
   MessageCircle,
   Compass,
   UserPlus,
+  User,
 } from "lucide-react"; // Icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { User } from "lucide-react";
 
-const SideNav = ({ user }) => {
+const SideNav = ({ user, theme }) => {
   return (
-    <div className="bg-black text-white h-screen pt-8 flex flex-col items-center overflow-hidden">
+    <div
+      className={`h-screen pt-8 flex flex-col items-center overflow-hidden ${
+        theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+      }`}
+    >
       {/* Profile Section */}
       <Link to={`/profile?id=${user._id}`}>
         <div className="flex flex-col items-center content-center gap-2 mb-8">
@@ -27,13 +31,23 @@ const SideNav = ({ user }) => {
               <User className="w-10 h-10 text-purple-600" />
             </div>
           )}
-          <h3 className="text-lg font-semibold hidden md:block">{user.name}</h3>
+          <h3
+            className={`text-lg font-semibold hidden md:block ${
+              theme === "dark" ? "text-white" : "text-black"
+            }`}
+          >
+            {user.name}
+          </h3>
         </div>
       </Link>
 
       {/* Create Post Button */}
       <Link to={`/create-post?id=${user._id}`}>
-        <button className="relative w-12 md:w-44 bg-purple-600 text-white p-3 mb-6 rounded-full text-lg font-bold flex items-center justify-center gap-2 group overflow-hidden">
+        <button
+          className={`relative w-12 md:w-44 h-12 md:h-14 text-white mb-6 rounded-full text-lg font-bold flex items-center justify-center gap-2 group overflow-hidden ${
+            theme === "dark" ? "bg-purple-600" : "bg-purple-600 text-white"
+          }`}
+        >
           <span className="absolute w-0 h-full bg-purple-400 group-hover:w-full transition-all duration-500 left-0 top-0"></span>
           <span className="absolute w-0 h-full bg-purple-500 group-hover:w-full transition-all duration-700 left-0 top-0"></span>
           <span className="absolute w-0 h-full bg-purple-300 group-hover:w-full transition-all duration-1000 left-0 top-0"></span>
@@ -51,41 +65,91 @@ const SideNav = ({ user }) => {
       <div className="flex flex-col items-center space-y-4 w-full">
         {/* Explore Friends Button */}
         <Link to={`/explore-friends`}>
-          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
-            <Compass className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
-            <span className="hidden md:block text-white">Explore</span>
+          <button
+            className={`group flex items-center justify-center w-12 h-12 md:w-44 md:h-14 rounded-full px-3 py-2 ${
+              theme === "dark"
+                ? "text-white bg-black hover:bg-gray-600"
+                : "text-black bg-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white"
+            }`}
+          >
+            <Compass
+              className={`w-8 h-8 md:w-6 md:h-6 ${
+                theme === "dark" ? "text-white" : "text-black"
+              }`}
+            />
+            <span className="hidden md:block">Explore</span>
           </button>
         </Link>
 
         {/* My Friends Button */}
         <Link to={`/friends`}>
-          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
-            <Users className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
-            <span className="hidden md:block text-white">Friends</span>
+          <button
+            className={`group flex items-center justify-center w-12 h-12 md:w-44 md:h-14 rounded-full px-3 py-2 ${
+              theme === "dark"
+                ? "text-white bg-black hover:bg-gray-600"
+                : "text-black bg-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white"
+            }`}
+          >
+            <Users
+              className={`w-8 h-8 md:w-6 md:h-6 ${
+                theme === "dark" ? "text-white" : "text-black"
+              }`}
+            />
+            <span className="hidden md:block">Friends</span>
           </button>
         </Link>
 
         {/* Requests Button */}
         <Link to={`/friend-requests`}>
-          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
-            <UserPlus className="w-15 h-15 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
-            <span className="hidden md:block text-white">Requests</span>
+          <button
+            className={`group flex items-center justify-center w-12 h-12 md:w-44 md:h-14 rounded-full px-3 py-2 ${
+              theme === "dark"
+                ? "text-white bg-black hover:bg-gray-600"
+                : "text-black bg-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white"
+            }`}
+          >
+            <UserPlus
+              className={`w-8 h-8 md:w-6 md:h-6 ${
+                theme === "dark" ? "text-white" : "text-black"
+              }`}
+            />
+            <span className="hidden md:block">Requests</span>
           </button>
         </Link>
 
         {/* Chat Button */}
         <Link to={`/chat`}>
-          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
-            <MessageCircle className="w-10 h-10 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
-            <span className="hidden md:block text-white">Chat</span>
+          <button
+            className={`group flex items-center justify-center w-12 h-12 md:w-44 md:h-14 rounded-full px-3 py-2 ${
+              theme === "dark"
+                ? "text-white bg-black hover:bg-gray-600"
+                : "text-black bg-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white"
+            }`}
+          >
+            <MessageCircle
+              className={`w-8 h-8 md:w-6 md:h-6 ${
+                theme === "dark" ? "text-white" : "text-black"
+              }`}
+            />
+            <span className="hidden md:block">Chat</span>
           </button>
         </Link>
 
         {/* Saved Button */}
         <Link to={`/saved`}>
-          <button className="bg-black hover:bg-gray-600 text-white w-14 md:w-44 text-center rounded-full px-4 py-3 flex items-center justify-center gap-2 group">
-            <Bookmark className="w-10 h-10 sm:w-8 sm:h-8 md:w-6 md:h-6 group-hover:text-black" />
-            <span className="hidden md:block text-white">Saved</span>
+          <button
+            className={`group flex items-center justify-center w-12 h-12 md:w-44 md:h-14 rounded-full px-3 py-2 ${
+              theme === "dark"
+                ? "text-white bg-black hover:bg-gray-600"
+                : "text-black bg-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white"
+            }`}
+          >
+            <Bookmark
+              className={`w-8 h-8 md:w-6 md:h-6 ${
+                theme === "dark" ? "text-white" : "text-black"
+              }`}
+            />
+            <span className="hidden md:block">Saved</span>
           </button>
         </Link>
       </div>

@@ -1,9 +1,6 @@
-// src/pages/Home.js
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Layout from "../pages/Layout";
-import PostCard from "../components/postCard";
+import PostCard from "../components/PostCard"; // Assuming PostCard component
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -21,15 +18,13 @@ const Home = () => {
   }, []);
 
   return (
-    <Layout>
-      <div className="mt-8">
-        {posts
-          .filter((post) => post.user) // Only render posts with a user
-          .map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
-      </div>
-    </Layout>
+    <div className="mt-8">
+      {posts
+        .filter((post) => post.user) // Only render posts with a user
+        .map((post) => (
+          <PostCard key={post._id} post={post} />
+        ))}
+    </div>
   );
 };
 
