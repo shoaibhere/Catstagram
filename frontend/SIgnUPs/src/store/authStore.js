@@ -153,4 +153,32 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+
+  changePassword: async (currentPassword, newPassword) => {
+    set({ isLoading: true, error: null, message: null });
+
+    const userId = localStorage.getItem("userId"); // Or wherever you store the user ID
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/change-password`,
+        { currentPassword, newPassword, userId }, // Include the user ID in the body
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      set({
+        isLoading: false,
+        message: response.data.message || "Password changed successfully",
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || error.message,
+      });
+    }
+  },
 }));

@@ -1,5 +1,6 @@
 const { User } = require("../models/users.model");
-const { FriendRequest } = require("../models/friendRequest.model"); // Import the FriendRequest model
+
+const { FriendRequest } = require("../models/friendRequest.model");
 
 // Send a friend request
 const sendFriendRequest = async (req, res) => {
@@ -31,7 +32,11 @@ const sendFriendRequest = async (req, res) => {
     });
     await friendRequest.save();
 
-    res.status(200).json({ message: "Friend request sent successfully" });
+    // Return the friend request ID in the response
+    res.status(200).json({
+      message: "Friend request sent successfully",
+      requestId: friendRequest._id, // Send the request ID back to the frontend
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -186,7 +191,6 @@ const deleteSentFriendRequest = async (req, res) => {
     const { id: requestId } = req.params; // Friend request ID from params
     const userId = req.userId; // Authenticated user ID (sender)
 
-    // Find the friend request by its ID
     const friendRequest = await FriendRequest.findById(requestId);
     if (!friendRequest) {
       return res.status(404).json({ message: "Friend request not found" });

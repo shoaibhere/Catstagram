@@ -16,6 +16,7 @@ import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Frien
 import ChatPage from "./pages/chat/ChatPage";
 import { ChatState, ChatProvider } from "./Context/ChatProvider";
 import Requests from "./pages/Requests";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = ChatState(); // Get user and loading state from context
@@ -113,6 +114,14 @@ function App() {
             element={
               <RedirectAuthenticatedUser>
                 <LoginPage />
+              </RedirectAuthenticatedUser>
+            }
+          />
+          <Route
+            path="/change-password"
+            element={
+              <RedirectAuthenticatedUser>
+                <ChangePasswordPage />
               </RedirectAuthenticatedUser>
             }
           />

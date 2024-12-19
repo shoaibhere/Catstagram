@@ -11,16 +11,20 @@ const RequestCard = ({
 }) => {
   const navigate = useNavigate();
 
+  // Determine whether to show sentBy or sentTo info based on isSentRequest
+  const userInfo = isSentRequest ? request.sentTo : request.sentBy;
+  console.log("userInfo", userInfo);
+
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center space-y-4">
       {/* Requester Info */}
       <div className="w-full">
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          {request.sentBy.profileImage ? (
+          {userInfo?.profileImage ? (
             <img
-              src={request.sentBy.profileImage}
-              alt={request.sentBy.name}
+              src={userInfo.profileImage}
+              alt={userInfo.name}
               className="w-14 h-14 rounded-full object-cover ring-2 ring-purple-200"
             />
           ) : (
@@ -33,9 +37,9 @@ const RequestCard = ({
           {/* User Details */}
           <div className="flex-grow">
             <h3 className="text-lg font-medium text-gray-900">
-              {request.sentBy.name}
+              {userInfo?.name}
             </h3>
-            <p className="text-sm text-gray-500 mb-2">{request.sentBy.email}</p>
+            <p className="text-sm text-gray-500 mb-2">{userInfo?.email}</p>
           </div>
         </div>
       </div>
@@ -53,7 +57,7 @@ const RequestCard = ({
               {loading ? "..." : "Unsend Request"}
             </button>
             <button
-              onClick={() => navigate(`/profile/${request.sentBy._id}`)}
+              onClick={() => navigate(`/profile/${userInfo?._id}`)}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 w-full"
               disabled={loading}
             >

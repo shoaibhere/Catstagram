@@ -1,7 +1,9 @@
 const crypto = require("crypto");
 const { User } = require("../models/users.model.js");
 const bcryptjs = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
+const jwt = require("jsonwebtoken");
 const generateTokenSetCookie = require("../utils/cookie.js");
 const {
   sendVerificationEmail,
@@ -76,7 +78,7 @@ const verifyEmail = async (req, res) => {
 
     user.isVerified = true;
     user.verificationToken = undefined;
-    user.verificationTokenExpiresAt = undefined;
+    user.verificationTokenExpire = undefined;
     await user.save();
 
     await sendWelcomeEmail(user.email, user.name);
@@ -210,7 +212,49 @@ const resetPassword = async (req, res) => {
     });
   }
 };
+const changePassword = async (req, res) => {
+  // Extract the token from the cookie
+  const token = req.cookies.token; // This assumes the cookie is named 'token'
 
+  if (!token) {
+    return res.status(401).json({ message: "Authentication token is missing" });
+  }
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Ensure JWT_SECRET is set in your .env file
+    const userId = decoded.userId; // Extract userId from the token
+
+    // Proceed with password change logic
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Verify the current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect current password" });
+    }
+
+    // Hash and update the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    // Optionally, generate a new JWT token after password change and set it in a cookie
+    const newToken = generateTokenSetCookie(res, userId); // Use the generateTokenSetCookie function to set the new token
+
+    res.json({
+      message: "Password changed successfully",
+      token: newToken, // Return the new token if needed
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 const checkAuth = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select("-password");
@@ -233,5 +277,6 @@ module.exports = {
   logout,
   forgotPassword,
   resetPassword,
+  changePassword,
   checkAuth,
 };
