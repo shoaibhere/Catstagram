@@ -1,5 +1,5 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import React, { useEffect } from "react";
+import React, { useState,useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
 import FloatingShape from "../src/components/floatingShape";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -16,6 +16,9 @@ import ExploreFriends from "./pages/FriendsExplore";
 import Website from "./pages/website";
 import SavedPosts from "./components/SavedPosts";
 import EditPost from "./pages/editPost";
+import Layout from "./pages/Layout";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
+import Requests from "./pages/Requests";
 
 // Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
@@ -44,12 +47,21 @@ const RedirectAuthenticatedUser = ({ children }) => {
 };
 
 function App() {
-  const { isCheckingAuth, checkAuth, isAuthenticated, user } = useAuthStore();
+  const { isCheckingAuth, checkAuth, user } = useAuthStore();
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+
+  useEffect(() => {
+    // Persist theme in localStorage
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const handleThemeSwitch = () => {
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+  };
 
   useEffect(() => {
     checkAuth(); // Perform authentication check
   }, [checkAuth]);
-
   if (isCheckingAuth) return <LoadingSpinner />; // Show loading spinner while checking auth
 
   return (
@@ -83,11 +95,13 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Home />
+                <Layout theme={theme} onThemeSwitch={handleThemeSwitch}>
+                  <Home />
+                </Layout>
               </ProtectedRoute>
             }
           />
-
+          
           {/* Signup and Login Routes */}
           <Route path="/signup" element={<SignUpPage />} />
           <Route
@@ -95,6 +109,15 @@ function App() {
             element={
               <RedirectAuthenticatedUser>
                 <LoginPage />
+              </RedirectAuthenticatedUser>
+            }
+          />
+
+        <Route
+            path="/change-password"
+            element={
+              <RedirectAuthenticatedUser>
+                <ChangePasswordPage />
               </RedirectAuthenticatedUser>
             }
           />
@@ -140,7 +163,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/friend-requests"
+            element={
+              <ProtectedRoute>
+                <Requests />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/edit-post/:id"
             element={

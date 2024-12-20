@@ -44,6 +44,16 @@ export const useAuthStore = create((set) => ({
         email,
         password,
       });
+
+      // Save user data and token to local storage
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify({
+          token: response.data.token, // Assuming the response includes a token
+          user: response.data.user,
+        })
+      );
+
       set({
         isAuthenticated: true,
         user: response.data.user,
@@ -96,7 +106,9 @@ export const useAuthStore = create((set) => ({
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {
-      const response = await axios.get(`${API_URL}/check-auth`);
+      const response = await axios.get(`${API_URL}/check-auth`, {
+        withCredentials: true, // Send cookies with the request
+      });
       set({
         user: response.data.user,
         isAuthenticated: true,
@@ -139,6 +151,34 @@ export const useAuthStore = create((set) => ({
         error: error.response.data.message || "Error resetting password",
       });
       throw error;
+    }
+  },
+
+  changePassword: async (currentPassword, newPassword) => {
+    set({ isLoading: true, error: null, message: null });
+
+    const userId = localStorage.getItem("userId"); // Or wherever you store the user ID
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/change-password`,
+        { currentPassword, newPassword, userId }, // Include the user ID in the body
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      set({
+        isLoading: false,
+        message: response.data.message || "Password changed successfully",
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || error.message,
+      });
     }
   },
 }));
