@@ -11,7 +11,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserProfile from "./pages/userProfile";
 import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
-import ExploreFriends from "./pages/FriendsExplore"; // Import the Explore Friends page
+import ExploreFriends from "./pages/FriendsExplore";
 import ChatPage from "./pages/chat/ChatPage";
 import { ChatState, ChatProvider } from "./Context/ChatProvider";
 import Requests from "./pages/Requests";
@@ -212,9 +212,6 @@ function App() {
               </ChatProvider>
             }
           />
-          {/* Add this route for the chat */}
-          {/* Default Route */}
-          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         </Routes>
       </div>
     </>
