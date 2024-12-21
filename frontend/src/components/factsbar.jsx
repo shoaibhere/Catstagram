@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useTheme } from "../contexts/themeContext"; // Ensure the path is correct
 
 const Factsbar = () => {
   const [facts, setFacts] = useState([]);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchFacts = async () => {
@@ -24,15 +26,23 @@ const Factsbar = () => {
   }, []);
 
   return (
-    <div className="w-80 h-full bg-gray-800 p-4 overflow-y-auto shadow-lg">
-      <h2 className="text-2xl font-bold text-center text-pink-400 mb-4">
+    <div className={`w-80 h-full p-4 overflow-y-auto ${
+      theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+    }`}>
+      <h2 className={`text-2xl font-bold text-center mb-4 ${
+        theme === "dark" ? "text-pink-400" : "text-purple-500"
+      }`}>
         Random Cat Facts
       </h2>
       <div className="space-y-4">
         {facts.map((fact, index) => (
           <div
             key={index}
-            className="p-4 bg-gray-700 rounded-lg shadow text-sm"
+            className={`p-4 rounded-lg shadow-md text-sm ${
+              theme === "dark" ? "bg-gray-700" : "bg-white"
+            } border ${
+              theme === "dark" ? "border-gray-600" : "border-purple-300"
+            }`}
           >
             {fact.fact}
           </div>

@@ -1,14 +1,16 @@
 import React from "react";
 import SideNav from "../components/sideNav";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
+import { useTheme } from "../contexts/themeContext";
 
-const Layout = ({ children, theme }) => {
+const Layout = ({ children }) => {
   const { user } = useAuthStore();
-
+  const {theme} = useTheme();
   const sidebarClasses = theme === "dark" ? "bg-black" : "bg-white";
   const navbarClasses = theme === "dark" ? "bg-gray-900" : "bg-gray-100";
+  const factsbarClasses = theme === "dark" ? "bg-black" : "bg-white";
 
   return (
     <div className="h-screen w-full flex flex-col text-white">
@@ -18,12 +20,12 @@ const Layout = ({ children, theme }) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex h-full pt-16 bg-dark">
+      <div className="flex h-full pt-16">
         {/* Left Sidebar (Fixed on the Left Side) */}
         <div
           className={`fixed left-0 top-16 bottom-0 w-1/5 p-4 z-10 ${sidebarClasses}`}
         >
-          <SideNav user={user} theme={theme} />
+          <SideNav user={user} />
         </div>
 
         {/* Main Content Area (Dynamic children) */}
@@ -32,12 +34,8 @@ const Layout = ({ children, theme }) => {
         </div>
 
         {/* Right Sidebar (Fixed on the Right Side) */}
-        <div className="fixed right-0 top-16 h-full bottom-0 w-1/5 p-4 bg-white z-10">
-          <div
-            className={`fixed right-4 top-16 h-full bottom-0 w-1/5 p-4 z-10 text-light`}
-          >
-            <Factsbar />
-          </div>
+        <div className={`fixed right-7 top-16 h-full bottom-0 w-1/5 p-4 z-10 ${factsbarClasses}`}>
+          <Factsbar />
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { updateProfile } from "../services/profile.services";
 import { useAuthStore } from "../store/authStore";
 import { Upload, User as UserIcon } from "lucide-react";
+import { useTheme } from "../contexts/themeContext";
 
 export default function EditProfileModal({ profile, onClose, onUpdate }) {
   const [name, setName] = useState(profile.name || "");
@@ -10,17 +11,25 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
   const [imagePreview, setImagePreview] = useState(profile.profileImage || "");
   const [errorMessage, setErrorMessage] = useState("");
   const { user } = useAuthStore();
+  const { theme } = useTheme();
+
+  // Theme-based styles
+  const modalBackground = theme === "dark" ? "bg-gray-800" : "bg-white";
+  const textColor = theme === "dark" ? "text-white" : "text-gray-800";
+  const inputBackground = theme === "dark" ? "bg-gray-700" : "bg-gray-100";
+  const borderColor = theme === "dark" ? "border-blue-600" : "border-blue-400";
+  const focusRingColor = theme === "dark" ? "focus:ring-blue-600" : "focus:ring-blue-400";
+  const buttonPrimary = theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-500 hover:bg-blue-600";
+  const buttonSecondary = theme === "dark" ? "bg-gray-600 hover:bg-gray-700" : "bg-gray-400 hover:bg-gray-500";
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file size (e.g., max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setErrorMessage("File size should be less than 5MB");
         return;
       }
 
-      // Validate file type
       const validTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!validTypes.includes(file.type)) {
         setErrorMessage("Only JPEG, PNG, and GIF images are allowed");
@@ -61,8 +70,8 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-white">Edit Profile</h2>
+      <div className={`${modalBackground} rounded-lg p-8 w-full max-w-md`}>
+        <h2 className={`text-2xl font-bold mb-6 ${textColor}`}>Edit Profile</h2>
 
         {errorMessage && (
           <div className="bg-red-600 text-white p-3 rounded-md mb-4">
@@ -79,7 +88,9 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
                 onChange={handleImageChange}
                 className="hidden"
               />
-              <div className="w-32 h-32 rounded-full border-4 border-blue-600 flex items-center justify-center overflow-hidden">
+              <div
+                className={`w-32 h-32 rounded-full ${borderColor} border-4 flex items-center justify-center overflow-hidden`}
+              >
                 {imagePreview ? (
                   <img
                     src={imagePreview}
@@ -90,33 +101,35 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
                   <UserIcon className="w-16 h-16 text-gray-400" />
                 )}
               </div>
-              <div className="absolute bottom-0 right-0 bg-blue-600 rounded-full p-2 group-hover:bg-blue-700 transition duration-300">
+              <div
+                className={`absolute bottom-0 right-0 ${buttonPrimary} rounded-full p-2 group-hover:bg-blue-700 transition duration-300`}
+              >
                 <Upload className="h-5 w-5 text-white" />
               </div>
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${textColor}`}>
               Name
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className={`w-full px-3 py-2 ${inputBackground} ${textColor} rounded-md border ${focusRingColor} focus:outline-none focus:ring-2`}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${textColor}`}>
               Bio
             </label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className={`w-full px-3 py-2 ${inputBackground} ${textColor} rounded-md border ${focusRingColor} focus:outline-none focus:ring-2`}
               rows="3"
               placeholder="Tell us about yourself"
             />
@@ -125,14 +138,14 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
           <div className="flex space-x-4 pt-4">
             <button
               type="submit"
-              className="flex-grow bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition duration-300"
+              className={`flex-grow ${buttonPrimary} text-white py-2 rounded-md transition duration-300`}
             >
               Save Changes
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-grow bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-md transition duration-300"
+              className={`flex-grow ${buttonSecondary} text-white py-2 rounded-md transition duration-300`}
             >
               Cancel
             </button>

@@ -2,21 +2,23 @@ import React, { useEffect, useState } from "react";
 import PostCard from "./postCard";
 import { getSavedPosts } from "../services/savedPosts.services";
 import Layout from "../pages/Layout";
+import { useTheme } from "../contexts/themeContext";
 
 const SavedPosts = ({ user }) => {
   const [savedPosts, setSavedPosts] = useState([]);
   const [viewMode, setViewMode] = useState("grid");
+  const { theme } = useTheme();
+
+  const fetchSavedPosts = async () => {
+    try {
+      const posts = await getSavedPosts(user._id);
+      setSavedPosts(posts);
+    } catch (error) {
+      console.error("Error fetching saved posts", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchSavedPosts = async () => {
-      try {
-        const posts = await getSavedPosts(user._id);
-        setSavedPosts(posts);
-      } catch (error) {
-        console.error("Error fetching saved posts", error);
-      }
-    };
-
     fetchSavedPosts();
   }, [user._id]);
 
@@ -26,19 +28,37 @@ const SavedPosts = ({ user }) => {
     );
   };
 
+  // Themed styles
+  const headerGradient =
+    theme === "dark"
+      ? "from-purple-400 via-pink-500 to-red-500"
+      : "from-blue-500 via-green-400 to-yellow-500";
+
+  const buttonSelected =
+    theme === "dark"
+      ? "bg-purple-700 text-white"
+      : "bg-blue-700 text-white";
+  const buttonUnselected =
+    theme === "dark"
+      ? "bg-gray-700 text-purple-300 hover:bg-purple-800"
+      : "bg-gray-300 text-blue-500 hover:bg-blue-400";
+
+  const textStyle =
+    theme === "dark" ? "text-gray-400" : "text-gray-600";
+
   return (
     <Layout>
-      <div className="min-h-screen text-white flex flex-col items-center pt-8">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 drop-shadow-lg mb-10 text-center transition-all hover:scale-105 duration-300">
+      <div className="min-h-screen flex flex-col items-center pt-8">
+        <h2
+          className={`text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r ${headerGradient} drop-shadow-lg mb-10 text-center transition-all hover:scale-105 duration-300`}
+        >
           Saved Posts
         </h2>
         <div className="mb-6 flex space-x-4">
           <button
             onClick={() => setViewMode("grid")}
             className={`px-4 py-2 rounded-md flex items-center ${
-              viewMode === "grid"
-                ? "bg-purple-700 text-white"
-                : "bg-gray-700 text-purple-300 hover:bg-purple-800"
+              viewMode === "grid" ? buttonSelected : buttonUnselected
             } transition duration-300`}
           >
             <svg
@@ -61,9 +81,7 @@ const SavedPosts = ({ user }) => {
           <button
             onClick={() => setViewMode("list")}
             className={`px-4 py-2 rounded-md flex items-center ${
-              viewMode === "list"
-                ? "bg-purple-700 text-white"
-                : "bg-gray-700 text-purple-300 hover:bg-purple-800"
+              viewMode === "list" ? buttonSelected : buttonUnselected
             } transition duration-300`}
           >
             <svg
@@ -104,7 +122,7 @@ const SavedPosts = ({ user }) => {
               />
             ))
           ) : (
-            <p className="text-gray-400">No saved posts yet.</p>
+            <p className={textStyle}>No saved posts yet.</p>
           )}
         </div>
       </div>

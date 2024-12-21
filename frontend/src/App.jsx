@@ -1,5 +1,5 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
 import FloatingShape from "../src/components/floatingShape";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -17,10 +17,10 @@ import Website from "./pages/website";
 import SavedPosts from "./components/SavedPosts";
 import EditPost from "./pages/editPost";
 import Layout from "./pages/Layout";
-import ChangePasswordPage from "./pages/ChangePasswordPage";
+import ChangePasswordPage from "./components/ChangePasswordModal";
 import Requests from "./pages/Requests";
+import { ThemeProvider, useTheme } from "./contexts/themeContext";
 
-// Protected Route: Redirect if not authenticated or not verified
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
@@ -35,7 +35,6 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Redirect Authenticated Users away from login/signup if already logged in
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
@@ -46,175 +45,144 @@ const RedirectAuthenticatedUser = ({ children }) => {
   return children;
 };
 
-function App() {
+const AppContent = () => {
+  const { theme } = useTheme();
+
+  const backgroundClasses =
+    theme === "dark"
+      ? "bg-gradient-to-br from-gray-900 via-purple-900 to-black"
+      : "bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200";
+
+  const shapeColors =
+    theme === "dark"
+      ? ["bg-pink-300", "bg-pink-200", "bg-pink-400"]
+      : ["bg-purple-200", "bg-blue-200", "bg-green-200"];
+
   const { isCheckingAuth, checkAuth, user } = useAuthStore();
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
   useEffect(() => {
-    // Persist theme in localStorage
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const handleThemeSwitch = () => {
-    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
-  };
-
-  useEffect(() => {
-    checkAuth(); // Perform authentication check
+    checkAuth();
   }, [checkAuth]);
-  if (isCheckingAuth) return <LoadingSpinner />; // Show loading spinner while checking auth
+
+  if (isCheckingAuth) return <LoadingSpinner />;
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black flex items-center justify-center relative overflow-hidden">
-        <FloatingShape
-          color="bg-pink-300"
-          size="w-64 h-64"
-          top="-5%"
-          left="10%"
-          delay={0}
-        />
-        <FloatingShape
-          color="bg-pink-200"
-          size="w-48 h-48"
-          top="70%"
-          left="80%"
-          delay={5}
-        />
-        <FloatingShape
-          color="bg-pink-400"
-          size="w-32 h-32"
-          top="40%"
-          left="10%"
-          delay={2}
-        />
-
-        <Routes>
-          {/* Protected Home Route */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout theme={theme} onThemeSwitch={handleThemeSwitch}>
-                  <Home />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          
-          {/* Signup and Login Routes */}
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route
-            path="/login"
-            element={
-              <RedirectAuthenticatedUser>
-                <LoginPage />
-              </RedirectAuthenticatedUser>
-            }
-          />
-
+    <div
+      className={`min-h-screen ${backgroundClasses} flex items-center justify-center relative overflow-hidden`}
+    >
+      <FloatingShape color={shapeColors[0]} size="w-64 h-64" top="-5%" left="10%" delay={0} />
+      <FloatingShape color={shapeColors[1]} size="w-48 h-48" top="70%" left="80%" delay={5} />
+      <FloatingShape color={shapeColors[2]} size="w-32 h-32" top="40%" left="10%" delay={2} />
+      <Routes>
         <Route
-            path="/change-password"
-            element={
-              <RedirectAuthenticatedUser>
-                <ChangePasswordPage />
-              </RedirectAuthenticatedUser>
-            }
-          />
-          <Route path="/website" element={<Website />} />
+          path="/"
+          element={
+            <ProtectedRoute>
+                <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route
+          path="/login"
+          element={
+            <RedirectAuthenticatedUser>
+              <LoginPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <RedirectAuthenticatedUser>
+              <ChangePasswordPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route path="/website" element={<Website />} />
+        <Route path="/verify-email" element={<EmailVerificationPage />} />
+        <Route
+          path="/forgot-password"
+          element={
+            <RedirectAuthenticatedUser>
+              <ForgotPasswordPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <RedirectAuthenticatedUser>
+              <ResetPasswordPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path="/profile/:id"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-post"
+          element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/friend-requests"
+          element={
+            <ProtectedRoute>
+              <Requests />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-post/:id"
+          element={
+            <ProtectedRoute>
+              <EditPost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/friends"
+          element={
+            <ProtectedRoute>
+              <Friends />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/explore-friends"
+          element={
+            <ProtectedRoute>
+              <ExploreFriends />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved-posts"
+          element={
+            <ProtectedRoute>
+              <SavedPosts user={user} />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </div>
+  );
+};
 
-          {/* Email Verification */}
-          <Route path="/verify-email" element={<EmailVerificationPage />} />
-
-          {/* Password Reset Routes */}
-          <Route
-            path="/forgot-password"
-            element={
-              <RedirectAuthenticatedUser>
-                <ForgotPasswordPage />
-              </RedirectAuthenticatedUser>
-            }
-          />
-          <Route
-            path="/reset-password/:token"
-            element={
-              <RedirectAuthenticatedUser>
-                <ResetPasswordPage />
-              </RedirectAuthenticatedUser>
-            }
-          />
-
-          {/* Profile Page */}
-          <Route
-            path="/profile/:id"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Create Post Page */}
-          <Route
-            path="/create-post"
-            element={
-              <ProtectedRoute>
-                <CreatePost />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/friend-requests"
-            element={
-              <ProtectedRoute>
-                <Requests />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/edit-post/:id"
-            element={
-              <ProtectedRoute>
-                <EditPost />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Friends Page */}
-          <Route
-            path="/friends"
-            element={
-              <ProtectedRoute>
-                <Friends />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Explore Friends Page */}
-          <Route
-            path="/explore-friends"
-            element={
-              <ProtectedRoute>
-                <ExploreFriends />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Saved Posts Page */}
-          <Route
-            path="/saved-posts"
-            element={
-              <ProtectedRoute>
-                <SavedPosts user={user} />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Default Route */}
-          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
-        </Routes>
-      </div>
-    </>
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

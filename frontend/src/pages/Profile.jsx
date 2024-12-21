@@ -10,15 +10,17 @@ import {
 } from "../services/profile.services";
 import { useAuthStore } from "../store/authStore";
 import Layout from "../pages/Layout";
+import { useTheme } from "../contexts/themeContext"; // Import theme context
 
 export default function Profile() {
   const { id } = useParams();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [profile, setProfile] = useState({});
   const [stats, setStats] = useState({});
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { user, logout } = useAuthStore();
+  const { theme } = useTheme(); // Access the theme context
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -44,11 +46,27 @@ export default function Profile() {
     }
   };
 
+  // Dynamic theme classes
+  const containerClasses =
+    theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-100 text-black";
+  const buttonPrimaryClasses =
+    theme === "dark"
+      ? "bg-blue-600 hover:bg-blue-700"
+      : "bg-blue-500 hover:bg-blue-600";
+  const buttonDangerClasses =
+    theme === "dark"
+      ? "bg-red-600 hover:bg-red-700"
+      : "bg-red-500 hover:bg-red-600";
+  const modalClasses =
+    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black";
+
   return (
     <Layout>
       <div className="p-8">
         {/* Profile Header */}
-        <div className="bg-gray-800 rounded-lg shadow-lg p-8 mb-8 mx-[150px]">
+        <div
+          className={`${containerClasses} rounded-lg shadow-lg p-8 mb-8 mx-[150px]`}
+        >
           <div className="flex items-center space-x-6">
             {/* Profile Image */}
             <div className="w-32 h-32 rounded-full border-4 border-blue-600 flex items-center justify-center overflow-hidden">
@@ -79,7 +97,7 @@ export default function Profile() {
               </div>
               <h1 className="text-3xl font-bold mt-2">{profile.name}</h1>
               {profile.bio && (
-                <p className="text-gray-300 mt-2">{profile.bio}</p>
+                <p className={`${theme==='dark'?"text-gray-300": "text-black"}mt-2`}>{profile.bio}</p>
               )}
             </div>
 
@@ -88,13 +106,13 @@ export default function Profile() {
               <div className="flex flex-col space-y-4">
                 <button
                   onClick={() => setShowEditModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition duration-300"
+                  className={`${buttonPrimaryClasses} px-4 py-2 rounded transition duration-300`}
                 >
                   Edit Profile
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded transition duration-300"
+                  className={`${buttonDangerClasses} px-4 py-2 rounded transition duration-300`}
                 >
                   Delete Account
                 </button>
@@ -122,21 +140,22 @@ export default function Profile() {
       {/* Delete Account Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg">
+          <div className={`${modalClasses} p-6 rounded-lg`}>
             <h2 className="text-xl font-bold mb-4">Confirm Account Deletion</h2>
             <p className="mb-6">
-              Are you sure you want to delete your account? This action cannot be undone.
+              Are you sure you want to delete your account? This action cannot
+              be undone.
             </p>
             <div className="flex space-x-4">
               <button
                 onClick={handleDeleteAccount}
-                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
+                className={`${buttonDangerClasses} px-4 py-2 rounded`}
               >
                 Delete Account
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded"
+                className={`${buttonPrimaryClasses} px-4 py-2 rounded`}
               >
                 Cancel
               </button>

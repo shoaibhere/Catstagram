@@ -6,6 +6,7 @@ import "cropperjs/dist/cropper.css";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faSave, faHeart, faBookmark } from "@fortawesome/free-solid-svg-icons";
+import { useTheme } from "../contexts/themeContext"; // Import theme context
 
 const EditPostForm = ({ post }) => {
   const [caption, setCaption] = useState(post.caption || "");
@@ -15,6 +16,17 @@ const EditPostForm = ({ post }) => {
   const [isImageCropped, setIsImageCropped] = useState(false);
   const cropperRef = useRef(null);
   const navigate = useNavigate();
+  const { theme } = useTheme(); // Use theme from context
+
+  // Theme-based styles
+  const formBackground = theme === "dark" ? "bg-gray-800" : "bg-white";
+  const textColor = theme === "dark" ? "text-white" : "text-gray-900";
+  const borderColor = theme === "dark" ? "border-gray-400" : "border-gray-300";
+  const inputBackground = theme === "dark" ? "bg-transparent" : "bg-gray-100";
+  const buttonGradient =
+    theme === "dark"
+      ? "bg-gradient-to-r from-green-500 to-emerald-600"
+      : "bg-gradient-to-r from-blue-500 to-blue-600";
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -65,43 +77,45 @@ const EditPostForm = ({ post }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-lg w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden mt-10 mx-auto"
+      className={`max-w-lg w-full ${formBackground} bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden mt-10 mx-auto`}
     >
       <div className="p-8">
-        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
+        <h2
+          className={`text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text`}
+        >
           Edit Post
         </h2>
 
         <form encType="multipart/form-data" onSubmit={handleSubmit}>
           {/* Caption Input */}
           <div className="mb-4">
-            <label htmlFor="caption" className="block text-white mb-2">
+            <label htmlFor="caption" className={`block mb-2 ${textColor}`}>
               Update Caption
             </label>
-            <div className="flex items-center border border-gray-400 rounded-md p-2">
+            <div className={`flex items-center ${borderColor} rounded-md p-2`}>
               <input
                 id="caption"
                 type="text"
                 placeholder="Update your caption..."
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                className="w-full bg-transparent text-white placeholder-gray-400 focus:outline-none"
+                className={`w-full border border-gray-400 rounded-md p-2 ${inputBackground} ${textColor} ${borderColor} placeholder-gray-400 focus:outline-none`}
               />
             </div>
           </div>
 
           {/* Upload Image */}
           <div className="mb-6">
-            <label htmlFor="profileImage" className="block text-white mb-2">
+            <label htmlFor="profileImage" className={`block mb-2 ${textColor}`}>
               Update Image
             </label>
-            <div className="flex items-center border border-gray-400 rounded-md p-2">
+            <div className={`flex items-center ${borderColor} rounded-md p-2`}>
               <input
                 id="profileImage"
                 type="file"
                 name="profileImage"
                 onChange={handleImageChange}
-                className="w-full bg-transparent text-white placeholder-gray-400 focus:outline-none"
+                className={`w-full ${inputBackground} ${textColor} placeholder-gray-400 focus:outline-none`}
               />
             </div>
 
@@ -129,7 +143,9 @@ const EditPostForm = ({ post }) => {
 
           {/* Preview Section */}
           {caption && croppedImage && (
-            <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-6 max-w-xl mx-auto">
+            <div
+              className={`${formBackground} rounded-lg shadow-lg p-4 mb-6 max-w-xl mx-auto`}
+            >
               <div className="flex items-center mb-4">
                 <img
                   src={
@@ -139,7 +155,7 @@ const EditPostForm = ({ post }) => {
                   className="w-10 h-10 rounded-full mr-3"
                 />
                 <div>
-                  <h2 className="text-md font-semibold">
+                  <h2 className={`text-md font-semibold ${textColor}`}>
                     {post.user?.name || "User Name"}
                   </h2>
                   <p className="text-sm text-gray-400">{"Just Now"}</p>
@@ -152,44 +168,29 @@ const EditPostForm = ({ post }) => {
                   className="w-full h-64 object-cover rounded-lg"
                 />
               </div>
-              <p className="text-sm text-white mb-4">{caption}</p>
-              {/* Like, Comment, Save Display */}{" "}
-              <div className="flex justify-between items-center text-white mt-4">
-                {" "}
+              <p className={`text-sm ${textColor} mb-4`}>{caption}</p>
+              {/* Like, Comment, Save Display */}
+              <div className={`flex justify-between items-center ${textColor}`}>
                 <div className="flex items-center">
-                  {" "}
-                  <FontAwesomeIcon
-                    icon={faHeart}
-                    className="text-red-500 mr-2"
-                  />{" "}
+                  <FontAwesomeIcon icon={faHeart} className="text-red-500 mr-2" />
                   <span className="text-gray-400 text-xs">
-                    {" "}
                     {post.likes.length === 1
                       ? "1 Like"
-                      : `${post.likes.length} Likes`}{" "}
-                  </span>{" "}
-                </div>{" "}
+                      : `${post.likes.length} Likes`}
+                  </span>
+                </div>
                 <div className="flex items-center">
-                  {" "}
-                  <FontAwesomeIcon
-                    icon={faComment}
-                    className="text-blue-400 mr-2"
-                  />{" "}
+                  <FontAwesomeIcon icon={faComment} className="text-blue-400 mr-2" />
                   <span className="text-gray-400 text-xs">
-                    {" "}
                     {post.comments.length === 1
                       ? "1 Comment"
-                      : `${post.comments.length} Comments`}{" "}
-                  </span>{" "}
-                </div>{" "}
+                      : `${post.comments.length} Comments`}
+                  </span>
+                </div>
                 <div className="flex items-center">
-                  {" "}
-                  <FontAwesomeIcon
-                    icon={faBookmark}
-                    className="text-green-400 mr-2"
-                  />{" "}
-                  <span>Saved</span>{" "}
-                </div>{" "}
+                  <FontAwesomeIcon icon={faBookmark} className="text-green-400 mr-2" />
+                  <span>Saved</span>
+                </div>
               </div>
             </div>
           )}
@@ -197,7 +198,7 @@ const EditPostForm = ({ post }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200`}
+            className={`w-full py-3 px-4 ${buttonGradient} text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200`}
             type="submit"
           >
             Edit Post

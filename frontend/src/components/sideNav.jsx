@@ -3,23 +3,23 @@ import { Link } from "react-router-dom";
 import {
   Users,
   Bookmark,
-  MessageCircle,
   Compass,
   UserPlus,
   User,
 } from "lucide-react"; // Icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useTheme } from "../contexts/themeContext";
 
-const SideNav = ({ user, theme }) => {
+const SideNav = ({ user }) => {
+  const {theme} = useTheme();
   return (
     <div
-      className={`h-screen pt-8 flex flex-col items-center overflow-hidden ${
-        theme === "dark" ? "bg-black text-white" : "bg-white text-black"
-      }`}
-    >
+    className={`h-screen pt-8 flex flex-col items-center overflow-hidden ${
+      theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+  }`}>
       {/* Profile Section */}
-      <Link to={`/profile?id=${user._id}`}>
+      <Link to={`/profile/${user._id}`}>
         <div className="flex flex-col items-center content-center gap-2 mb-8">
           {user.profileImage ? (
             <img
@@ -117,26 +117,8 @@ const SideNav = ({ user, theme }) => {
           </button>
         </Link>
 
-        {/* Chat Button */}
-        <Link to={`/chat`}>
-          <button
-            className={`group flex items-center justify-center w-12 h-12 md:w-44 md:h-14 rounded-full px-3 py-2 ${
-              theme === "dark"
-                ? "text-white bg-black hover:bg-gray-600"
-                : "text-black bg-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white"
-            }`}
-          >
-            <MessageCircle
-              className={`w-8 h-8 md:w-6 md:h-6 ${
-                theme === "dark" ? "text-white" : "text-black"
-              }`}
-            />
-            <span className="hidden md:block">Chat</span>
-          </button>
-        </Link>
-
         {/* Saved Button */}
-        <Link to={`/saved`}>
+        <Link to={`/saved-posts`}>
           <button
             className={`group flex items-center justify-center w-12 h-12 md:w-44 md:h-14 rounded-full px-3 py-2 ${
               theme === "dark"

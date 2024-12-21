@@ -1,38 +1,36 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { User } from "lucide-react";
+import { useTheme } from "../contexts/themeContext";
 
-const UserCard = ({ user, isFriend, onFriendUpdate, request }) => {
+const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [requestSent, setRequestSent] = useState(false); // Track if a friend request has been sent
+  const { theme } = useTheme(); // Access theme context
 
   const API_URL =
     import.meta.env.MODE === "development"
       ? "http://localhost:8000/api/friends"
       : "/api/friends";
 
-  // Check localStorage for previous request sent status
   useEffect(() => {
-    const storedRequestStatus = localStorage.getItem(`requestSent-${user._id}`);
-    if (storedRequestStatus === "true") {
-      setRequestSent(true); // If a request was already sent, update the state
+    // Retrieve the saved request status from localStorage during component mount
+    const requestId = localStorage.getItem(`requestSent-${user._id}`);
+    if (requestId) {
+      setRequestSent(true);
     }
   }, [user._id]);
 
   const handleFriendRequest = async () => {
     try {
       setIsLoading(true);
-      if (requestSent) {
-        return; // Prevent sending the request if it's already sent
-      }
+      if (requestSent) return; // Prevent duplicate requests
 
-      // Send the friend request and get the request ID in the response
       const response = await axios.post(`${API_URL}/request/${user._id}`);
       const { requestId } = response.data;
 
-      // Set state to reflect that the request has been sent
       setRequestSent(true);
       localStorage.setItem(`requestSent-${user._id}`, requestId); // Save the request ID to localStorage
       onFriendUpdate();
@@ -47,11 +45,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate, request }) => {
   const handleRemoveFriend = async () => {
     try {
       setIsLoading(true);
-
-      // Remove friend (replace with your actual endpoint)
       await axios.delete(`${API_URL}/remove/${user._id}`);
-
-      // Trigger parent update to reflect the changes
       onFriendUpdate();
     } catch (error) {
       console.error("Error removing friend:", error);
@@ -61,25 +55,15 @@ const UserCard = ({ user, isFriend, onFriendUpdate, request }) => {
     }
   };
 
-  // Unsend the friend request using request._id
   const handleUnsendRequest = async () => {
     try {
       setIsLoading(true);
-
-      // Get the requestId from localStorage
       const requestId = localStorage.getItem(`requestSent-${user._id}`);
+      if (!requestId) return;
 
-      if (!requestId) {
-        console.error("Request ID is missing in localStorage.");
-        return;
-      }
-
-      // Make the API call to unsend the friend request using requestId
       await axios.delete(`${API_URL}/request/${requestId}`);
-
-      // Update the state and localStorage to reflect that the request is unsent
       setRequestSent(false);
-      localStorage.removeItem(`requestSent-${user._id}`); // Remove requestId from localStorage
+      localStorage.removeItem(`requestSent-${user._id}`); // Remove the request ID from localStorage
       onFriendUpdate();
     } catch (error) {
       console.error("Error unsending friend request:", error);
@@ -89,76 +73,100 @@ const UserCard = ({ user, isFriend, onFriendUpdate, request }) => {
     }
   };
 
+  const buttonText = isFriend
+    ? "Remove Friend"
+    : requestSent
+    ? "Cancel Request"
+    : "Send Friend Request";
+
+  const buttonGradient = isFriend
+    ? theme === "dark"
+      ? "from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+      : "from-red-400 to-red-500 hover:from-red-500 hover:to-red-600"
+    : requestSent
+    ? theme === "dark"
+      ? "from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700"
+      : "from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600"
+    : theme === "dark"
+    ? "from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+    : "from-green-400 to-green-500 hover:from-green-500 hover:to-green-600";
+
   return (
-    <div className="w-full bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border-l-2 border-purple-500 ml-2">
-      <div className="p-4">
-        <div className="flex items-center gap-4">
-          {/* Avatar */}
-          {user.profileImage ? (
-            <img
-              src={user.profileImage}
-              alt={user.name}
-              className="w-14 h-14 rounded-full object-cover ring-2 ring-purple-200"
-            />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center">
-              <User className="w-7 h-7 text-purple-600" />
-            </div>
-          )}
+    <div
+      className={`w-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-gray-900 via-purple-900 to-black border-purple-600"
+          : "bg-white border-gray-300"
+      }`}
+    >
+      <div className="flex flex-col md:flex-row items-center gap-4">
+        {/* Avatar */}
+        {user.profileImage ? (
+          <img
+            src={user.profileImage}
+            alt={user.name}
+            className={`w-16 h-16 md:w-20 md:h-20 rounded-full object-cover ring-4 shadow-md ${
+              theme === "dark" ? "ring-purple-400" : "ring-gray-300"
+            }`}
+          />
+        ) : (
+          <div
+            className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center ring-4 shadow-md ${
+              theme === "dark"
+                ? "bg-purple-300 text-purple-800 ring-purple-400"
+                : "bg-gray-100 text-gray-600 ring-gray-300"
+            }`}
+          >
+            <User className="w-8 h-8 md:w-10 md:h-10" />
+          </div>
+        )}
 
-          {/* User Details */}
-          <div className="flex-grow">
-            <h3 className="text-lg font-medium text-gray-900">{user.name}</h3>
-            <p className="text-sm text-gray-500 mb-2">{user.email}</p>
+        {/* User Details */}
+        <div className="flex-grow text-center md:text-left">
+          <h3
+            className={`text-xl font-bold ${
+              theme === "dark" ? "text-white" : "text-gray-800"
+            }`}
+          >
+            <Link to={`/profile/${user._id}`}>
+            {user.name}
+            </Link>
+          </h3>
+          <p
+            className={`text-sm ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            } mb-2`}
+          >
+            {user.email}
+          </p>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => navigate(`/profile/${user._id}`)}
-                className="px-3 py-1.5 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors duration-200"
-                disabled={isLoading}
-              >
-                View Profile
-              </button>
+          {/* Action Buttons */}
+          <div className="flex flex-col md:flex-row gap-2 mt-4">
+            <button
+              onClick={() => navigate(`/profile/${user._id}`)}
+              className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${
+                theme === "dark"
+                  ? "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800"
+                  : "bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white hover:from-blue-500 hover:to-blue-700"
+              }`}
+              disabled={isLoading}
+            >
+              View Profile
+            </button>
 
-              {isFriend ? (
-                <button
-                  onClick={handleRemoveFriend}
-                  className="px-3 py-1.5 text-sm border border-red-500 text-red-500 rounded transition-colors duration-200 hover:bg-red-50"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "..." : "Remove Friend"}
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleFriendRequest}
-                    className={`px-3 py-1.5 text-sm border rounded transition-colors duration-200 ${
-                      requestSent
-                        ? "border-gray-500 text-gray-500 hover:bg-gray-50 cursor-not-allowed"
-                        : "border-green-500 text-green-500 hover:bg-green-50"
-                    }`}
-                    disabled={isLoading || requestSent} // Disable button if request is sent
-                  >
-                    {isLoading
-                      ? "..."
-                      : requestSent
-                      ? "Request Sent"
-                      : "Send Friend Request"}
-                  </button>
-
-                  {requestSent && (
-                    <button
-                      onClick={handleUnsendRequest}
-                      className="px-3 py-1.5 text-sm border border-red-500 text-red-500 rounded transition-colors duration-200 hover:bg-red-50"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "..." : "Unsend Request"}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+            <button
+              onClick={
+                isFriend
+                  ? handleRemoveFriend
+                  : requestSent
+                  ? handleUnsendRequest
+                  : handleFriendRequest
+              }
+              className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-200 bg-gradient-to-r ${buttonGradient}`}
+              disabled={isLoading}
+            >
+              {isLoading ? "..." : buttonText}
+            </button>
           </div>
         </div>
       </div>

@@ -1,6 +1,12 @@
 import { motion } from "framer-motion";
+import { useTheme } from "../contexts/themeContext";
 
-const FloatingShape = ({ color, size, top, left, delay }) => {
+const FloatingShape = ({ size, top, left, delay }) => {
+  const { theme } = useTheme();
+
+  // Define theme-based colors
+  const color = theme === "dark" ? "bg-purple-400" : "bg-blue-300";
+
   return (
     <motion.div
       className={`absolute rounded-full ${color} ${size} opacity-20 blur-xl`}
@@ -20,4 +26,5 @@ const FloatingShape = ({ color, size, top, left, delay }) => {
     />
   );
 };
+
 export default FloatingShape;

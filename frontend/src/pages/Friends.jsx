@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import UserCard from "../components/UserCard";
-import Navbar from "../components/navbar";
 import SideNav from "../components/sideNav";
+import Navbar from "../components/Navbar";
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
 
