@@ -4,7 +4,7 @@ import { useAuthStore } from "./store/authStore";
 import FloatingShape from "../src/components/floatingShape";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Home from "./pages/Home";
-import SignUpPage from "./pages/SignUpPage";
+import SignUpPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";

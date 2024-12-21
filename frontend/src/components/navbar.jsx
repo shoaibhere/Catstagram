@@ -3,7 +3,7 @@ import logo from "../assets/images/logo.jpg";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from '../contexts/themeContext';
-import ChangePasswordModal from "./ChangePasswordModal";  // Ensure this is the correct path
+import ChangePasswordModal from "../components/ChangePasswordModal";  // Ensure this is the correct path
 import {
   Home,
   LogOut,
