@@ -72,7 +72,7 @@ const CreatePostForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/posts",
+        "https://catstagram-backend.onrender.com/api/posts",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

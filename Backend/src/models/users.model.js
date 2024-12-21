@@ -52,6 +52,15 @@ const signupSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+signupSchema.pre("remove", async function (next) {
+  try {
+    // Delete all posts associated with the user
+    await Post.deleteMany({ user: this._id });
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 const User = mongoose.model("User", signupSchema);
 

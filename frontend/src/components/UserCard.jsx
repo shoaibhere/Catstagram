@@ -12,7 +12,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
 
   const API_URL =
     import.meta.env.MODE === "development"
-      ? "http://localhost:8000/api/friends"
+      ? "https://catstagram-backend.onrender.com/api/friends"
       : "/api/friends";
 
   useEffect(() => {

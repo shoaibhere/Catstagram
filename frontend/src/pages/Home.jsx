@@ -18,7 +18,7 @@ const Home = () => {
     if (!hasMore) return; // Prevent fetching if hasMore is already false
 
     try {
-      const response = await axios.get(`http://localhost:8000/api/posts?page=${page}&limit=10`);
+      const response = await axios.get(`https://catstagram-backend.onrender.com/api/posts?page=${page}&limit=10`);
       console.log("Fetched data:", response.data.data); // Debug log
       if (response.data.data.length === 0) {
         setHasMore(false); // If no more data, stop trying to load more

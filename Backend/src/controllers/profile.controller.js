@@ -3,20 +3,37 @@ const { Post } = require("../models/posts.model");
 const cloudinary = require("cloudinary").v2;
 
 const deleteAccount = async (req, res) => {
+  const session = await mongoose.startSession(); // Start a session for transaction
+  session.startTransaction();
+
   try {
     const userId = req.params.id;
 
-    await Post.deleteMany({ user: userId });
+    // Delete all posts by the user
+    await Post.deleteMany({ user: userId }).session(session);
 
-    await User.updateMany({ friends: userId }, { $pull: { friends: userId } });
+    // Remove the user from other users' friends lists
+    await User.updateMany(
+      { friends: userId },
+      { $pull: { friends: userId } }
+    ).session(session);
 
-    await User.findByIdAndDelete(userId);
+    // Delete the user account
+    await User.findByIdAndDelete(userId).session(session);
 
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // Clear the cookie
     res.clearCookie("token");
 
-    res.status(200).json({ message: "Account deleted successfully" });
+    res.status(200).json({ message: "Account deleted successfully and related posts removed" });
   } catch (error) {
-    res.status(500).json({ error: "Error deleting account" });
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error deleting account:", error);
+    res.status(500).json({ error: "Error deleting account. Please try again." });
   }
 };
 
