@@ -42,6 +42,12 @@ const signupSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    blocked: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     // List of saved posts as references to Post documents
     savedPosts: [
       {

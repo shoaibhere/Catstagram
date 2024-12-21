@@ -1,55 +1,85 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { User } from "lucide-react";
+import { User, Ban } from "lucide-react"; // Import Ban icon
 import { useTheme } from "../contexts/themeContext";
 
 const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [requestSent, setRequestSent] = useState(false); // Track if a friend request has been sent
+  const [requestSent, setRequestSent] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false); // Track if the user is blocked
   const { theme } = useTheme(); // Access theme context
 
   const API_URL =
     import.meta.env.MODE === "development"
-      ? "http://localhost:8000/api/friends"
-      : "/api/friends";
+      ? "http://localhost:8000/api"
+      : "/api";
 
   useEffect(() => {
-    // Retrieve the saved request status from localStorage during component mount
-    const requestId = localStorage.getItem(`requestSent-${user._id}`);
-    if (requestId) {
-      setRequestSent(true);
+    // Check if the user is blocked from localStorage
+    const blockedStatus = localStorage.getItem(`blocked-${user._id}`);
+    if (blockedStatus) {
+      setIsBlocked(true);
     }
   }, [user._id]);
+
+  const handleBlockUser = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${API_URL}/user/block-user`, {
+        userIdToBlock: user._id,
+      });
+
+      if (response.data.success) {
+        setIsBlocked(true);
+        localStorage.setItem(`blocked-${user._id}`, true); // Save blocked status to localStorage
+        alert(`User ${user.name} has been blocked.`);
+      }
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      alert("Failed to block the user. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUnblockUser = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${API_URL}/user/unblock-user`, {
+        userIdToUnblock: user._id,
+      });
+
+      if (response.data.success) {
+        setIsBlocked(false);
+        localStorage.removeItem(`blocked-${user._id}`); // Remove blocked status from localStorage
+        alert(`User ${user.name} has been unblocked.`);
+      }
+    } catch (error) {
+      console.error("Error unblocking user:", error);
+      alert("Failed to unblock the user. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFriendRequest = async () => {
     try {
       setIsLoading(true);
       if (requestSent) return; // Prevent duplicate requests
 
-      const response = await axios.post(`${API_URL}/request/${user._id}`);
+      const response = await axios.post(
+        `${API_URL}/friends/request/${user._id}`
+      );
       const { requestId } = response.data;
 
       setRequestSent(true);
-      localStorage.setItem(`requestSent-${user._id}`, requestId); // Save the request ID to localStorage
+      localStorage.setItem(`requestSent-${user._id}`, requestId); // Save request status to localStorage
       onFriendUpdate();
     } catch (error) {
       console.error("Error sending friend request:", error);
       alert("Failed to send friend request. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRemoveFriend = async () => {
-    try {
-      setIsLoading(true);
-      await axios.delete(`${API_URL}/remove/${user._id}`);
-      onFriendUpdate();
-    } catch (error) {
-      console.error("Error removing friend:", error);
-      alert("Failed to remove friend. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -61,9 +91,9 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       const requestId = localStorage.getItem(`requestSent-${user._id}`);
       if (!requestId) return;
 
-      await axios.delete(`${API_URL}/request/${requestId}`);
+      await axios.delete(`${API_URL}/friends/request/${requestId}`);
       setRequestSent(false);
-      localStorage.removeItem(`requestSent-${user._id}`); // Remove the request ID from localStorage
+      localStorage.removeItem(`requestSent-${user._id}`);
       onFriendUpdate();
     } catch (error) {
       console.error("Error unsending friend request:", error);
@@ -73,13 +103,30 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
     }
   };
 
-  const buttonText = isFriend
+  const handleRemoveFriend = async () => {
+    try {
+      setIsLoading(true);
+      await axios.delete(`${API_URL}/friends/remove/${user._id}`);
+      onFriendUpdate();
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      alert("Failed to remove friend. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const buttonText = isBlocked
+    ? "Blocked"
+    : isFriend
     ? "Remove Friend"
     : requestSent
     ? "Cancel Request"
     : "Send Friend Request";
 
-  const buttonGradient = isFriend
+  const buttonGradient = isBlocked
+    ? "bg-red-500 text-white cursor-not-allowed"
+    : isFriend
     ? theme === "dark"
       ? "from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
       : "from-red-400 to-red-500 hover:from-red-500 hover:to-red-600"
@@ -93,12 +140,26 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
 
   return (
     <div
-      className={`w-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 ${
+      className={`relative w-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 ${
         theme === "dark"
           ? "bg-gradient-to-br from-gray-900 via-purple-900 to-black border-purple-600"
           : "bg-white border-gray-300"
       }`}
     >
+      {/* Block Button */}
+      <button
+        onClick={isBlocked ? handleUnblockUser : handleBlockUser}
+        title={isBlocked ? "Unblock User" : "Block User"}
+        className={`absolute top-2 right-2 p-2 rounded-full transition-colors duration-200 ${
+          isBlocked
+            ? "bg-red-600 text-white hover:bg-red-700"
+            : "bg-transparent text-red-600 hover:text-red-800"
+        }`}
+        disabled={isLoading}
+      >
+        <Ban className="w-5 h-5" />
+      </button>
+
       <div className="flex flex-col md:flex-row items-center gap-4">
         {/* Avatar */}
         {user.profileImage ? (
@@ -128,9 +189,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
               theme === "dark" ? "text-white" : "text-gray-800"
             }`}
           >
-            <Link to={`/profile/${user._id}`}>
-            {user.name}
-            </Link>
+            <Link to={`/profile/${user._id}`}>{user.name}</Link>
           </h3>
           <p
             className={`text-sm ${
@@ -162,8 +221,12 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
                   ? handleUnsendRequest
                   : handleFriendRequest
               }
-              className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-200 bg-gradient-to-r ${buttonGradient}`}
-              disabled={isLoading}
+              className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                isBlocked || isLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Disabled styling
+                  : `bg-gradient-to-r ${buttonGradient}`
+              }`}
+              disabled={isBlocked || isLoading}
             >
               {isLoading ? "..." : buttonText}
             </button>

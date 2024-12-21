@@ -270,7 +270,103 @@ const checkAuth = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+const blockUser = async (req, res) => {
+  const token = req.cookies.token; // This assumes the cookie is named 'token'
+  const { userIdToBlock } = req.body; // Assume IDs are provided in the request body
+
+  if (!token) {
+    return res.status(401).json({ message: "Authentication token is missing" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Ensure JWT_SECRET is set in your .env file
+    const userId = decoded.userId; // Extract userId from the token
+
+    // Find the current user by ID extracted from token
+    const currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Current user not found" });
+    }
+
+    // Check if the user to block exists
+    const userToBlock = await User.findById(userIdToBlock);
+    if (!userToBlock) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User to block not found" });
+    }
+
+    // Check if the user is already blocked
+    if (currentUser.blocked.includes(userIdToBlock)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User is already blocked" });
+    }
+
+    // Add the user to the blocked list
+    currentUser.blocked.push(userIdToBlock);
+    await currentUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: ` User ${userToBlock.name} blocked successfully`,
+      blocked: currentUser.blocked,
+    });
+  } catch (error) {
+    console.log("Error in blockUser: ", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+const unblockUser = async (req, res) => {
+  const token = req.cookies.token;
+  const { userIdToUnblock } = req.body;
+
+  if (!token) {
+    return res.status(401).json({ message: "Authentication token is missing" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    const currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Current user not found" });
+    }
+
+    // Check if the user is in the blocked list
+    if (!currentUser.blocked.includes(userIdToUnblock)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User is not blocked" });
+    }
+
+    // Remove the user from the blocked list
+    currentUser.blocked = currentUser.blocked.filter(
+      (blockedUserId) => blockedUserId.toString() !== userIdToUnblock
+    );
+    await currentUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: `User unblocked successfully`,
+      blocked: currentUser.blocked,
+    });
+  } catch (error) {
+    console.log("Error in unblockUser: ", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = { blockUser, unblockUser };
+
 module.exports = {
+  blockUser,
+  unblockUser,
   signup,
   verifyEmail,
   login,
