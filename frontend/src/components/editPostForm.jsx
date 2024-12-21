@@ -58,7 +58,7 @@ const EditPostForm = ({ post }) => {
 
     try {
       await axios.post(
-        `https://catstagram-backend.onrender.com/api/posts/edit/${post._id}`,
+        `http://localhost:8000/api/posts/edit/${post._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

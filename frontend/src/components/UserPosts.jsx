@@ -18,7 +18,7 @@ const UserPosts = ({ userId }) => {
   useEffect(() => {
     const API_URL =
       import.meta.env.MODE === "development"
-        ? "https://catstagram-backend.onrender.com"
+        ? "http://localhost:8000"
         : "/api/posts";
 
     const fetchUserPosts = async () => {

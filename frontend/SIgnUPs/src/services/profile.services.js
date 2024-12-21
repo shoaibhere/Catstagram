@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   import.meta.env.MODE === "development"
-    ? "https://catstagram-backend.onrender.com/api/profile"
+    ? "http://localhost:8000/api/profile"
     : "/api/profile";
 
 export const updateProfile = async (formData, id) => {

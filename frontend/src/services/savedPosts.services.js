@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   import.meta.env.MODE === "development"
-    ? "https://catstagram-backend.onrender.com/api/saved-posts"
+    ? "http://localhost:8000/api/saved-posts"
     : "/api/saved-posts";
 
 export const savePost = async (userId, postId) => {

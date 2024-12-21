@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   import.meta.env.MODE === "development"
-    ? "https://catstagram-backend.onrender.com/api/liked-posts"
+    ? "http://localhost:8000/api/liked-posts"
     : "/api/liked-posts";
 
 export const likePost = async (userId, postId) => {
