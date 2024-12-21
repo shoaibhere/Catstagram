@@ -8,14 +8,26 @@ const sendFriendRequest = async (req, res) => {
     const { id: friendId } = req.params;
     const userId = req.userId;
 
-    // Check if a request already exists or if they are already friends
+    // Get the user and the target friend from the database
+    const user = await User.findById(userId);
+    const friend = await User.findById(friendId);
+
+    // Check if the user is blocked by the friend
+    if (
+      friend.blocked.some(
+        (blockedUser) => blockedUser._id.toString() === userId
+      )
+    ) {
+      return res.status(400).json({
+        message: "You are blocked by this user. Cannot send a friend request.",
+      });
+    }
+
+    // Check if a friend request already exists or if they are already friends
     const existingRequest = await FriendRequest.findOne({
       "sentBy._id": userId,
       "sentTo._id": friendId,
     });
-
-    const user = await User.findById(userId);
-    const friend = await User.findById(friendId); // Get the friend details
 
     if (user.friends.includes(friendId)) {
       return res.status(400).json({ message: "Already friends" });
@@ -25,7 +37,7 @@ const sendFriendRequest = async (req, res) => {
       return res.status(400).json({ message: "Friend request already sent" });
     }
 
-    // Create and save the friend request with the complete user objects
+    // Create and save the friend request
     const friendRequest = new FriendRequest({
       sentBy: user, // Store the entire user object
       sentTo: friend, // Store the entire friend object
