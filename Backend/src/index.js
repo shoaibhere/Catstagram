@@ -8,7 +8,8 @@ const friendRoutes = require("./routes/friends.routes.js");
 const profileRouter = require("./routes/profile.routes.js");
 const savedPostsRouter = require("./routes/savedPosts.routes");
 const likedPostsRouter = require("./routes/likedPosts.routes.js");
-
+const commentRouter = require("./routes/comments.routes.js");
+  
 const cors = require("cors");
 const axios = require("axios");
 
@@ -41,6 +42,7 @@ app.use("/api/user", userRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/friends", friendRoutes);
 app.use("/api/profile", profileRouter);
+app.use("/api/comment", commentRouter);
 app.use("/api/saved-posts", savedPostsRouter);
 app.use("/api/liked-posts", likedPostsRouter);
 
