@@ -21,7 +21,7 @@ router.post("/request/decline/:id", verifyToken, declineFriendRequest);
 
 router.delete("/remove/:id", verifyToken, removeFriend);
 
-router.get("/list", verifyToken, getFriends);
+router.get("/list/:id", verifyToken, getFriends);
 
 router.get("/potential", verifyToken, getPotentialFriends);
 

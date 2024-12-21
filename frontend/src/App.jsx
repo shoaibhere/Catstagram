@@ -70,15 +70,33 @@ const AppContent = () => {
     <div
       className={`min-h-screen ${backgroundClasses} flex items-center justify-center relative overflow-hidden`}
     >
-      <FloatingShape color={shapeColors[0]} size="w-64 h-64" top="-5%" left="10%" delay={0} />
-      <FloatingShape color={shapeColors[1]} size="w-48 h-48" top="70%" left="80%" delay={5} />
-      <FloatingShape color={shapeColors[2]} size="w-32 h-32" top="40%" left="10%" delay={2} />
+      <FloatingShape
+        color={shapeColors[0]}
+        size="w-64 h-64"
+        top="-5%"
+        left="10%"
+        delay={0}
+      />
+      <FloatingShape
+        color={shapeColors[1]}
+        size="w-48 h-48"
+        top="70%"
+        left="80%"
+        delay={5}
+      />
+      <FloatingShape
+        color={shapeColors[2]}
+        size="w-32 h-32"
+        top="40%"
+        left="10%"
+        delay={2}
+      />
       <Routes>
         <Route
           path="/"
           element={
             <ProtectedRoute>
-                <Home />
+              <Home />
             </ProtectedRoute>
           }
         />

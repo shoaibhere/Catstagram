@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { updateProfile } from "../services/profile.services";
 import { useAuthStore } from "../store/authStore";
-import { Upload, User as UserIcon } from "lucide-react";
+import { Upload, User as UserIcon, Lock, Unlock } from "lucide-react";
 import { useTheme } from "../contexts/themeContext";
 
 export default function EditProfileModal({ profile, onClose, onUpdate }) {
   const [name, setName] = useState(profile.name || "");
   const [bio, setBio] = useState(profile.bio || "");
+  const [isPrivate, setIsPrivate] = useState(profile.isPrivate || false);
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(profile.profileImage || "");
   const [errorMessage, setErrorMessage] = useState("");
@@ -18,9 +19,16 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
   const textColor = theme === "dark" ? "text-white" : "text-gray-800";
   const inputBackground = theme === "dark" ? "bg-gray-700" : "bg-gray-100";
   const borderColor = theme === "dark" ? "border-blue-600" : "border-blue-400";
-  const focusRingColor = theme === "dark" ? "focus:ring-blue-600" : "focus:ring-blue-400";
-  const buttonPrimary = theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-500 hover:bg-blue-600";
-  const buttonSecondary = theme === "dark" ? "bg-gray-600 hover:bg-gray-700" : "bg-gray-400 hover:bg-gray-500";
+  const focusRingColor =
+    theme === "dark" ? "focus:ring-blue-600" : "focus:ring-blue-400";
+  const buttonPrimary =
+    theme === "dark"
+      ? "bg-blue-600 hover:bg-blue-700"
+      : "bg-blue-500 hover:bg-blue-600";
+  const buttonSecondary =
+    theme === "dark"
+      ? "bg-gray-600 hover:bg-gray-700"
+      : "bg-gray-400 hover:bg-gray-500";
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -53,6 +61,7 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("bio", bio);
+    formData.append("isPrivate", isPrivate);
     if (profileImage) {
       formData.append("profileImage", profileImage);
     }
@@ -133,6 +142,46 @@ export default function EditProfileModal({ profile, onClose, onUpdate }) {
               rows="3"
               placeholder="Tell us about yourself"
             />
+          </div>
+
+          {/* Profile Privacy Radio Buttons */}
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${textColor}`}>
+              Profile Privacy
+            </label>
+            <div className="flex space-x-4">
+              <label
+                className={`flex items-center space-x-3 cursor-pointer p-2 rounded hover:bg-opacity-10 hover:bg-gray-500`}
+              >
+                <input
+                  type="radio"
+                  name="privacy"
+                  checked={!isPrivate}
+                  onChange={() => setIsPrivate(false)}
+                  className="form-radio h-4 w-4 text-blue-600"
+                />
+                <div className="flex items-center space-x-2">
+                  <Unlock className={`h-5 w-5 ${textColor}`} />
+                  <span className={textColor}>Public Profile</span>
+                </div>
+              </label>
+
+              <label
+                className={`flex items-center space-x-3 cursor-pointer p-2 rounded hover:bg-opacity-10 hover:bg-gray-500`}
+              >
+                <input
+                  type="radio"
+                  name="privacy"
+                  checked={isPrivate}
+                  onChange={() => setIsPrivate(true)}
+                  className="form-radio h-4 w-4 text-blue-600"
+                />
+                <div className="flex items-center space-x-2">
+                  <Lock className={`h-5 w-5 ${textColor}`} />
+                  <span className={textColor}>Private Profile</span>
+                </div>
+              </label>
+            </div>
           </div>
 
           <div className="flex space-x-4 pt-4">

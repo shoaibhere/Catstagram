@@ -23,7 +23,7 @@ const deleteAccount = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { name, bio } = req.body;
+    const { name, bio, isPrivate } = req.body; // Add isPrivate to destructured fields
     let profileImage = req.user?.profileImage;
 
     if (req.file) {
@@ -43,6 +43,7 @@ const updateProfile = async (req, res) => {
         name,
         bio,
         profileImage,
+        isPrivate: isPrivate === "true",
       },
       { new: true }
     ).select("-password");
@@ -56,7 +57,6 @@ const updateProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 const getUserStats = async (req, res) => {
   try {
     const userId = req.params.id;

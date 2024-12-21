@@ -11,6 +11,7 @@ import {
 import { useAuthStore } from "../store/authStore";
 import Layout from "../pages/Layout";
 import { useTheme } from "../contexts/themeContext"; // Import theme context
+import FriendsListModal from "../components/FriendsListModal";
 
 export default function Profile() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export default function Profile() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { user, logout } = useAuthStore();
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
   const { theme } = useTheme(); // Access the theme context
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export default function Profile() {
       <div className="p-8">
         {/* Profile Header */}
         <div
-          className={`${containerClasses} rounded-lg shadow-lg p-8 mb-8 mx-[150px]`}
+          className={`${containerClasses} rounded-lg shadow-lg p-8 mb-8 mx-[100px]`}
         >
           <div className="flex items-center space-x-6">
             {/* Profile Image */}
@@ -88,7 +90,16 @@ export default function Profile() {
                   </p>
                   <p className="text-gray-400">Posts</p>
                 </div>
-                <div className="text-center">
+                {/* <div className="text-center">
+                  <p className="text-xl font-semibold">
+                    {stats.friendsCount || 0}
+                  </p>
+                  <p className="text-gray-400">Friends</p>
+                </div> */}
+                <div
+                  className="text-center cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setShowFriendsModal(true)}
+                >
                   <p className="text-xl font-semibold">
                     {stats.friendsCount || 0}
                   </p>
@@ -97,7 +108,13 @@ export default function Profile() {
               </div>
               <h1 className="text-3xl font-bold mt-2">{profile.name}</h1>
               {profile.bio && (
-                <p className={`${theme==='dark'?"text-gray-300": "text-black"}mt-2`}>{profile.bio}</p>
+                <p
+                  className={`${
+                    theme === "dark" ? "text-gray-300" : "text-black"
+                  }mt-2`}
+                >
+                  {profile.bio}
+                </p>
               )}
             </div>
 
@@ -163,6 +180,14 @@ export default function Profile() {
           </div>
         </div>
       )}
+
+      {/* Friends List Modal */}
+      <FriendsListModal
+        isOpen={showFriendsModal}
+        onClose={() => setShowFriendsModal(false)}
+        userId={id}
+      />
     </Layout>
   );
 }
+

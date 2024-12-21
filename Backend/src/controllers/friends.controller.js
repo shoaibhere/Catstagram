@@ -169,7 +169,9 @@ const removeFriend = async (req, res) => {
 // Get user's friends
 const getFriends = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).populate(
+    const userId = req.params.id;
+
+    const user = await User.findById(userId).populate(
       "friends",
       "name email profileImage"
     );

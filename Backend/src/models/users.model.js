@@ -31,6 +31,10 @@ const signupSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     verificationToken: String,
