@@ -26,7 +26,7 @@ const UserPosts = ({ userId }) => {
         setLoading(true);
         const token = localStorage.getItem("token");
 
-        const response = await axios.get(`${API_URL}/api/posts/${userId}`, {
+        const response = await axios.get(`${API_URL}/api/posts/${userId}/${user._id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

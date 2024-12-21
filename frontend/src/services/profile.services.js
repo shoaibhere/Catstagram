@@ -52,3 +52,13 @@ export const deleteAccount = async (id) => {
     throw error;
   }
 };
+
+export const checkIfBlocked = async (userId, profileId) => {
+  try {
+    const response = await axios.get(`${API_URL}/check-blocked/${userId}/${profileId}`);
+    return response.data.isBlocked; // Assuming the backend returns an object with `isBlocked` boolean
+  } catch (error) {
+    console.error("Error checking if blocked:", error);
+    throw error;
+  }
+};

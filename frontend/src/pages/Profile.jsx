@@ -7,6 +7,7 @@ import {
   getProfileById,
   getUserStats,
   deleteAccount,
+  checkIfBlocked, // This needs to be implemented on your backend
 } from "../services/profile.services";
 import { useAuthStore } from "../store/authStore";
 import Layout from "../pages/Layout";
@@ -19,22 +20,27 @@ export default function Profile() {
   const [stats, setStats] = useState({});
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false); // State to track if the user is blocked
   const { user, logout } = useAuthStore();
   const { theme } = useTheme(); // Access the theme context
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const data = await getProfileById(id);
-        setProfile(data);
-        const stats = await getUserStats(id);
-        setStats(stats);
+        const [profileData, statsData, blockedStatus] = await Promise.all([
+          getProfileById(id),
+          getUserStats(id),
+          checkIfBlocked(user._id, id), // This function needs to check if the current user is blocked by the profile owner
+        ]);
+        setProfile(profileData);
+        setStats(statsData);
+        setIsBlocked(blockedStatus); // Assume this returns true/false
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
     };
     fetchProfileData();
-  }, [id]);
+  }, [id, user._id]);
 
   const handleDeleteAccount = async () => {
     try {
@@ -47,35 +53,21 @@ export default function Profile() {
   };
 
   // Dynamic theme classes
-  const containerClasses =
-    theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-100 text-black";
-  const buttonPrimaryClasses =
-    theme === "dark"
-      ? "bg-blue-600 hover:bg-blue-700"
-      : "bg-blue-500 hover:bg-blue-600";
-  const buttonDangerClasses =
-    theme === "dark"
-      ? "bg-red-600 hover:bg-red-700"
-      : "bg-red-500 hover:bg-red-600";
-  const modalClasses =
-    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black";
+  const containerClasses = theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-100 text-black";
+  const buttonPrimaryClasses = theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-500 hover:bg-blue-600";
+  const buttonDangerClasses = theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600";
+  const modalClasses = theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black";
 
   return (
     <Layout>
       <div className="p-8">
         {/* Profile Header */}
-        <div
-          className={`${containerClasses} rounded-lg shadow-lg p-8 mb-8 mx-[150px]`}
-        >
+        <div className={`${containerClasses} rounded-lg shadow-lg p-8 mb-8 mx-[150px]`}>
           <div className="flex items-center space-x-6">
-            {/* Profile Image */}
+            {/* Conditionally render profile image or generic icon */}
             <div className="w-32 h-32 rounded-full border-4 border-blue-600 flex items-center justify-center overflow-hidden">
-              {profile.profileImage ? (
-                <img
-                  src={profile.profileImage}
-                  alt={profile.name}
-                  className="w-full h-full object-cover"
-                />
+              {profile.profileImage && !isBlocked ? (
+                <img src={profile.profileImage} alt={profile.name} className="w-full h-full object-cover" />
               ) : (
                 <UserIcon className="w-16 h-16 text-gray-400" />
               )}
@@ -83,37 +75,27 @@ export default function Profile() {
             <div className="flex-grow">
               <div className="flex space-x-6 mt-4">
                 <div className="text-center">
-                  <p className="text-xl font-semibold">
-                    {stats.postCount || 0}
-                  </p>
+                  <p className="text-xl font-semibold">{stats.postCount || 0}</p>
                   <p className="text-gray-400">Posts</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xl font-semibold">
-                    {stats.friendsCount || 0}
-                  </p>
+                  <p className="text-xl font-semibold">{stats.friendsCount || 0}</p>
                   <p className="text-gray-400">Friends</p>
                 </div>
               </div>
-              <h1 className="text-3xl font-bold mt-2">{profile.name}</h1>
-              {profile.bio && (
-                <p className={`${theme==='dark'?"text-gray-300": "text-black"}mt-2`}>{profile.bio}</p>
+              <h1 className="text-3xl font-bold mt-2">{isBlocked ? "Catstagram User" : profile.name}</h1>
+              {profile.bio && !isBlocked && (
+                <p className={`${theme === 'dark' ? "text-gray-300" : "text-black"} mt-2`}>{profile.bio}</p>
               )}
             </div>
 
             {/* Buttons visible only to the profile owner */}
-            {id === user._id && (
+            {id === user._id && !isBlocked && (
               <div className="flex flex-col space-y-4">
-                <button
-                  onClick={() => setShowEditModal(true)}
-                  className={`${buttonPrimaryClasses} px-4 py-2 rounded transition duration-300`}
-                >
+                <button onClick={() => setShowEditModal(true)} className={`${buttonPrimaryClasses} px-4 py-2 rounded transition duration-300`}>
                   Edit Profile
                 </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className={`${buttonDangerClasses} px-4 py-2 rounded transition duration-300`}
-                >
+                <button onClick={() => setShowDeleteConfirm(true)} className={`${buttonDangerClasses} px-4 py-2 rounded transition duration-300`}>
                   Delete Account
                 </button>
               </div>
@@ -122,7 +104,7 @@ export default function Profile() {
         </div>
 
         {/* User Posts Section */}
-        <UserPosts userId={id} />
+        {!isBlocked && <UserPosts userId={id} />}
       </div>
 
       {/* Edit Profile Modal */}
@@ -143,20 +125,13 @@ export default function Profile() {
           <div className={`${modalClasses} p-6 rounded-lg`}>
             <h2 className="text-xl font-bold mb-4">Confirm Account Deletion</h2>
             <p className="mb-6">
-              Are you sure you want to delete your account? This action cannot
-              be undone.
+              Are you sure you want to delete your account? This action cannot be undone.
             </p>
             <div className="flex space-x-4">
-              <button
-                onClick={handleDeleteAccount}
-                className={`${buttonDangerClasses} px-4 py-2 rounded`}
-              >
+              <button onClick={handleDeleteAccount} className={`${buttonDangerClasses} px-4 py-2 rounded`}>
                 Delete Account
               </button>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className={`${buttonPrimaryClasses} px-4 py-2 rounded`}
-              >
+              <button onClick={() => setShowDeleteConfirm(false)} className={`${buttonPrimaryClasses} px-4 py-2 rounded`}>
                 Cancel
               </button>
             </div>

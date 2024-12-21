@@ -83,6 +83,11 @@ const PostCard = ({ post, user }) => {
     }
   };
 
+  // Utility function to handle pluralization
+  const formatCount = (count, singular) => {
+    return `${count} ${count === 1 ? singular : singular + 's'}`;
+  };
+
   if (!post || !post.user) return null;
 
   return (
@@ -168,14 +173,14 @@ const PostCard = ({ post, user }) => {
           >
             <FontAwesomeIcon icon={faHeart} />
           </button>
-          <span className="text-gray-400 text-xs">{likeCount} Likes</span>
+          <span className="text-gray-400 text-xs">{formatCount(likeCount, 'Like')}</span>
         </div>
 
         <div className="flex items-center">
           <button className="text-xl text-gray-500 hover:text-blue-500 mr-3">
             <FontAwesomeIcon icon={faComment} />
           </button>
-          <span className="text-gray-400 text-xs">{post.comments.length} Comments</span>
+          <span className="text-gray-400 text-xs">{formatCount(post.comments.length, 'Comment')}</span>
         </div>
 
         <div className="flex items-center">

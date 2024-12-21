@@ -6,6 +6,7 @@ const {
   updateProfile,
   getUserStats,
   getProfileById,
+  checkIfBlocked,
 } = require("../controllers/profile.controller");
 
 router.get("/getProfile/:id", verifyToken, getProfileById);
@@ -17,5 +18,7 @@ router.put(
   updateProfile
 );
 router.get("/stats/:id", verifyToken, getUserStats);
+router.get("/check-blocked/:userId/:profileId", verifyToken, checkIfBlocked);
+
 
 module.exports = router;

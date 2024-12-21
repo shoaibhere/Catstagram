@@ -12,15 +12,20 @@ function getPaginationParams(query) {
 // Fetch all posts with pagination
 const getPosts = async (req, res) => {
   try {
+    const currentUser = req.params.currentuserid; // Assuming you have access to the user ID from the request object
     const { page, limit, skip } = getPaginationParams(req.query);
 
-    const posts = await Post.find()
+    // Fetch only posts from users who have not blocked the current user
+    const blockedUsers = await User.find({ blocked: currentUser }).select('_id');
+    const blockedUserIds = blockedUsers.map(user => user._id);
+
+    const posts = await Post.find({ user: { $nin: blockedUserIds } })
       .populate("user", "name profileImage")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalPosts = await Post.countDocuments();
+    const totalPosts = await Post.countDocuments({ user: { $nin: blockedUserIds } });
 
     res.status(200).json({
       success: true,
@@ -45,9 +50,16 @@ const getPosts = async (req, res) => {
 const getPostsByUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const user = await User.findById(userId).select("name profileImage email");
+    const currentUser = req.params.currentuserid; // Assuming this is the ID of the user making the request
+
+    const user = await User.findById(userId).select("name profileImage email blocked");
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Check if the currentUser is blocked
+    if (user.blocked.includes(currentUser)) {
+      return res.status(403).json({ success: false, message: "The User has blocked you" });
     }
 
     const { page, limit, skip } = getPaginationParams(req.query);
