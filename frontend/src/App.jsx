@@ -32,14 +32,14 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/verify-email" replace />;
   }
 
-  return children;
+  return children;  
 };
 
 const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
   if (isAuthenticated && user && user.isVerified) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return children;
@@ -75,7 +75,7 @@ const AppContent = () => {
       <FloatingShape color={shapeColors[2]} size="w-32 h-32" top="40%" left="10%" delay={2} />
       <Routes>
         <Route
-          path="/"
+          path="/home"
           element={
             <ProtectedRoute>
                 <Home />
@@ -99,7 +99,7 @@ const AppContent = () => {
             </RedirectAuthenticatedUser>
           }
         />
-        <Route path="/website" element={<Website />} />
+        <Route path="/" element={<Website />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route
           path="/forgot-password"
