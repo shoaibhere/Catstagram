@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { User, Ban } from "lucide-react";
+import { User, Ban } from 'lucide-react';
 import { useTheme } from "../contexts/themeContext";
+
+const API_URL = import.meta.env.MODE === "development" ? "http://localhost:8000/api" : "/api";
 
 const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [requestSent, setRequestSent] = useState(localStorage.getItem(`requestSent-${user._id}`) !== null);
-  const [isBlocked, setIsBlocked] = useState(localStorage.getItem(`blocked-${user._id}`) === 'true');
-  const { theme } = useTheme(); 
-
-  const API_URL =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:8000/api"
-      : "/api";
+  const [requestSent, setRequestSent] = useState(false);
+  const [requestId, setRequestId] = useState(null);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
-    // Initialization effect for blocked status
-    const updateBlockStatus = () => {
-      const blockedStatus = localStorage.getItem(`blocked-${user._id}`);
-      setIsBlocked(blockedStatus === 'true');
+    const fetchUserStatus = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/friends/requests-get-one/${user._id}`);
+        const { friendRequestStatus, requestId } = response.data;
+        setRequestSent(friendRequestStatus === 'pending');
+        setRequestId(requestId);
+        // You might want to add logic here to set isBlocked based on the API response
+      } catch (error) {
+        console.error("Error fetching user status:", error);
+      }
     };
-    updateBlockStatus();
+
+    fetchUserStatus();
   }, [user._id]);
 
   const handleBlockUser = async () => {
@@ -31,7 +36,6 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       const response = await axios.post(`${API_URL}/user/block-user`, { userIdToBlock: user._id });
       if (response.data.success) {
         setIsBlocked(true);
-        localStorage.setItem(`blocked-${user._id}`, 'true');
         alert(`User ${user.name} has been blocked.`);
       }
     } catch (error) {
@@ -48,7 +52,6 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       const response = await axios.post(`${API_URL}/user/unblock-user`, { userIdToUnblock: user._id });
       if (response.data.success) {
         setIsBlocked(false);
-        localStorage.removeItem(`blocked-${user._id}`);
         alert(`User ${user.name} has been unblocked.`);
       }
     } catch (error) {
@@ -66,7 +69,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       const response = await axios.post(`${API_URL}/friends/request/${user._id}`);
       const { requestId } = response.data;
       setRequestSent(true);
-      localStorage.setItem(`requestSent-${user._id}`, requestId);
+      setRequestId(requestId);
       onFriendUpdate();
     } catch (error) {
       console.error("Error sending friend request:", error);
@@ -77,13 +80,12 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   };
 
   const handleUnsendRequest = async () => {
-    if (isLoading || !requestSent) return;
+    if (isLoading || !requestSent || !requestId) return;
     setIsLoading(true);
     try {
-      const requestId = localStorage.getItem(`requestSent-${user._id}`);
       await axios.delete(`${API_URL}/friends/request/${requestId}`);
       setRequestSent(false);
-      localStorage.removeItem(`requestSent-${user._id}`);
+      setRequestId(null);
       onFriendUpdate();
     } catch (error) {
       console.error("Error unsending friend request:", error);
@@ -224,3 +226,4 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
 };
 
 export default UserCard;
+

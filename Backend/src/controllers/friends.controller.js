@@ -224,6 +224,39 @@ const deleteSentFriendRequest = async (req, res) => {
   }
 };
 
+// Assume this is part of your user retrieval logic
+const getUserWithFriendRequestStatus = async (req, res) => {
+  try {
+    const { userId } = req.params; // the ID of the user to retrieve
+    const currentUser = req.userId; // ID of the requesting user from auth middleware
+
+    const user = await User.findById(userId)
+      .select('name email profileImage')
+      .lean(); // Convert to plain JS object for easy manipulation
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if there's an existing friend request between the currentUser and the retrieved user
+    const friendRequest = await FriendRequest.findOne({
+      $or: [
+        { sentBy: currentUser, sentTo: userId },
+        { sentBy: userId, sentTo: currentUser }
+      ]
+    });
+
+    // Add friend request status to the user object
+    user.friendRequestStatus = friendRequest ? friendRequest.status : null;
+    user.requestId = friendRequest ? friendRequest._id : null;
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   sendFriendRequest,
   approveFriendRequest,
@@ -234,4 +267,5 @@ module.exports = {
   getPotentialFriends,
   deleteSentFriendRequest,
   getSentFriendRequests,
+  getUserWithFriendRequestStatus,
 };
