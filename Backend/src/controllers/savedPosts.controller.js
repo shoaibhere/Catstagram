@@ -61,7 +61,7 @@ const unsavePost = async (req, res) => {
 const getSavedPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const currentUser = req.user._id;  // Assuming you extract the current user's ID from authentication middleware
+    const currentUser = req.userId;  // Assuming you extract the current user's ID from authentication middleware
 
     const user = await User.findById(userId).populate({
       path: "savedPosts",

@@ -4,7 +4,7 @@ const { FriendRequest } = require("../models/friendRequest.model");
 
 const sendFriendRequest = async (req, res) => {
   const sentToId = req.params.id; // Extract the recipient's ID from request parameters
-  const sentById = req.userId; // Assuming the authenticated user's ID is stored in req.user
+  const sentById = req.userId; // Assuming the authenticated user's ID is stored in req.userId
 
   try {
     if (sentById.toString() === sentToId) {
@@ -28,6 +28,8 @@ const sendFriendRequest = async (req, res) => {
       ],
     });
     const areAlreadyFriends = sender.friends.includes(sentToId);
+    const isBlocked = recipient.blocked.includes(sentById);
+    const hasBeenBlocked = sender.blocked.includes(sentToId);
 
     if (existingRequest) {
       return res
@@ -36,6 +38,23 @@ const sendFriendRequest = async (req, res) => {
           message: "Friend request already exists or has been handled.",
         });
     }
+
+    if (isBlocked) {
+      return res
+        .status(409)
+        .json({
+          message: "You have been blocked by this user.",
+        });
+    }
+
+    if (hasBeenBlocked) {
+      return res
+        .status(409)
+        .json({
+          message: "Can't send, You blocked this user.",
+        });
+    }
+
 
     if (areAlreadyFriends) {
       return res.status(409).json({ message: "Users are already friends." });
@@ -71,6 +90,7 @@ const sendFriendRequest = async (req, res) => {
       .json({ message: "Internal server error while sending friend request." });
   }
 };
+
 
 // Approve a friend request
 const approveFriendRequest = async (req, res) => {
@@ -258,7 +278,6 @@ const deleteSentFriendRequest = async (req, res) => {
   }
 };
 
-// Assume this is part of your user retrieval logic
 const getUserWithFriendRequestStatus = async (req, res) => {
   try {
     const { userId } = req.params; // the ID of the user to retrieve
@@ -280,15 +299,22 @@ const getUserWithFriendRequestStatus = async (req, res) => {
       ],
     });
 
-    // Add friend request status to the user object
-    user.friendRequestStatus = friendRequest ? friendRequest.status : null;
-    user.requestId = friendRequest ? friendRequest._id : null;
+    const currentUserDetails = await User.findById(currentUser);
+    const isBlocked = currentUserDetails.blocked.includes(userId.toString()); // Check if the user is blocked
 
-    res.json(user);
+    // Add friend request status and blocked status to the user object
+    res.json({
+      ...user,
+      friendRequestStatus: friendRequest ? friendRequest.status : null,
+      requestId: friendRequest ? friendRequest._id : null,
+      isBlocked
+    });
   } catch (error) {
+    console.error("Error fetching user details:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const checkFriendStatus = async (req, res) => {
   try {

@@ -67,7 +67,7 @@ const EditPostForm = ({ post }) => {
         }
       );
       alert("Post updated successfully!");
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       console.error("Error updating post:", error);
       alert("Failed to update post.");

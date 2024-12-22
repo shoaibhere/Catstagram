@@ -17,11 +17,11 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
-        const response = await axios.get(`${API_URL}/friends/requests-get-one/${user._id}`);
-        const { friendRequestStatus, requestId } = response.data;
+        const response = await axios.get(`${API_URL}/friends/status/${user._id}`);
+        const { friendRequestStatus, requestId, isBlocked } = response.data;
         setRequestSent(friendRequestStatus === 'pending');
         setRequestId(requestId);
-        // You might want to add logic here to set isBlocked based on the API response
+        setIsBlocked(isBlocked);
       } catch (error) {
         console.error("Error fetching user status:", error);
       }
@@ -37,6 +37,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       if (response.data.success) {
         setIsBlocked(true);
         alert(`User ${user.name} has been blocked.`);
+        onFriendUpdate();
       }
     } catch (error) {
       console.error("Error blocking user:", error);
@@ -53,6 +54,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       if (response.data.success) {
         setIsBlocked(false);
         alert(`User ${user.name} has been unblocked.`);
+        onFriendUpdate();
       }
     } catch (error) {
       console.error("Error unblocking user:", error);
@@ -63,7 +65,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   };
 
   const handleFriendRequest = async () => {
-    if (isLoading || requestSent) return;
+    if (isLoading || requestSent || isBlocked) return;
     setIsLoading(true);
     try {
       const response = await axios.post(`${API_URL}/friends/request/${user._id}`);
@@ -71,7 +73,6 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       setRequestSent(true);
       setRequestId(requestId);
       onFriendUpdate();
-      window.location.reload();
     } catch (error) {
       console.error("Error sending friend request:", error);
       alert("Failed to send friend request. Please try again.");
@@ -97,6 +98,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   };
 
   const handleRemoveFriend = async () => {
+    if (isBlocked) return;
     setIsLoading(true);
     try {
       await axios.delete(`${API_URL}/friends/remove/${user._id}`);
@@ -132,13 +134,11 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
     : "from-green-400 to-green-500 hover:from-green-500 hover:to-green-600";
 
   return (
-    <div
-      className={`relative w-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 ${
+    <div className={`relative w-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 ${
         theme === "dark"
           ? "bg-gradient-to-br from-gray-900 via-purple-900 to-black border-purple-600"
           : "bg-white border-gray-300"
-      }`}
-    >
+      }`}>
       <button
         onClick={isBlocked ? handleUnblockUser : handleBlockUser}
         title={isBlocked ? "Unblock User" : "Block User"}
@@ -151,7 +151,6 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       >
         <Ban className="w-5 h-5" />
       </button>
-
       <div className="flex flex-col md:flex-row items-center gap-4">
         {user.profileImage ? (
           <img
@@ -172,23 +171,17 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
             <User className="w-8 h-8 md:w-10 md:h-10" />
           </div>
         )}
-
         <div className="flex-grow text-center md:text-left">
-          <h3
-            className={`text-xl font-bold ${
+          <h3 className={`text-xl font-bold ${
               theme === "dark" ? "text-white" : "text-gray-800"
-            }`}
-          >
+            }`}>
             <Link to={`/profile/${user._id}`}>{user.name}</Link>
           </h3>
-          <p
-            className={`text-sm ${
+          <p className={`text-sm ${
               theme === "dark" ? "text-gray-400" : "text-gray-600"
-            } mb-2`}
-          >
+            } mb-2`}>
             {user.email}
           </p>
-
           <div className="flex flex-col md:flex-row gap-2 mt-4">
             <button
               onClick={() => navigate(`/profile/${user._id}`)}
@@ -201,7 +194,6 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
             >
               View Profile
             </button>
-
             <button
               onClick={
                 isFriend
@@ -227,4 +219,3 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
 };
 
 export default UserCard;
-

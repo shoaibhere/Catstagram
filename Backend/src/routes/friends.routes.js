@@ -33,7 +33,7 @@ router.get("/requests/pending", verifyToken, getPendingFriendRequests);
 
 router.get("/requests/sent", verifyToken, getSentFriendRequests);
 
-router.get("/requests-get-one/:userId", verifyToken, getUserWithFriendRequestStatus);
+router.get("/status/:userId", verifyToken, getUserWithFriendRequestStatus);
 
 router.delete("/request/:id", verifyToken, deleteSentFriendRequest);
 
