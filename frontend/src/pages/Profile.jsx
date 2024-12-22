@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import EditProfileModal from "../components/EditProfileModal";
 import UserPosts from "../components/UserPosts";
 import { useParams, useNavigate } from "react-router-dom";
-import { User as UserIcon } from "lucide-react";
+import { User as UserIcon, Lock } from "lucide-react";
 import {
   getProfileById,
   getUserStats,
@@ -10,8 +10,9 @@ import {
 } from "../services/profile.services";
 import { useAuthStore } from "../store/authStore";
 import Layout from "../pages/Layout";
-import { useTheme } from "../contexts/themeContext"; // Import theme context
+import { useTheme } from "../contexts/themeContext";
 import FriendsListModal from "../components/FriendsListModal";
+import FriendProtectedContent from "../components/FriendStatus";
 
 export default function Profile() {
   const { id } = useParams();
@@ -22,7 +23,7 @@ export default function Profile() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { user, logout } = useAuthStore();
   const [showFriendsModal, setShowFriendsModal] = useState(false);
-  const { theme } = useTheme(); // Access the theme context
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -90,12 +91,7 @@ export default function Profile() {
                   </p>
                   <p className="text-gray-400">Posts</p>
                 </div>
-                {/* <div className="text-center">
-                  <p className="text-xl font-semibold">
-                    {stats.friendsCount || 0}
-                  </p>
-                  <p className="text-gray-400">Friends</p>
-                </div> */}
+
                 <div
                   className="text-center cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => setShowFriendsModal(true)}
@@ -111,7 +107,7 @@ export default function Profile() {
                 <p
                   className={`${
                     theme === "dark" ? "text-gray-300" : "text-black"
-                  }mt-2`}
+                  } mt-2`}
                 >
                   {profile.bio}
                 </p>
@@ -138,8 +134,22 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* User Posts Section */}
-        <UserPosts userId={id} />
+        {/* Protected Content */}
+        <FriendProtectedContent
+          userId={id}
+          fallbackMessage="Only friends can view this user's posts and friends list"
+        >
+          <>
+            {/* User Posts Section */}
+            <UserPosts userId={id} />
+          </>
+
+          <FriendsListModal
+            isOpen={showFriendsModal}
+            onClose={() => setShowFriendsModal(false)}
+            userId={id}
+          />
+        </FriendProtectedContent>
       </div>
 
       {/* Edit Profile Modal */}
@@ -180,14 +190,6 @@ export default function Profile() {
           </div>
         </div>
       )}
-
-      {/* Friends List Modal */}
-      <FriendsListModal
-        isOpen={showFriendsModal}
-        onClose={() => setShowFriendsModal(false)}
-        userId={id}
-      />
     </Layout>
   );
 }
-

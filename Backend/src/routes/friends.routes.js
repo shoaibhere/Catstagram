@@ -11,6 +11,7 @@ const {
   getPotentialFriends,
   deleteSentFriendRequest,
   getSentFriendRequests,
+  checkFriendStatus,
 } = require("../controllers/friends.controller");
 
 router.post("/request/:id", verifyToken, sendFriendRequest);
@@ -22,6 +23,8 @@ router.post("/request/decline/:id", verifyToken, declineFriendRequest);
 router.delete("/remove/:id", verifyToken, removeFriend);
 
 router.get("/list/:id", verifyToken, getFriends);
+
+router.get("/check/:id", verifyToken, checkFriendStatus);
 
 router.get("/potential", verifyToken, getPotentialFriends);
 

@@ -226,6 +226,54 @@ const deleteSentFriendRequest = async (req, res) => {
   }
 };
 
+const checkFriendStatus = async (req, res) => {
+  try {
+    const { id: targetUserId } = req.params;
+    const currentUserId = req.userId;
+
+    if (targetUserId === currentUserId) {
+      return res.status(200).json({
+        isFriend: false,
+        isOwnProfile: true,
+        isPublic: true,
+      });
+    }
+
+    const targetUser = await User.findById(targetUserId);
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isBlocked = targetUser.blocked.includes(currentUserId);
+    if (isBlocked) {
+      return res.status(200).json({
+        isFriend: false,
+        isOwnProfile: false,
+        isPublic: false,
+        isBlocked: true,
+      });
+    }
+
+    const isFriend = targetUser.friends.includes(currentUserId);
+
+    if (targetUser.isPrivate) {
+      return res.status(200).json({
+        isFriend,
+        isOwnProfile: false,
+        isPublic: false,
+      });
+    }
+    res.status(200).json({
+      isFriend,
+      isOwnProfile: false,
+      isPublic: true,
+      isBlocked: false,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   sendFriendRequest,
   approveFriendRequest,
@@ -236,4 +284,5 @@ module.exports = {
   getPotentialFriends,
   deleteSentFriendRequest,
   getSentFriendRequests,
+  checkFriendStatus,
 };
