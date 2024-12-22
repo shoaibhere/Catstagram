@@ -12,6 +12,8 @@ import {
 import { useAuthStore } from "../store/authStore";
 import Layout from "../pages/Layout";
 import { useTheme } from "../contexts/themeContext";
+import FriendsListModal from "../components/FriendsListModal";
+import FriendProtectedContent from "../components/FriendStatus";
 
 export default function Profile() {
   const { id } = useParams();
@@ -20,6 +22,7 @@ export default function Profile() {
   const [stats, setStats] = useState({});
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const { user, logout } = useAuthStore();
   const { theme } = useTheme();
@@ -87,8 +90,14 @@ export default function Profile() {
                   <p className="text-xl font-semibold">{stats.postCount || 0}</p>
                   <p className="text-gray-400">Posts</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-xl font-semibold">{stats.friendsCount || 0}</p>
+
+                <div
+                  className="text-center cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setShowFriendsModal(true)}
+                >
+                  <p className="text-xl font-semibold">
+                    {stats.friendsCount || 0}
+                  </p>
                   <p className="text-gray-400">Friends</p>
                 </div>
               </div>
@@ -127,9 +136,23 @@ export default function Profile() {
             )}
           </div>
         </div>
-
-        {/* User Posts Section */}
+ 
+        {/* Protected Content */}
+        <FriendProtectedContent
+          userId={id}
+          fallbackMessage="Only friends can view this user's posts and friends list"
+        >
+          <>
+            {/* User Posts Section */}
         {!isBlocked && <UserPosts userId={id} />}
+          </>
+
+          <FriendsListModal
+            isOpen={showFriendsModal}
+            onClose={() => setShowFriendsModal(false)}
+            userId={id}
+          />
+        </FriendProtectedContent>
       </div>
 
       {/* Edit Profile Modal */}

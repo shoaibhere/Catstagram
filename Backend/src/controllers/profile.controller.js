@@ -14,26 +14,41 @@ const deleteAccount = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const userId = req.params.id;
-  const { name, bio } = req.body;
-  let profileImage = req.user?.profileImage;
-  if (req.file) {
-    try {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      profileImage = result.secure_url;
-    } catch (cloudinaryError) {
-      return res.status(500).json({ error: "Failed to upload profile image" });
+  try {
+    const userId = req.params.id;
+    const { name, bio, isPrivate } = req.body; // Add isPrivate to destructured fields
+    let profileImage = req.user?.profileImage;
+
+    if (req.file) {
+      try {
+        const result = await cloudinary.uploader.upload(req.file.path);
+        profileImage = result.secure_url;
+      } catch (cloudinaryError) {
+        return res
+          .status(500)
+          .json({ error: "Failed to upload profile image" });
+      }
     }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        name,
+        bio,
+        profileImage,
+        isPrivate: isPrivate === "true",
+      },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    { name, bio, profileImage },
-    { new: true }
-  ).select("-password");
-  if (!updatedUser) {
-    return res.status(404).json({ error: "User not found" });
-  }
-  res.status(200).json(updatedUser);
 };
 
 const getUserStats = async (req, res) => {

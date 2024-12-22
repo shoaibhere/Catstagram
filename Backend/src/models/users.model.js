@@ -16,6 +16,10 @@ const signupSchema = new mongoose.Schema({
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     blocked: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    isPrivate: {
+        type: Boolean,
+        default: false,
+      },
 }, { timestamps: true });
 
 // Hash the password before saving a User
