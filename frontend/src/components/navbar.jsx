@@ -8,11 +8,7 @@ import {
   Home,
   LogOut,
   Cat,
-  Settings,
-  Sun,
-  Moon,
   Lock,
-  ChevronDown,
 } from "lucide-react";
 import ThemeToggle from "./themeToggle"; // Ensure the path is correct and matches your file structure
 

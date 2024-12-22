@@ -156,29 +156,21 @@ export const useAuthStore = create((set) => ({
 
   changePassword: async (currentPassword, newPassword) => {
     set({ isLoading: true, error: null, message: null });
-
-    const userId = localStorage.getItem("userId"); // Or wherever you store the user ID
-
     try {
-      const response = await axios.post(
-        `${API_URL}/change-password`,
-        { currentPassword, newPassword, userId }, // Include the user ID in the body
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      const response = await axios.post(`${API_URL}/change-password`, { currentPassword, newPassword });
       set({
         isLoading: false,
-        message: response.data.message || "Password changed successfully",
+        message: "Password changed successfully",
+        error: null,
       });
     } catch (error) {
       set({
         isLoading: false,
-        error: error.response?.data?.message || error.message,
+        error: error.response?.data?.message || "Failed to change password",
+        message: null,
       });
     }
   },
+
+  clearMessages: () => set({ error: null, message: null }),
 }));
