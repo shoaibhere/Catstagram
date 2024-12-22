@@ -82,8 +82,12 @@ const getComments = async (req, res) => {
     // Find the post and populate the comments
     const post = await Post.findById(postId).populate({
       path: 'comments',
-      populate: { path: 'user', select: 'name' } // Assuming you want to include user name
+      populate: {
+        path: 'user',
+        select: 'name profileImage'  // Correctly formatted
+      }
     });
+    
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
@@ -106,7 +110,7 @@ const getOneComment = async (req, res) => {
     const { commentId } = req.params;
 
     // Retrieve the comment and populate the user details
-    const comment = await Comment.findById(commentId).populate('user', 'name email'); // Adjust fields as needed
+    const comment = await Comment.findById(commentId).populate('user', 'name'); // Adjust fields as needed
 
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });

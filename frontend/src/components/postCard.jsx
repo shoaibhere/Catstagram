@@ -10,33 +10,32 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark as farBookmark } from "@fortawesome/free-regular-svg-icons";
 import { faBookmark as fasBookmark } from "@fortawesome/free-solid-svg-icons";
-import { User } from "lucide-react";
+import { User } from 'lucide-react';
 import { format } from "date-fns";
 import { savePost, unsavePost } from "../services/savedPosts.services";
 import { likePost, unlikePost } from "../services/likedPosts.services";
 import axios from "axios";
 import { useTheme } from "../contexts/themeContext";
+import CommentSection from './commentSection';
+import Modal from './Modal';
 
 const PostCard = ({ post, user }) => {
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [commentCount, setCommentCount] = useState(post.comments.length);
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
-  const { theme } = useTheme(); // Using theme from context
+  const { theme } = useTheme();
 
-  // Theme-based styles
-  const containerClass =
-    theme === "dark"
-      ? "bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white"
-      : "bg-gradient-to-br from-gray-100 via-gray-200 to-white text-gray-800";
-  const userIconBgClass =
-    theme === "dark" ? "bg-purple-300 text-purple-800" : "bg-gray-300 text-gray-800";
-  const dropdownClass =
-    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-800";
+  const containerClass = theme === "dark"
+    ? "bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white"
+    : "bg-gradient-to-br from-gray-100 via-gray-200 to-white text-gray-800";
+  const userIconBgClass = theme === "dark" ? "bg-purple-300 text-purple-800" : "bg-gray-300 text-gray-800";
+  const dropdownClass = theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-800";
   const buttonClass = theme === "dark" ? "hover:text-red-500" : "hover:text-red-700";
 
-  // Initial setup for saved and liked state
   useEffect(() => {
     if (user && user._id) {
       const saved = post.savedBy.some((savedId) => savedId.toString() === user._id.toString());
@@ -83,18 +82,18 @@ const PostCard = ({ post, user }) => {
     }
   };
 
-  // Utility function to handle pluralization
   const formatCount = (count, singular) => {
     return `${count} ${count === 1 ? singular : singular + 's'}`;
+  };
+
+  const handleCommentCountChange = (newCount) => { 
+    setCommentCount(newCount);
   };
 
   if (!post || !post.user) return null;
 
   return (
-    <div
-      className={`w-[350px] ${containerClass} rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 mb-4 max-w-md mx-auto transform hover:scale-105 transition-transform duration-300 relative`}
-    >
-      {/* User Info and Post Meta */}
+    <div className={`w-[350px] ${containerClass} rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 mb-4 max-w-md mx-auto transform hover:scale-105 transition-transform duration-300 relative`}>
       <div className="flex items-center mb-3 justify-between">
         <div className="flex items-center">
           {post.user.profileImage ? (
@@ -104,9 +103,7 @@ const PostCard = ({ post, user }) => {
               alt="User Profile"
             />
           ) : (
-            <div
-              className={`w-10 h-10 rounded-full ${userIconBgClass} flex items-center justify-center ring-4 ring-purple-400 shadow-md mr-3`}
-            >
+            <div className={`w-10 h-10 rounded-full ${userIconBgClass} flex items-center justify-center ring-4 ring-purple-400 shadow-md mr-3`}>
               <User className="w-6 h-6" />
             </div>
           )}
@@ -129,9 +126,7 @@ const PostCard = ({ post, user }) => {
               <FontAwesomeIcon icon={faEllipsisV} />
             </button>
             {showDropdown && (
-              <div
-                className={`absolute top-8 right-0 w-24 ${dropdownClass} shadow-lg rounded-lg z-10`}
-              >
+              <div className={`absolute top-8 right-0 w-24 ${dropdownClass} shadow-lg rounded-lg z-10`}>
                 <Link
                   to={`/edit-post/${post._id}`}
                   className="block px-3 py-2 hover:bg-gray-200 w-full text-left"
@@ -152,7 +147,6 @@ const PostCard = ({ post, user }) => {
         )}
       </div>
 
-      {/* Post Image */}
       <div className="mb-3 relative mx-auto w-full aspect-square max-w-full overflow-hidden rounded-lg shadow-md">
         <img
           src={post.image || "https://via.placeholder.com/600x600"}
@@ -161,10 +155,8 @@ const PostCard = ({ post, user }) => {
         />
       </div>
 
-      {/* Caption */}
       <p className="text-sm font-semibold mb-3 leading-snug">{post.caption || "Caption"}</p>
 
-      {/* Like, Comment, Save Section */}
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           <button
@@ -177,17 +169,18 @@ const PostCard = ({ post, user }) => {
         </div>
 
         <div className="flex items-center">
-          <button className="text-xl text-gray-500 hover:text-blue-500 mr-3">
+          <button 
+            className="text-xl text-gray-500 hover:text-blue-500 mr-3"
+            onClick={() => setIsCommentModalOpen(true)}
+          >
             <FontAwesomeIcon icon={faComment} />
           </button>
-          <span className="text-gray-400 text-xs">{formatCount(post.comments.length, 'Comment')}</span>
+          <span className="text-gray-400 text-xs">{formatCount(commentCount, 'Comment')}</span> {/* Update 3 */}
         </div>
 
         <div className="flex items-center">
           <button
-            className={`text-xl ${
-              isSaved ? "text-green-500" : "text-gray-500"
-            } hover:text-blue-500 mr-3`}
+            className={`text-xl ${isSaved ? "text-green-500" : "text-gray-500"} hover:text-blue-500 mr-3`}
             onClick={handleSavePost}
           >
             <FontAwesomeIcon icon={isSaved ? fasBookmark : farBookmark} />
@@ -195,8 +188,17 @@ const PostCard = ({ post, user }) => {
           <span className="text-gray-400 text-xs">{isSaved ? "Saved" : "Save"}</span>
         </div>
       </div>
+
+      <Modal isOpen={isCommentModalOpen} onClose={() => setIsCommentModalOpen(false)}>
+        <CommentSection 
+          postId={post._id} 
+          userId={user._id} 
+          onCommentCountChange={handleCommentCountChange}
+        />
+      </Modal>
     </div>
   );
 };
 
 export default PostCard;
+
