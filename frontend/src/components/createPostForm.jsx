@@ -5,19 +5,20 @@ import axios from "axios";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faSave, faHeart, faBookmark } from "@fortawesome/free-solid-svg-icons";
+import { faComment, faSave, faHeart, faBookmark, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "../store/authStore";
-import { useTheme } from "../contexts/themeContext"; // Import the theme context
+import { useTheme } from "../contexts/themeContext";
 
 const CreatePostForm = () => {
   const [image, setImage] = useState(null);
   const [caption, setCaption] = useState("");
   const [croppedImage, setCroppedImage] = useState(null);
   const [isImageCropped, setIsImageCropped] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
   const cropperRef = useRef(null);
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { theme } = useTheme(); // Use the theme from the context
+  const { theme } = useTheme();
 
   // Theme-based styling
   const containerClass = theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-800";
@@ -31,7 +32,7 @@ const CreatePostForm = () => {
       reader.onload = () => {
         setImage(reader.result);
         setIsImageCropped(false);
-        setCroppedImage(null); // Clear previous cropped image
+        setCroppedImage(null);
       };
       reader.onerror = () => alert("Failed to load image. Please try again.");
       reader.readAsDataURL(file);
@@ -63,6 +64,7 @@ const CreatePostForm = () => {
       return;
     }
 
+    setLoading(true); // Start loading
     const blob = await fetch(croppedImage).then((res) => res.blob());
     const file = new File([blob], "cropped-image.png", { type: "image/png" });
 
@@ -88,6 +90,8 @@ const CreatePostForm = () => {
     } catch (error) {
       console.error("Error uploading post:", error);
       alert("An error occurred while creating the post.");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -195,12 +199,16 @@ const CreatePostForm = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className={`w-full py-3 px-4 ${buttonClass} font-bold rounded-lg ${
-              !isImageCropped || !caption.trim() ? "opacity-50 cursor-not-allowed" : ""
+            className={`w-full py-3 px-4 ${buttonClass} font-bold rounded-lg flex justify-center items-center ${
+              !isImageCropped || !caption.trim() || loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={!isImageCropped || !caption.trim()}
+            disabled={!isImageCropped || !caption.trim() || loading}
           >
-            Create Post
+            {loading ? (
+              <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+            ) : (
+              "Create Post"
+            )}
           </motion.button>
         </form>
       </div>

@@ -5,7 +5,7 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faSave, faHeart, faBookmark } from "@fortawesome/free-solid-svg-icons";
+import { faComment, faSpinner, faHeart, faBookmark } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "../contexts/themeContext"; // Import theme context
 
 const EditPostForm = ({ post }) => {
@@ -14,6 +14,7 @@ const EditPostForm = ({ post }) => {
   const [newImage, setNewImage] = useState(null); // New uploaded image
   const [croppedImage, setCroppedImage] = useState(image);
   const [isImageCropped, setIsImageCropped] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
   const cropperRef = useRef(null);
   const navigate = useNavigate();
   const { theme } = useTheme(); // Use theme from context
@@ -55,6 +56,7 @@ const EditPostForm = ({ post }) => {
       const file = new File([blob], "cropped-image.png", { type: "image/png" });
       formData.append("profileImage", file);
     }
+    setLoading(true); // Start loading
 
     try {
       await axios.post(
@@ -201,7 +203,11 @@ const EditPostForm = ({ post }) => {
             className={`w-full py-3 px-4 ${buttonGradient} text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200`}
             type="submit"
           >
-            Edit Post
+           {loading ? (
+            <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+          ) : (
+            "Edit Post"
+          )}
           </motion.button>
         </form>
       </div>
