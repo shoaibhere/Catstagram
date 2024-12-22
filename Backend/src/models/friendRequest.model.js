@@ -20,12 +20,7 @@ const friendRequestSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-friendRequestSchema.post('save', async function(doc, next) {
-  if (doc.status === "approved" || doc.status === "declined") {
-      await doc.remove(); // This deletes the current document after saving changes
-  }
-  next();
-});
+
 // Composite index on sentBy and sentTo for quickly checking existing friend requests
 friendRequestSchema.index({ sentBy: 1, sentTo: 1 }, { unique: true });
 

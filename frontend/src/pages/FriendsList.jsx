@@ -7,6 +7,7 @@ import { useTheme } from "../contexts/themeContext";
 
 const FriendsList = () => {
   const [friends, setFriends] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuthStore();
   const { theme } = useTheme();
 
@@ -28,6 +29,14 @@ const FriendsList = () => {
     }
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value.toLowerCase());
+  };
+
+  const filteredFriends = friends.filter((friend) =>
+    friend.name.toLowerCase().includes(searchTerm)
+  );
+
   // Theme-based styling
   const headerGradient =
     theme === "dark"
@@ -45,15 +54,39 @@ const FriendsList = () => {
             Your Friends
           </h2>
 
+          {/* Search Bar */}
+          <div className="mb-6 flex justify-center">
+            <input
+              type="text"
+              placeholder="Search friends by name..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className={`w-full md:w-1/2 p-3 rounded-md border ${
+                theme === "dark"
+                  ? "bg-gray-800 text-white border-gray-600"
+                  : "bg-gray-100 text-gray-800 border-gray-300"
+              } focus:ring-2 focus:ring-purple-500 focus:outline-none`}
+            />
+          </div>
+
+          {/* Friends Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
-            {friends.map((friend) => (
-              <UserCard
-                key={friend._id}
-                user={friend}
-                isFriend={true}
-                onFriendUpdate={fetchFriends}
-              />
-            ))}
+            {filteredFriends.length > 0 ? (
+              filteredFriends.map((friend) => (
+                <UserCard
+                  key={friend._id}
+                  user={friend}
+                  isFriend={true}
+                  onFriendUpdate={fetchFriends}
+                />
+              ))
+            ) : (
+              <div className="flex justify-center items-center w-full col-span-2">
+                <p className="text-gray-500 text-lg">
+                  No friends match your search.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

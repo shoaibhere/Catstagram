@@ -91,7 +91,7 @@ const approveFriendRequest = async (req, res) => {
     await User.findByIdAndUpdate(friendRequest.sentBy, {
       $push: { friends: userId }, // Add approver to the sender's friend list
     });
-
+    await FriendRequest.findByIdAndDelete(requestId);
     res
       .status(200)
       .json({ message: "Friend request approved and users are now friends" });
@@ -111,7 +111,8 @@ const declineFriendRequest = async (req, res) => {
     if (!friendRequest || friendRequest.sentTo.toString() !== userId) {
       return res.status(400).json({ message: "Invalid or expired request" });
     }
-
+    await FriendRequest.findByIdAndDelete(requestId);
+    
     res.status(200).json({ message: "Friend request declined" });
   } catch (error) {
     res.status(500).json({ message: error.message });
