@@ -4,37 +4,77 @@ const { User } = require("../models/users.model");
 function getPaginationParams(query) {
   const page = parseInt(query.page, 10) || 1;
   const limit = parseInt(query.limit, 10) || 10;
-  const skip = (page - 1) * limit;
-  return { page, limit, skip };
+  return { page, limit };
 }
 
 const getPosts = async (req, res) => {
   try {
     const currentUser = req.params.currentuserid;
-    const { page, limit, skip } = getPaginationParams(req.query);
+    const { limit } = getPaginationParams(req.query);
 
-    const blockedUsers = await User.find({ blocked: currentUser }).select('_id');
-    const blockedUserIds = blockedUsers.map(user => user._id);
+    // Fetch blocked users for the current user
+    const blockedUsers = await User.find({ blocked: currentUser }).select("_id");
+    const blockedUserIds = blockedUsers.map((user) => user._id);
 
-    const posts = await Post.find({ user: { $nin: blockedUserIds } })
-      .populate("user", "name profileImage")
-      .populate({
-        path: "comments",
-        select: "text createdAt user",
-        populate: { path: "user", select: "name profileImage" }
-      })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    // Use aggregation pipeline with $match and $sample
+    const posts = await Post.aggregate([
+      {
+        $match: {
+          user: { $nin: blockedUserIds }, // Exclude posts by blocked users
+        },
+      },
+      { $sample: { size: limit } }, // Randomly sample 'limit' posts
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "comments",
+          foreignField: "_id",
+          as: "comments",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          comments: {
+            $cond: {
+              if: { $isArray: "$comments" },
+              then: "$comments",
+              else: [],
+            },
+          }, // Ensure comments is always an array
+        },
+      },
+      {
+        $project: {
+          "user.password": 0, // Exclude sensitive fields
+          "comments.user.password": 0,
+        },
+      },
+    ]);
 
-    const totalPosts = await Post.countDocuments({ user: { $nin: blockedUserIds } });
+    // Count total posts matching the criteria
+    const totalPosts = await Post.countDocuments({
+      user: { $nin: blockedUserIds },
+    });
 
     res.status(200).json({
       success: true,
       data: posts,
       pagination: {
         totalPosts,
-        currentPage: page,
         totalPages: Math.ceil(totalPosts / limit),
       },
     });
@@ -43,10 +83,11 @@ const getPosts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching posts",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
 
 const getPostsByUserId = async (req, res) => {
   try {
@@ -62,8 +103,6 @@ const getPostsByUserId = async (req, res) => {
       return res.status(403).json({ success: false, message: "The User has blocked you" });
     }
 
-    const { page, limit, skip } = getPaginationParams(req.query);
-
     const posts = await Post.find({ user: userId })
       .populate("user", "name profileImage")
       .populate({
@@ -71,23 +110,18 @@ const getPostsByUserId = async (req, res) => {
         select: "text createdAt user",
         populate: { path: "user", select: "name profileImage" }
       })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .sort({ createdAt: -1 });
+      posts.forEach((post) => {
+        if (!post.comments) post.comments = [];
+      });
 
-    const totalPosts = await Post.countDocuments({ user: userId });
 
     res.status(200).json({
       success: true,
       data: {
         user: user,
         posts: posts
-      },
-      pagination: {
-        totalPosts,
-        currentPage: page,
-        totalPages: Math.ceil(totalPosts / limit),
-      },
+      }
     });
   } catch (error) {
     console.error("Error fetching user's posts:", error);
