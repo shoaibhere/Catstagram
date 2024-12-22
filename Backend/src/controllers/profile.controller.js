@@ -5,8 +5,6 @@ const cloudinary = require("cloudinary").v2;
 const deleteAccount = async (req, res) => {
   try {
     const userId = req.params.id;
-    await Post.deleteMany({ user: userId });
-    await User.updateMany({ friends: userId }, { $pull: { friends: userId } });
     await User.findByIdAndDelete(userId);
     res.clearCookie("token");
     res.status(200).json({ message: "Account deleted successfully" });
