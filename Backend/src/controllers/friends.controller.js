@@ -8,7 +8,9 @@ const sendFriendRequest = async (req, res) => {
 
   try {
     if (sentById.toString() === sentToId) {
-      return res.status(400).json({ message: "Cannot send a friend request to yourself." });
+      return res
+        .status(400)
+        .json({ message: "Cannot send a friend request to yourself." });
     }
 
     // Ensure both users exist
@@ -22,13 +24,17 @@ const sendFriendRequest = async (req, res) => {
     const existingRequest = await FriendRequest.findOne({
       $or: [
         { sentBy: sentById, sentTo: sentToId },
-        { sentBy: sentToId, sentTo: sentById }
-      ]
+        { sentBy: sentToId, sentTo: sentById },
+      ],
     });
     const areAlreadyFriends = sender.friends.includes(sentToId);
 
     if (existingRequest) {
-      return res.status(409).json({ message: "Friend request already exists or has been handled." });
+      return res
+        .status(409)
+        .json({
+          message: "Friend request already exists or has been handled.",
+        });
     }
 
     if (areAlreadyFriends) {
@@ -39,7 +45,7 @@ const sendFriendRequest = async (req, res) => {
     const newRequest = new FriendRequest({
       sentBy: sentById,
       sentTo: sentToId,
-      status: "pending"
+      status: "pending",
     });
     await newRequest.save();
 
@@ -50,20 +56,21 @@ const sendFriendRequest = async (req, res) => {
         status: newRequest.status,
         sentTo: {
           id: recipient._id,
-          name: recipient.name
+          name: recipient.name,
         },
         sentBy: {
           id: sender._id,
-          name: sender.name
-        }
-      }
+          name: sender.name,
+        },
+      },
     });
   } catch (error) {
     console.error("Error sending friend request: ", error);
-    res.status(500).json({ message: "Internal server error while sending friend request." });
+    res
+      .status(500)
+      .json({ message: "Internal server error while sending friend request." });
   }
 };
-
 
 // Approve a friend request
 const approveFriendRequest = async (req, res) => {
@@ -112,7 +119,7 @@ const declineFriendRequest = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired request" });
     }
     await FriendRequest.findByIdAndDelete(requestId);
-    
+
     res.status(200).json({ message: "Friend request declined" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -193,7 +200,7 @@ const getPotentialFriends = async (req, res) => {
     // Fetch all friend requests involving the current user (either sent or received)
     const friendRequests = await FriendRequest.find({
       $or: [{ sentBy: currentUserId }, { sentTo: currentUserId }],
-      status: "pending"  // Optional: filter by pending status if necessary
+      status: "pending", // Optional: filter by pending status if necessary
     });
 
     // Extract user IDs from these friend requests to exclude them from potential friends
@@ -206,12 +213,14 @@ const getPotentialFriends = async (req, res) => {
     const currentUser = await User.findById(currentUserId);
 
     // Include current user's friends and their own ID in the exclusion set
-    currentUser.friends.forEach(friend => requestedUserIds.add(friend.toString()));
+    currentUser.friends.forEach((friend) =>
+      requestedUserIds.add(friend.toString())
+    );
     requestedUserIds.add(currentUserId);
 
     const users = await User.find(
       { _id: { $nin: Array.from(requestedUserIds) } },
-      "name email profileImage"  // Select only the necessary fields
+      "name email profileImage" // Select only the necessary fields
     );
 
     res.status(200).json(users);
@@ -254,7 +263,7 @@ const getUserWithFriendRequestStatus = async (req, res) => {
     const currentUser = req.userId; // ID of the requesting user from auth middleware
 
     const user = await User.findById(userId)
-      .select('name email profileImage')
+      .select("name email profileImage")
       .lean(); // Convert to plain JS object for easy manipulation
 
     if (!user) {
@@ -265,8 +274,8 @@ const getUserWithFriendRequestStatus = async (req, res) => {
     const friendRequest = await FriendRequest.findOne({
       $or: [
         { sentBy: currentUser, sentTo: userId },
-        { sentBy: userId, sentTo: currentUser }
-      ]
+        { sentBy: userId, sentTo: currentUser },
+      ],
     });
 
     // Add friend request status to the user object
@@ -278,7 +287,6 @@ const getUserWithFriendRequestStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 module.exports = {
   sendFriendRequest,

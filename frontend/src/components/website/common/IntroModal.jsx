@@ -1,27 +1,30 @@
-import { useState } from 'react';
-import Modal from 'react-modal';
-import ReactTypingEffect from 'react-typing-effect';
+import { useState, useEffect } from "react";
+import Modal from "react-modal";
 
 const customStyles = {
-  overlay: {zIndex: '11', backgroundColor: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(5px)',},
+  overlay: {
+    zIndex: "11",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backdropFilter: "blur(5px)",
+  },
   content: {
-    position: 'relative',
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    transform: 'translate(-50%, -50%)',
-    background: 'rgba(35, 5, 23, 0.85)',
-    color: '#fff',
-    backdropFilter: 'blur(15px)',
-    WebkitBackdropFilter: 'blur(15px)',
-    borderRadius: '15px',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-    padding: '2rem',
-    maxWidth: '500px',
-    width: '90%',
-    animation: 'fadeIn 0.5s ease-in-out',
+    position: "relative",
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    transform: "translate(-50%, -50%)",
+    background: "rgba(35, 5, 23, 0.85)",
+    color: "#fff",
+    backdropFilter: "blur(15px)",
+    WebkitBackdropFilter: "blur(15px)",
+    borderRadius: "15px",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+    padding: "2rem",
+    maxWidth: "500px",
+    width: "90%",
+    animation: "fadeIn 0.5s ease-in-out",
   },
 };
 
@@ -42,7 +45,34 @@ const styleSheet = document.styleSheets[0];
 styleSheet.insertRule(fadeInAnimation, styleSheet.cssRules.length);
 
 function IntroModal() {
-  const [modalIsOpen, setIsOpen] = useState(true); 
+  const [modalIsOpen, setIsOpen] = useState(true);
+  const [text, setText] = useState("");
+  const finalText = "Welcome to Catstagram Website!";
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; // A to Z
+
+  useEffect(() => {
+    let currentIndex = 0;
+
+    const interval = setInterval(() => {
+      let newText = "";
+      for (let i = 0; i < currentIndex; i++) {
+        newText += finalText[i];
+      }
+      if (currentIndex < finalText.length) {
+        // Choose a letter from the alphabet for the animation effect
+        newText += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+      }
+      setText(newText);
+
+      if (currentIndex === finalText.length) {
+        clearInterval(interval); // Clear interval when finished
+      }
+
+      currentIndex++;
+    }, 200); // Adjusted speed (slower)
+
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array to run only once
 
   function closeModal() {
     setIsOpen(false);
@@ -60,47 +90,43 @@ function IntroModal() {
         <button
           onClick={closeModal}
           style={{
-            position: 'absolute',
-            top: '12px',
-            right: '12px',
-            background: 'transparent',
-            border: 'none',
-            color: 'rgba(255, 255, 255, 0.7)',
-            fontSize: '20px',
-            cursor: 'pointer',
-            transition: 'color 0.3s ease',
+            position: "absolute",
+            top: "12px",
+            right: "12px",
+            background: "transparent",
+            border: "none",
+            color: "rgba(255, 255, 255, 0.7)",
+            fontSize: "20px",
+            cursor: "pointer",
+            transition: "color 0.3s ease",
           }}
-          onMouseOver={(e) => (e.target.style.color = 'white')}
-          onMouseOut={(e) => (e.target.style.color = 'rgba(255, 255, 255, 0.7)')}
+          onMouseOver={(e) => (e.target.style.color = "white")}
+          onMouseOut={(e) =>
+            (e.target.style.color = "rgba(255, 255, 255, 0.7)")
+          }
         >
           &#10007;
         </button>
 
         <div
           style={{
-            textAlign: 'center',
-            fontFamily: 'Fantasy',
-            fontSize: '22px',
-            color: 'rgb(147 51 234)',
-            marginBottom: '20px',
+            textAlign: "center",
+            fontFamily: "Fantasy",
+            fontSize: "22px",
+            color: "rgb(147 51 234)",
+            marginBottom: "20px",
           }}
         >
-          <ReactTypingEffect
-            text={["Welcome to Catstagram Website!"]}
-            speed={80}
-            eraseSpeed={50}
-            eraseDelay={2000}
-            typingDelay={500}
-          />
+          <div>{text}</div>
         </div>
 
         <p
           style={{
-            fontSize: '16px',
-            color: 'rgba(255, 255, 255, 0.8)',
-            textAlign: 'center',
-            lineHeight: '1.5',
-            marginBottom: '1rem',
+            fontSize: "16px",
+            color: "rgba(255, 255, 255, 0.8)",
+            textAlign: "center",
+            lineHeight: "1.5",
+            marginBottom: "1rem",
           }}
         >
           Explore the world of cats with us. Enjoy a purr-fect experience!
@@ -109,21 +135,21 @@ function IntroModal() {
         <button
           onClick={closeModal}
           style={{
-            display: 'block',
-            margin: '0 auto',
-            padding: '10px 20px',
-            background: 'rgb(147 51 234)',
-            color: '#fff',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            borderRadius: '8px',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(147, 51, 234, 0.4)',
+            display: "block",
+            margin: "0 auto",
+            padding: "10px 20px",
+            background: "rgb(147 51 234)",
+            color: "#fff",
+            fontSize: "16px",
+            fontWeight: "bold",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            boxShadow: "0 4px 15px rgba(147, 51, 234, 0.4)",
           }}
-          onMouseOver={(e) => (e.target.style.transform = 'scale(1.1)')}
-          onMouseOut={(e) => (e.target.style.transform = 'scale(1)')}
+          onMouseOver={(e) => (e.target.style.transform = "scale(1.1)")}
+          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
         >
           Get Started
         </button>

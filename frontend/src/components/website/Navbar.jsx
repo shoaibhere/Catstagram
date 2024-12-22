@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { Menu, X, User } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Menu, X, User } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'Services', href: '#services' },
-    { name: 'Activities', href: '#activities'},
-    { name: 'Team', href: '#team' },
-    { name: 'FAQs', href: '#faqs' },
-    { name: 'Contact', href: '#contact' },
+    { name: "Home", href: "#home" },
+    { name: "Services", href: "#services" },
+    { name: "Activities", href: "#activities" },
+    { name: "Team", href: "#team" },
+    { name: "FAQs", href: "#faqs" },
+    { name: "Contact", href: "#contact" },
   ];
 
   const scrollToSection = (e, href) => {
     e.preventDefault();
-    if (href !== '#') {
+    if (href !== "#") {
       const section = document.querySelector(href);
       if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
+        section.scrollIntoView({ behavior: "smooth" });
       }
     }
   };
@@ -31,8 +31,15 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <img className="h-8 w-auto" src="./src/assets/logo.jpg" alt="Catstagram" />
-              <span className="ml-2 text-3xl font-normal text-purple-600 dark:text-purple-600" style={{ fontFamily: "'Billabong', cursive" }}>
+              <img
+                className="h-8 w-auto"
+                src="./src/assets/images/logo.png"
+                alt="Catstagram"
+              />
+              <span
+                className="ml-2 text-3xl font-normal text-purple-600 dark:text-purple-600"
+                style={{ fontFamily: "'Billabong', cursive" }}
+              >
                 Catstagram
               </span>
             </div>
@@ -46,23 +53,30 @@ const Navbar = () => {
                 className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-1 pt-1 text-sm font-medium group"
               >
                 {item.name}
-                <span className="hidden group-hover:inline-block ml-1 transform rotate-45 transition-transform duration-300">🐾</span>
-                <span className="absolute left-0 right-0 bottom-0 h-[1px] bg-purple-400 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100" 
-                      style={{ bottom: '-8px' }}></span>
+                <span className="hidden group-hover:inline-block ml-1 transform rotate-45 transition-transform duration-300">
+                  🐾
+                </span>
+                <span
+                  className="absolute left-0 right-0 bottom-0 h-[1px] bg-purple-400 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
+                  style={{ bottom: "-8px" }}
+                ></span>
               </a>
             ))}
             <ThemeToggle />
-            <Link
-            to="/login">
+            <Link to="/login">
               <button className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-1 pt-1 text-sm font-medium group">
                 <User className="h-6 w-6 mr-2 inline-block" />
                 <span>
                   Login
-                  <span className="hidden group-hover:inline-block ml-1 transform rotate-45 transition-transform duration-300">🐾</span>
+                  <span className="hidden group-hover:inline-block ml-1 transform rotate-45 transition-transform duration-300">
+                    🐾
+                  </span>
                 </span>
-                <span className="absolute left-0 right-0 bottom-0 h-[1px] bg-purple-400 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100" 
-                      style={{ bottom: '-8px' }}></span>
-            </button>
+                <span
+                  className="absolute left-0 right-0 bottom-0 h-[1px] bg-purple-400 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
+                  style={{ bottom: "-8px" }}
+                ></span>
+              </button>
             </Link>
           </div>
           <div className="-mr-2 flex items-center sm:hidden">
