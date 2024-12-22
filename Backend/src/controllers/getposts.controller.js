@@ -10,96 +10,71 @@ function getPaginationParams(query) {
 const getPosts = async (req, res) => {
   try {
     const currentUser = req.params.currentuserid;
-    const { limit } = getPaginationParams(req.query);
+    const { page, limit } = getPaginationParams(req.query);
+    const search = req.query.search || '';
 
-    // Fetch blocked and private users
-    const blockedUsers = await User.find({ blocked: currentUser }).select("_id");
-    const blockedUserIds = blockedUsers.map((user) => user._id);
+    // Fetch the current user and their blocked list
+    const currentUserDetails = await User.findById(currentUser);
+    const blockedUserIds = currentUserDetails.blocked || [];
 
-    // Find users where currentUser is not a friend and the account is private
+    // Fetch private users not friends
     const privateAndNotFriends = await User.find({
-      $and: [
-        { _id: { $nin: [currentUser] } }, // Not the current user
-        { friends: { $ne: currentUser } }, // Current user not in friends list
-        { isPrivate: true }, // Account is private
-      ]
+      _id: { $nin: [currentUser, ...currentUserDetails.friends] },
+      isPrivate: true
     }).select("_id");
-    const privateAndNotFriendIds = privateAndNotFriends.map((user) => user._id);
+    const privateAndNotFriendIds = privateAndNotFriends.map(user => user._id.toString());
 
-    // Users to exclude are either blocked or private without friendship
+    // Combine IDs to exclude from the posts
     const excludeUserIds = [...blockedUserIds, ...privateAndNotFriendIds];
 
-    // Use aggregation pipeline with $match and $sample
-    const posts = await Post.aggregate([
-      {
-        $match: {
-          user: { $nin: excludeUserIds }, // Exclude posts by blocked users and private users who are not friends
-        },
-      },
-      { $sample: { size: limit } }, // Randomly sample 'limit' posts
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      {
-        $lookup: {
-          from: "comments",
-          localField: "comments",
-          foreignField: "_id",
-          as: "comments",
-        },
-      },
-      {
-        $unwind: {
-          path: "$user",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $set: {
-          comments: {
-            $cond: {
-              if: { $isArray: "$comments" },
-              then: "$comments",
-              else: [],
-            },
-          }, // Ensure comments is always an array
-        },
-      },
-      {
-        $project: {
-          "user.password": 0, // Exclude sensitive fields
-          "comments.user.password": 0,
-        },
-      },
-    ]);
+    // Create a search query if there is a search term
+    const searchQuery = search ? {
+      $or: [
+        { caption: { $regex: search, $options: 'i' } }, // Search by caption
+        { 'user.name': { $regex: search, $options: 'i' } } // Search by user name
+      ]
+    } : {};
 
-    // Count total posts matching the criteria
+    // Total count of posts (for pagination calculation)
     const totalPosts = await Post.countDocuments({
-      user: { $nin: excludeUserIds },
+      $and: [
+        { user: { $nin: excludeUserIds } },
+        searchQuery
+      ]
     });
 
-    res.status(200).json({
+    // Fetch the posts with pagination and search
+    const posts = await Post.find({
+      $and: [
+        { user: { $nin: excludeUserIds } },
+        searchQuery
+      ]
+    })
+    .populate("user", "name profileImage")
+    .populate("comments", "text createdAt user")
+    .sort({ createdAt: -1 }) // Sorting by creation time, newest first
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+    res.json({
       success: true,
       data: posts,
       pagination: {
         totalPosts,
         totalPages: Math.ceil(totalPosts / limit),
-      },
+        currentPage: page
+      }
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({
       success: false,
       message: "Error fetching posts",
-      error: error.message,
+      error: error.message
     });
   }
 };
+
 
 
 
