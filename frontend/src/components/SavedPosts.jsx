@@ -6,6 +6,7 @@ import { useTheme } from "../contexts/themeContext";
 
 const SavedPosts = ({ user }) => {
   const [savedPosts, setSavedPosts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
   const [viewMode, setViewMode] = useState("grid");
   const { theme } = useTheme();
 
@@ -28,6 +29,16 @@ const SavedPosts = ({ user }) => {
     );
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value.toLowerCase());
+  };
+
+  const filteredPosts = savedPosts.filter(
+    (post) =>
+      post.user.name?.toLowerCase().includes(searchTerm) ||
+      post.caption?.toLowerCase().includes(searchTerm)
+  );
+
   // Themed styles
   const headerGradient =
     theme === "dark"
@@ -35,16 +46,18 @@ const SavedPosts = ({ user }) => {
       : "from-blue-500 via-green-400 to-yellow-500";
 
   const buttonSelected =
-    theme === "dark"
-      ? "bg-purple-700 text-white"
-      : "bg-blue-700 text-white";
+    theme === "dark" ? "bg-purple-700 text-white" : "bg-blue-700 text-white";
   const buttonUnselected =
     theme === "dark"
       ? "bg-gray-700 text-purple-300 hover:bg-purple-800"
       : "bg-gray-300 text-blue-500 hover:bg-blue-400";
 
-  const textStyle =
-    theme === "dark" ? "text-gray-400" : "text-gray-600";
+  const inputClass =
+    theme === "dark"
+      ? "bg-gray-800 text-white border-gray-600 placeholder-gray-400"
+      : "bg-gray-100 text-gray-800 border-gray-300 placeholder-gray-500";
+
+  const textStyle = theme === "dark" ? "text-gray-400" : "text-gray-600";
 
   return (
     <Layout>
@@ -54,6 +67,19 @@ const SavedPosts = ({ user }) => {
         >
           Saved Posts
         </h2>
+
+        {/* Search Bar */}
+        <div className="mb-6 w-full md:w-1/2">
+          <input
+            type="text"
+            placeholder="Search saved posts by title or caption..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className={`w-full p-3 rounded-md border focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${inputClass}`}
+          />
+        </div>
+
+        {/* View Mode Buttons */}
         <div className="mb-6 flex space-x-4">
           <button
             onClick={() => setViewMode("grid")}
@@ -104,6 +130,8 @@ const SavedPosts = ({ user }) => {
             List
           </button>
         </div>
+
+        {/* Saved Posts Grid or List */}
         <div
           className={`${
             viewMode === "grid"
@@ -111,8 +139,8 @@ const SavedPosts = ({ user }) => {
               : "flex flex-col space-y-6 w-full max-w-2xl"
           }`}
         >
-          {savedPosts.length > 0 ? (
-            savedPosts.map((post) => (
+          {filteredPosts.length > 0 ? (
+            filteredPosts.map((post) => (
               <PostCard
                 key={post._id}
                 post={post}
@@ -122,7 +150,11 @@ const SavedPosts = ({ user }) => {
               />
             ))
           ) : (
-            <p className={textStyle}>No saved posts yet.</p>
+            <div className="flex justify-center items-center w-full col-span-2">
+              <p className="text-gray-500 text-lg">
+                No Saved Posts Found.
+              </p>
+            </div>
           )}
         </div>
       </div>

@@ -7,7 +7,9 @@ import { useTheme } from "../contexts/themeContext";
 
 const Requests = () => {
   const [receivedRequests, setReceivedRequests] = useState([]);
-  const [loading, setLoading] = useState(false); // Centralized loading state
+  const [filteredRequests, setFilteredRequests] = useState([]); // State for filtered requests
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
+  const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
   const { theme } = useTheme();
 
@@ -26,11 +28,21 @@ const Requests = () => {
       const receivedResponse = await axios.get(`${API_URL}/requests/pending`);
       console.log("Received Response", receivedResponse.data);
       setReceivedRequests(receivedResponse.data);
+      setFilteredRequests(receivedResponse.data); // Initialize filtered list
     } catch (error) {
       console.error("Error fetching friend requests:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearchChange = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+    const filtered = receivedRequests.filter((request) =>
+      request.sentBy.name.toLowerCase().includes(term)
+    );
+    setFilteredRequests(filtered);
   };
 
   const handleApproveRequest = async (requestId) => {
@@ -59,6 +71,11 @@ const Requests = () => {
 
   const mainContentClasses = theme === "dark" ? "text-white" : "text-black";
 
+  const inputClass =
+    theme === "dark"
+      ? "bg-gray-800 text-white border-gray-600 placeholder-gray-400"
+      : "bg-gray-100 text-gray-800 border-gray-300 placeholder-gray-500";
+
   return (
     <Layout>
       <div
@@ -69,18 +86,37 @@ const Requests = () => {
           Pending Friend Requests
         </h2>
 
+        {/* Search Bar */}
+        <div className="mb-8 w-full md:w-1/2">
+          <input
+            type="text"
+            placeholder="Search requests by name..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className={`w-full p-3 rounded-md border focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${inputClass}`}
+          />
+        </div>
+
         {/* Received Requests Only */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
-          {receivedRequests.map((request) => (
-            <RequestCard
-              key={request._id}
-              request={request} // Pass the full request object here
-              isSentRequest={false} // This is a received request
-              onApprove={() => handleApproveRequest(request._id)} // Passing request id to approve
-              onDecline={() => handleDeclineRequest(request._id)} // Passing request id to decline
-              loading={loading} // Pass loading state
-            />
-          ))}
+          {filteredRequests.length > 0 ? (
+            filteredRequests.map((request) => (
+              <RequestCard
+                key={request._id}
+                request={request} // Pass the full request object here
+                isSentRequest={false} // This is a received request
+                onApprove={() => handleApproveRequest(request._id)} // Passing request id to approve
+                onDecline={() => handleDeclineRequest(request._id)} // Passing request id to decline
+                loading={loading} // Pass loading state
+              />
+            ))
+          ) : (
+            <div className="flex justify-center items-center w-full col-span-2">
+              <p className="text-gray-500 text-lg">
+                No Requests Found.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
