@@ -16,7 +16,7 @@ const Hero = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl text-center mx-auto">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white dark:text-gray-100 mb-4 leading-tight animate-fade-in-down">
-              Purr-fect App for Your
+              Purr-fect Website for Your
             </h1>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white dark:text-gray-100 mb-8 leading-tight animate-fade-in-down">
               Feline Friends
@@ -27,7 +27,7 @@ const Hero = () => {
             <Link
               to="/signup" // Use "to" for routing
             >
-              <button className="bg-purple-600 dark:bg-purple-500 text-white py-3 px-8 rounded-full text-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition duration-300 transform hover:scale-105 animate-bounce">
+              <button className="bg-purple-600 dark:bg-purple-500 text-white py-3 px-8 rounded-full text-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition duration-3000 transform hover:scale-105 animate-bounce">
                 Meow to Create Account
               </button>
             </Link>
