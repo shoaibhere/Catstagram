@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/themeContext';
 import { User } from 'lucide-react';
 import { format } from 'date-fns';
+import CommentButton from './commentButton';
 
 const CommentSection = ({ postId, userId, onCommentCountChange }) => {
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
-  const [editingComment, setEditingComment] = useState(null);
+  const [commentText, setCommentText] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState(null);
   const { theme } = useTheme();
 
   const isDarkTheme = theme === 'dark';
@@ -27,18 +28,26 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
     }
   };
 
-  const handleAddComment = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (editingCommentId) {
+      await handleEditComment();
+    } else {
+      await handleAddComment();
+    }
+  };
+
+  const handleAddComment = async () => {
     try {
       const response = await fetch(`http://localhost:8000/api/comment/add-comment/${postId}/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: newComment }),
+        body: JSON.stringify({ text: commentText }),
       });
       if (!response.ok) throw new Error('Failed to add comment');
-      setNewComment('');
+      setCommentText('');
       await fetchComments();
       onCommentCountChange(comments.length + 1);
     } catch (error) {
@@ -46,17 +55,18 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
     }
   };
 
-  const handleEditComment = async (commentId, newText) => {
+  const handleEditComment = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/comment/edit-comment/${commentId}/${userId}`, {
+      const response = await fetch(`http://localhost:8000/api/comment/edit-comment/${editingCommentId}/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: newText }),
+        body: JSON.stringify({ text: commentText }),
       });
       if (!response.ok) throw new Error('Failed to edit comment');
-      setEditingComment(null);
+      setCommentText('');
+      setEditingCommentId(null);
       await fetchComments();
     } catch (error) {
       console.error('Error editing comment:', error);
@@ -76,30 +86,54 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
     }
   };
 
+  const startEditing = async (commentId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/comment/get-one/${commentId}`);
+      if (!response.ok) throw new Error('Failed to fetch comment');
+      const data = await response.json();
+      setCommentText(data.comment.text);
+      setEditingCommentId(commentId);
+    } catch (error) {
+      console.error('Error fetching comment for edit:', error);
+    }
+  };
+
+  const cancelEditing = () => {
+    setCommentText('');
+    setEditingCommentId(null);
+  };
+
   return (
+    
     <div className={`flex flex-col h-[350px] ${isDarkTheme ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} rounded-lg overflow-hidden`}>
-      <form onSubmit={handleAddComment} className="mt-auto p-4 border-t border-gray-200 dark:border-gray-700">
-        <input
-          type="text"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment..."
-          className={`w-full p-3 border rounded-lg ${
+      <form onSubmit={handleSubmit} className="mt-auto p-4 border-t border-gray-200 dark:border-gray-700 flex flex-col justify-center items-center">
+        <textarea
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          placeholder={editingCommentId ? "Edit your comment..." : "Add a comment..."}
+          className={`w-full h-20 p-3 border rounded-lg mb-2 resize-none ${
             isDarkTheme
               ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
               : 'bg-white border-gray-300 placeholder-gray-400'
           }`}
+          rows="3"
         />
-        <button
-          type="submit"
-          className={`w-full mt-2 p-3 ${
-            isDarkTheme
-              ? 'bg-blue-600 hover:bg-blue-700'
-              : 'bg-blue-500 hover:bg-blue-600'
-          } text-white font-semibold rounded-lg transition duration-300`}
-        >
-          Add Comment
-        </button>
+        <div className="flex justify-between gap-2 items-center">
+          {editingCommentId && (
+            <button
+              type="button"
+              onClick={cancelEditing}
+              className={`px-4 py-2 rounded-lg ${
+                isDarkTheme ? 'bg-red-700 hover:bg-red-600' : 'bg-red-200 hover:bg-red-300'
+              } transition duration-300`}
+            >
+              Cancel
+            </button>
+          )}
+          <div className={editingCommentId ? '' : 'ml-auto'}>
+            <CommentButton onClick={handleSubmit} text={editingCommentId ? 'Update' : 'Comment'} />
+          </div>
+        </div>
       </form>
       <ul className="space-y-4 mb-4 overflow-y-auto flex-grow p-4">
         {comments.map((comment) => (
@@ -118,48 +152,29 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
                   </div>
                 )}
               </div>
-              <div className="flex-grow">
-                <div className="flex items-center justify-between">
+              <div className="flex-grow overflow-hidden">
+                <div className="flex items-center justify-between mb-1">
                   <p className={`font-semibold ${isDarkTheme ? 'text-gray-300' : 'text-gray-700'}`}>{comment.user.name}</p>
                   <p className={`text-xs ${isDarkTheme ? 'text-gray-400' : 'text-gray-500'}`}>
                     {format(new Date(comment.createdAt), 'MMM d, yyyy HH:mm')}
                   </p>
                 </div>
-                {editingComment === comment._id ? (
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    handleEditComment(comment._id, e.target.text.value);
-                  }}>
-                    <input
-                      name="text"
-                      defaultValue={comment.text}
-                      className={`w-full p-2 mt-2 border rounded ${isDarkTheme ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
-                    />
-                    <div className="mt-2 flex justify-end space-x-2">
-                      <button type="submit" className={`px-3 py-1 rounded ${isDarkTheme ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}>Save</button>
-                      <button onClick={() => setEditingComment(null)} className={`px-3 py-1 rounded ${isDarkTheme ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'}`}>Cancel</button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <p className="mt-1">{comment.text}</p>
-                    {comment.user._id === userId && (
-                      <div className="mt-2 text-sm">
-                        <button
-                          onClick={() => setEditingComment(comment._id)}
-                          className={`mr-2 ${isDarkTheme ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleRemoveComment(comment._id)}
-                          className={`${isDarkTheme ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'}`}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    )}
-                  </>
+                <p className="mt-1 break-words">{comment.text}</p>
+                {comment.user._id === userId && (
+                  <div className="mt-2 text-sm">
+                    <button
+                      onClick={() => startEditing(comment._id)}
+                      className={`mr-2 ${isDarkTheme ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleRemoveComment(comment._id)}
+                      className={`${isDarkTheme ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -172,4 +187,3 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
 };
 
 export default CommentSection;
-
