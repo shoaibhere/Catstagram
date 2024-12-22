@@ -21,6 +21,11 @@ const commentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+// Index on user to quickly find comments made by a specific user
+commentSchema.index({ user: 1 });
+
+// Optionally, index on createdAt to sort comments by date
+commentSchema.index({ createdAt: -1 });
 
 const Comment = mongoose.model("Comment", commentSchema);
 

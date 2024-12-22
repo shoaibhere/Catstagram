@@ -25,6 +25,14 @@ signupSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
 });
+signupSchema.index({ email: 1 }, { unique: true });
+
+// Optionally, index lastLogin to quickly query recently active users
+signupSchema.index({ lastLogin: -1 });
+
+signupSchema.index({ friends: 1 });
+signupSchema.index({ blocked: 1 });
+signupSchema.index({ savedPosts: 1 });
 
 // Handle related data deletion when a User is deleted
 signupSchema.pre('findOneAndDelete', async function(next) {

@@ -9,6 +9,7 @@ const profileRouter = require("./routes/profile.routes.js");
 const savedPostsRouter = require("./routes/savedPosts.routes");
 const likedPostsRouter = require("./routes/likedPosts.routes.js");
 const commentRouter = require("./routes/comments.routes.js");
+const mongoose = require("mongoose");
   
 const cors = require("cors");
 const axios = require("axios");
@@ -45,6 +46,14 @@ app.use("/api/profile", profileRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/saved-posts", savedPostsRouter);
 app.use("/api/liked-posts", likedPostsRouter);
+
+mongoose.connection.on('error', (err) => {
+  if (err.code === 11000) {
+    console.error('There was a duplicate key error');
+  } else {
+    console.error('Database error: ', err);
+  }
+});
 
 app.listen(PORT, () => {
   connectDB();

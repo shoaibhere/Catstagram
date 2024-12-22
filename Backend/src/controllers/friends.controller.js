@@ -2,57 +2,68 @@ const { User } = require("../models/users.model");
 
 const { FriendRequest } = require("../models/friendRequest.model");
 
-// Send a friend request
 const sendFriendRequest = async (req, res) => {
+  const sentToId = req.params.id; // Extract the recipient's ID from request parameters
+  const sentById = req.userId; // Assuming the authenticated user's ID is stored in req.user
+
   try {
-    const { id: friendId } = req.params;
-    const userId = req.userId;
-
-    // Get the user and the target friend from the database
-    const user = await User.findById(userId);
-    const friend = await User.findById(friendId);
-
-    // Check if the user is blocked by the friend
-    if (
-      friend.blocked.some(
-        (blockedUser) => blockedUser._id.toString() === userId
-      )
-    ) {
-      return res.status(400).json({
-        message: "You are blocked by this user. Cannot send a friend request.",
-      });
+    if (sentById.toString() === sentToId) {
+      return res.status(400).json({ message: "Cannot send a friend request to yourself." });
     }
 
-    // Check if a friend request already exists or if they are already friends
+    // Ensure both users exist
+    const sender = await User.findById(sentById);
+    const recipient = await User.findById(sentToId);
+    if (!sender || !recipient) {
+      return res.status(404).json({ message: "One or both users not found." });
+    }
+
+    // Check existing requests or if already friends
     const existingRequest = await FriendRequest.findOne({
-      "sentBy._id": userId,
-      "sentTo._id": friendId,
+      $or: [
+        { sentBy: sentById, sentTo: sentToId },
+        { sentBy: sentToId, sentTo: sentById }
+      ]
     });
-
-    if (user.friends.includes(friendId)) {
-      return res.status(400).json({ message: "Already friends" });
-    }
+    const areAlreadyFriends = sender.friends.includes(sentToId);
 
     if (existingRequest) {
-      return res.status(400).json({ message: "Friend request already sent" });
+      return res.status(409).json({ message: "Friend request already exists or has been handled." });
+    }
+
+    if (areAlreadyFriends) {
+      return res.status(409).json({ message: "Users are already friends." });
     }
 
     // Create and save the friend request
-    const friendRequest = new FriendRequest({
-      sentBy: user, // Store the entire user object
-      sentTo: friend, // Store the entire friend object
+    const newRequest = new FriendRequest({
+      sentBy: sentById,
+      sentTo: sentToId,
+      status: "pending"
     });
-    await friendRequest.save();
+    await newRequest.save();
 
-    // Return the friend request ID in the response
-    res.status(200).json({
-      message: "Friend request sent successfully",
-      requestId: friendRequest._id, // Send the request ID back to the frontend
+    res.status(201).json({
+      message: "Friend request sent successfully.",
+      request: {
+        id: newRequest._id,
+        status: newRequest.status,
+        sentTo: {
+          id: recipient._id,
+          name: recipient.name
+        },
+        sentBy: {
+          id: sender._id,
+          name: sender.name
+        }
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error sending friend request: ", error);
+    res.status(500).json({ message: "Internal server error while sending friend request." });
   }
 };
+
 
 // Approve a friend request
 const approveFriendRequest = async (req, res) => {
@@ -81,9 +92,6 @@ const approveFriendRequest = async (req, res) => {
       $push: { friends: userId }, // Add approver to the sender's friend list
     });
 
-    // Delete the friend request after approval
-    await FriendRequest.findByIdAndDelete(requestId);
-
     res
       .status(200)
       .json({ message: "Friend request approved and users are now friends" });
@@ -103,9 +111,6 @@ const declineFriendRequest = async (req, res) => {
     if (!friendRequest || friendRequest.sentTo.toString() !== userId) {
       return res.status(400).json({ message: "Invalid or expired request" });
     }
-
-    // Remove the friend request without adding friends
-    await FriendRequest.findByIdAndDelete(requestId);
 
     res.status(200).json({ message: "Friend request declined" });
   } catch (error) {
@@ -180,24 +185,41 @@ const getFriends = async (req, res) => {
   }
 };
 
-// Get potential friends (users who are not friends)
 const getPotentialFriends = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const currentUserId = req.userId;
+
+    // Fetch all friend requests involving the current user (either sent or received)
+    const friendRequests = await FriendRequest.find({
+      $or: [{ sentBy: currentUserId }, { sentTo: currentUserId }],
+      status: "pending"  // Optional: filter by pending status if necessary
+    });
+
+    // Extract user IDs from these friend requests to exclude them from potential friends
+    const requestedUserIds = friendRequests.reduce((acc, req) => {
+      acc.add(req.sentBy.toString());
+      return acc;
+    }, new Set());
+
+    // Fetch the current user to include their friends and themselves in the exclusion list
+    const currentUser = await User.findById(currentUserId);
+
+    // Include current user's friends and their own ID in the exclusion set
+    currentUser.friends.forEach(friend => requestedUserIds.add(friend.toString()));
+    requestedUserIds.add(currentUserId);
+
     const users = await User.find(
-      {
-        _id: {
-          $nin: [...user.friends, user._id],
-        },
-      },
-      "name email profileImage"
+      { _id: { $nin: Array.from(requestedUserIds) } },
+      "name email profileImage"  // Select only the necessary fields
     );
 
     res.status(200).json(users);
   } catch (error) {
+    console.error("Error fetching potential friends:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 const deleteSentFriendRequest = async (req, res) => {
   try {
     const { id: requestId } = req.params; // Friend request ID from params

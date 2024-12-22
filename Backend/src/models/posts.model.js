@@ -8,6 +8,11 @@ const postSchema = new mongoose.Schema({
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],  // Array of Comment IDs
     savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
+// Index on user to efficiently fetch posts by a specific user
+postSchema.index({ user: 1 });
+
+// Index on createdAt for sorting posts by date
+postSchema.index({ createdAt: -1 });
 
 // Apply transaction to findOneAndDelete middleware
 postSchema.pre('findOneAndDelete', async function(next) {
