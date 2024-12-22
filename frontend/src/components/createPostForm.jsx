@@ -5,7 +5,13 @@ import axios from "axios";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faSave, faHeart, faBookmark, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import {
+  faComment,
+  faSave,
+  faHeart,
+  faBookmark,
+  faSpinner,
+} from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../contexts/themeContext";
 
@@ -21,9 +27,16 @@ const CreatePostForm = () => {
   const { theme } = useTheme();
 
   // Theme-based styling
-  const containerClass = theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-800";
-  const inputClass = theme === "dark" ? "bg-gray-700 text-white focus:ring-blue-500" : "bg-gray-200 text-gray-800 focus:ring-blue-300";
-  const buttonClass = theme === "dark" ? "bg-green-500 hover:bg-green-600" : "bg-green-600 hover:bg-green-700";
+  const containerClass =
+    theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-800";
+  const inputClass =
+    theme === "dark"
+      ? "bg-gray-700 text-white focus:ring-blue-500"
+      : "bg-gray-200 text-gray-800 focus:ring-blue-300";
+  const buttonClass =
+    theme === "dark"
+      ? "bg-green-500 hover:bg-green-600"
+      : "bg-green-600 hover:bg-green-700";
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -83,7 +96,7 @@ const CreatePostForm = () => {
 
       if (response.data.success) {
         alert("Post created successfully!");
-        navigate("/");
+        navigate("/home");
       } else {
         alert("Failed to create post: " + response.data.message);
       }
@@ -103,7 +116,9 @@ const CreatePostForm = () => {
       className={`max-w-md w-full ${containerClass} bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden mt-8`}
     >
       <div className="p-8">
-        <h2 className={`text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text`}>
+        <h2
+          className={`text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text`}
+        >
           Create Post
         </h2>
 
@@ -156,7 +171,9 @@ const CreatePostForm = () => {
           </div>
 
           {caption && croppedImage && (
-            <div className={`${containerClass} rounded-lg shadow-lg p-4 mb-6 max-w-xl mx-auto`}>
+            <div
+              className={`${containerClass} rounded-lg shadow-lg p-4 mb-6 max-w-xl mx-auto`}
+            >
               <div className="flex items-center mb-4">
                 <img
                   src={user?.profileImage || "https://via.placeholder.com/50"}
@@ -164,7 +181,9 @@ const CreatePostForm = () => {
                   className="w-10 h-10 rounded-full mr-3"
                 />
                 <div>
-                  <h2 className="text-md font-semibold">{user?.name || "User Name"}</h2>
+                  <h2 className="text-md font-semibold">
+                    {user?.name || "User Name"}
+                  </h2>
                   <p className="text-sm text-gray-400">{"Just Now"}</p>
                 </div>
               </div>
@@ -180,15 +199,24 @@ const CreatePostForm = () => {
               <p className="text-sm mb-4">{caption}</p>
               <div className="flex justify-between items-center mt-4">
                 <div className="flex items-center">
-                  <FontAwesomeIcon icon={faHeart} className="text-red-500 mr-2" />
+                  <FontAwesomeIcon
+                    icon={faHeart}
+                    className="text-red-500 mr-2"
+                  />
                   <span className="text-gray-400 text-xs">1 Like</span>
                 </div>
                 <div className="flex items-center">
-                  <FontAwesomeIcon icon={faComment} className="text-blue-400 mr-2" />
+                  <FontAwesomeIcon
+                    icon={faComment}
+                    className="text-blue-400 mr-2"
+                  />
                   <span className="text-gray-400 text-xs">0 Comments</span>
                 </div>
                 <div className="flex items-center">
-                  <FontAwesomeIcon icon={faBookmark} className="text-green-400 mr-2" />
+                  <FontAwesomeIcon
+                    icon={faBookmark}
+                    className="text-green-400 mr-2"
+                  />
                   <span className="text-gray-400 text-xs">Save</span>
                 </div>
               </div>
@@ -200,7 +228,9 @@ const CreatePostForm = () => {
             whileTap={{ scale: 0.98 }}
             type="submit"
             className={`w-full py-3 px-4 ${buttonClass} font-bold rounded-lg flex justify-center items-center ${
-              !isImageCropped || !caption.trim() || loading ? "opacity-50 cursor-not-allowed" : ""
+              !isImageCropped || !caption.trim() || loading
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             }`}
             disabled={!isImageCropped || !caption.trim() || loading}
           >

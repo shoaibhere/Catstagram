@@ -31,13 +31,13 @@ const Footer = () => {
               Catstagram Contact
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Phone: +92 322 4354756
+              Phone: 111 111 111
             </p>
             <p className="text-gray-600 dark:text-gray-400">
               Email: team@catstagram.com
             </p>
             <p className="text-gray-600 dark:text-gray-400">
-              Address: 123 Meow Street, Paw-Villa.
+              Address: Comsats University Islamabad , Lahore Campus
             </p>
           </div>
         </div>

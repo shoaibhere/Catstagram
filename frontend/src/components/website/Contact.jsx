@@ -1,7 +1,13 @@
-import React from "react";
-import { Phone, Mail, MapPin } from "lucide-react";
+import React, { useState } from "react";
+import { Phone, Mail, MapPin, CheckCircle } from "lucide-react";
 
 const Contact = () => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSubmit = () => {
+    setIsSubmitted(true); // Set state to true on successful submission
+  };
+
   return (
     <section
       id="contact"
@@ -11,49 +17,13 @@ const Contact = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800 dark:text-purple-200">
           Get in Touch
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div>
-            <h3 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
-              Reach Out to Us
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
-              We'd love to hear from you. Feel free to reach out with any
-              questions about our Catstagram services.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <Phone className="h-6 w-6 text-purple-400 dark:text-purple-300 mr-4" />
-                <p className="text-gray-600 dark:text-gray-400">
-                  <strong className="text-gray-900 dark:text-gray-100">
-                    Phone:
-                  </strong>{" "}
-                  +92 322 4354756{" "}
-                </p>
-              </div>
-              <div className="flex items-center">
-                <Mail className="h-6 w-6 text-purple-400 dark:text-purple-300 mr-4" />
-                <p className="text-gray-600 dark:text-gray-400">
-                  <strong className="text-gray-900 dark:text-gray-100">
-                    Email:
-                  </strong>{" "}
-                  team@catstagram.com
-                </p>
-              </div>
-              <div className="flex items-center">
-                <MapPin className="h-6 w-6 text-purple-400 dark:text-purple-300 mr-4" />
-                <p className="text-gray-600 dark:text-gray-400">
-                  <strong className="text-gray-900 dark:text-gray-100">
-                    Address:
-                  </strong>{" "}
-                  123 Meow Street, Paw-Villa, Postal-Code 12345
-                </p>
-              </div>
-            </div>
-          </div>
+
+        <div className="flex justify-center">
           <form
-            className="space-y-6"
+            className="space-y-6 w-full md:w-1/2"
             action="https://api.web3forms.com/submit"
             method="POST"
+            onSubmit={handleSubmit} // Handle form submission
           >
             <input
               type="hidden"
@@ -115,6 +85,22 @@ const Contact = () => {
             </button>
           </form>
         </div>
+
+        {/* Success Alert Box */}
+        {isSubmitted && (
+          <div className="flex justify-center mt-8">
+            <div
+              className="flex items-center bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
+              <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
+              <strong className="font-bold">Success!</strong>
+              <span className="ml-2 block sm:inline">
+                Your message has been sent successfully.
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
