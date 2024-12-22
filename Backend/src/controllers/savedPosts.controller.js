@@ -58,23 +58,36 @@ const unsavePost = async (req, res) => {
   }
 };
 
-// Get all saved posts for a user
 const getSavedPosts = async (req, res) => {
   try {
     const { userId } = req.params;
+    const currentUser = req.user._id;  // Assuming you extract the current user's ID from authentication middleware
 
     const user = await User.findById(userId).populate({
       path: "savedPosts",
-      populate: { path: "user", select: "name profileImage" }, // Populate the user field within the post
+      populate: {
+        path: "user",
+        select: "name profileImage isPrivate friends"
+      }
     });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    res.status(200).json(user.savedPosts);
+    // Filter out posts that the current user should not see
+    const visiblePosts = user.savedPosts.filter(post => {
+      const postOwner = post.user;
+      // Check if the post owner has a private account and if the current user is not their friend
+      return !postOwner.isPrivate || postOwner.friends.includes(currentUser.toString()) || postOwner._id.toString() === currentUser.toString();
+    });
+
+    res.status(200).json(visiblePosts);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred", error });
   }
 };
+
 
 module.exports = { savePost, unsavePost, getSavedPosts };

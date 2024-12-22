@@ -12,15 +12,28 @@ const getPosts = async (req, res) => {
     const currentUser = req.params.currentuserid;
     const { limit } = getPaginationParams(req.query);
 
-    // Fetch blocked users for the current user
+    // Fetch blocked and private users
     const blockedUsers = await User.find({ blocked: currentUser }).select("_id");
     const blockedUserIds = blockedUsers.map((user) => user._id);
+
+    // Find users where currentUser is not a friend and the account is private
+    const privateAndNotFriends = await User.find({
+      $and: [
+        { _id: { $nin: [currentUser] } }, // Not the current user
+        { friends: { $ne: currentUser } }, // Current user not in friends list
+        { isPrivate: true }, // Account is private
+      ]
+    }).select("_id");
+    const privateAndNotFriendIds = privateAndNotFriends.map((user) => user._id);
+
+    // Users to exclude are either blocked or private without friendship
+    const excludeUserIds = [...blockedUserIds, ...privateAndNotFriendIds];
 
     // Use aggregation pipeline with $match and $sample
     const posts = await Post.aggregate([
       {
         $match: {
-          user: { $nin: blockedUserIds }, // Exclude posts by blocked users
+          user: { $nin: excludeUserIds }, // Exclude posts by blocked users and private users who are not friends
         },
       },
       { $sample: { size: limit } }, // Randomly sample 'limit' posts
@@ -67,7 +80,7 @@ const getPosts = async (req, res) => {
 
     // Count total posts matching the criteria
     const totalPosts = await Post.countDocuments({
-      user: { $nin: blockedUserIds },
+      user: { $nin: excludeUserIds },
     });
 
     res.status(200).json({
@@ -87,6 +100,7 @@ const getPosts = async (req, res) => {
     });
   }
 };
+
 
 
 const getPostsByUserId = async (req, res) => {

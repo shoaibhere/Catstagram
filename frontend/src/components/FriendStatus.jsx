@@ -64,9 +64,11 @@ const FriendProtectedContent = ({ userId, children, fallbackMessage }) => {
 
   if (!canView) {
     return (
-      <div className="text-center p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
-        <p className="text-gray-600 dark:text-gray-300">{fallbackMessage}</p>
-      </div>
+      <div className="flex justify-center items-center w-full col-span-2">
+              <p className="text-gray-500 text-lg">
+              {fallbackMessage}
+              </p>
+            </div>
     );
   }
 
