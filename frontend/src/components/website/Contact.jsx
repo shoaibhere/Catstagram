@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { useTheme } from "./ThemeContext"; // Make sure this path is correct
+import { useTheme } from "./ThemeContext"; // Ensure the path is correct
 import { Phone, Mail, MapPin, CheckCircle } from "lucide-react";
 
 const Contact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { isDarkMode } = useTheme(); // Use the theme context
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = () => {
     setIsSubmitted(true); // Set state to true on successful submission
   };
 
@@ -23,10 +22,18 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className={`pt-8 border-t ${isDarkMode ? "border-purple-900 py-20 bg-gray-800" : "border-purple-500 py-20 bg-white"}`}
+      className={`pt-8 border-t ${
+        isDarkMode
+          ? "border-purple-900 py-20 bg-gray-800"
+          : "border-purple-500 py-20 bg-white"
+      }`}
     >
       <div className="container mx-auto px-4">
-        <h2 className={`text-3xl md:text-4xl font-bold text-center mb-12 ${isDarkMode ? "text-purple-200" : "text-gray-800"}`}>
+        <h2
+          className={`text-3xl md:text-4xl font-bold text-center mb-12 ${
+            isDarkMode ? "text-purple-200" : "text-gray-800"
+          }`}
+        >
           Get in Touch
         </h2>
 
@@ -35,8 +42,13 @@ const Contact = () => {
             className="space-y-6 w-full md:w-1/2"
             action="https://api.web3forms.com/submit"
             method="POST"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit} // Allow form submission and handle success
           >
+            <input
+              type="hidden"
+              name="access_key"
+              value="0fe491ff-09b1-4358-ba44-780f92009d47"
+            />
             {/* Use conditional styles */}
             <div>
               <label htmlFor="name" className={labelStyle}>
@@ -48,15 +60,37 @@ const Contact = () => {
               <label htmlFor="email" className={labelStyle}>
                 Your Email
               </label>
-              <input type="email" id="email" name="email" className={inputStyle} />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className={inputStyle}
+              />
             </div>
             <div>
               <label htmlFor="message" className={labelStyle}>
                 Your Message
               </label>
-              <textarea id="message" name="message" rows="4" className={inputStyle}></textarea>
+              <textarea
+                id="message"
+                name="message"
+                rows="4"
+                className={inputStyle}
+              ></textarea>
             </div>
-            <button type="submit" className={`w-full ${isDarkMode ? "bg-purple-600 hover:bg-purple-700" : "bg-purple-400 hover:bg-purple-500"} text-white py-3 px-6 rounded-md transition duration-300 transform hover:scale-105`}>
+            <input
+              type="hidden"
+              name="redirect"
+              value="http://localhost:5173"
+            ></input>
+            <button
+              type="submit"
+              className={`w-full ${
+                isDarkMode
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-purple-400 hover:bg-purple-500"
+              } text-white py-3 px-6 rounded-md transition duration-300 transform hover:scale-105`}
+            >
               Send Message
             </button>
           </form>
@@ -65,7 +99,10 @@ const Contact = () => {
         {/* Success Alert Box */}
         {isSubmitted && (
           <div className="flex justify-center mt-8">
-            <div className="flex items-center bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <div
+              className="flex items-center bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
               <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
               <strong className="font-bold">Success!</strong>
               <span className="ml-2 block sm:inline">
