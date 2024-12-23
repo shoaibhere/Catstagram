@@ -73,6 +73,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
       setRequestSent(true);
       setRequestId(requestId);
       onFriendUpdate();
+      window.location.reload();
     } catch (error) {
       console.error("Error sending friend request:", error);
       alert("Failed to send friend request. Please try again.");
