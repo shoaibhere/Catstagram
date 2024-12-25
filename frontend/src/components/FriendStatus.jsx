@@ -7,7 +7,7 @@ const FriendProtectedContent = ({ userId, children, fallbackMessage }) => {
   const { user } = useAuthStore();
 
   const API_URL =
-    import.meta.env.MODE === "development" ? "http://localhost:8000/" : "/";
+    import.meta.env.MODE === "development" ? `${process.env.API_URL}/` : "/";
 
   useEffect(() => {
     const checkAccess = async () => {

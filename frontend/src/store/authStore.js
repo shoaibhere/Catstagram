@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_URL =
   import.meta.env.MODE === "development"
-    ? "http://localhost:8000/api/user"
+    ? `${process.env.API_URL}/api/user`
     : "/api/user";
 
 axios.defaults.withCredentials = true;

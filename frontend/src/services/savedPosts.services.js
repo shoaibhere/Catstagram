@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   import.meta.env.MODE === "development"
-    ? "http://localhost:8000/api/saved-posts"
+    ? `${process.env.API_URL}/api/saved-posts`
     : "/api/saved-posts";
 
 export const savePost = async (userId, postId) => {

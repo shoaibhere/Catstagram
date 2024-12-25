@@ -60,7 +60,7 @@ const EditPostForm = ({ post }) => {
 
     try {
       await axios.post(
-        `http://localhost:8000/api/posts/edit/${post._id}`,
+        `${process.env.API_URL}/api/posts/edit/${post._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

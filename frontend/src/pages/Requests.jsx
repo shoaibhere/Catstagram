@@ -15,7 +15,7 @@ const Requests = () => {
 
   const API_URL =
     import.meta.env.MODE === "development"
-      ? "http://localhost:8000/api/friends"
+      ? `${process.env.API_URL}/api/friends`
       : "/api/friends";
 
   useEffect(() => {
