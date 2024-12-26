@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useTheme } from "../contexts/themeContext"; // Ensure the path is correct
+import process from 'process';
+
 
 const Factsbar = () => {
   const [facts, setFacts] = useState([]);
@@ -9,7 +11,7 @@ const Factsbar = () => {
   useEffect(() => {
     const fetchFacts = async () => {
       try {
-        const response = await axios.get(`${process.env.API_URL}/api/catfacts`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/catfacts`);
         const allFacts = response.data.data;
         // Randomly shuffle facts and select the first 10
         const randomFacts = allFacts

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
+import process from 'process';
+
 
 const FriendProtectedContent = ({ userId, children, fallbackMessage }) => {
   const [canView, setCanView] = useState(false);
@@ -7,7 +9,7 @@ const FriendProtectedContent = ({ userId, children, fallbackMessage }) => {
   const { user } = useAuthStore();
 
   const API_URL =
-    import.meta.env.MODE === "development" ? `${process.env.API_URL}/` : "/";
+    import.meta.env.MODE === "development" ? `${process.env.REACT_APP_API_URL}/` : "/";
 
   useEffect(() => {
     const checkAccess = async () => {

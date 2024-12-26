@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"; // To extract post ID from URL
 import Layout from "./Layout";
 import EditPostForm from "../components/editPostForm";
 import axios from "axios";
+import process from "process";
 
 const EditPost = () => {
   const { id } = useParams();
@@ -13,7 +14,7 @@ const EditPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`${process.env.API_URL}/api/posts/edit/${id}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/posts/edit/${id}`);
         if (response.data.success) {
           setPost(response.data.post); // Set post data
         } else {

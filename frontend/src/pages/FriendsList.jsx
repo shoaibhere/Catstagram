@@ -4,6 +4,7 @@ import UserCard from "../components/UserCard";
 import Layout from "./Layout";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../contexts/themeContext";
+import process from "process";
 
 const FriendsList = () => {
   const [friends, setFriends] = useState([]);
@@ -13,7 +14,7 @@ const FriendsList = () => {
 
   const API_URL =
     import.meta.env.MODE === "development"
-      ? `${process.env.API_URL}`
+      ? `${process.env.REACT_APP_API_URL}`
       : "/api/friends";
 
   useEffect(() => {

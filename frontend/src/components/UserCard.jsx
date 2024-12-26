@@ -3,8 +3,10 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { User, Ban } from 'lucide-react';
 import { useTheme } from "../contexts/themeContext";
+import process from 'process';
 
-const API_URL = import.meta.env.MODE === "development" ? `${process.env.API_URL}/api` : "/api";
+
+const API_URL = import.meta.env.MODE === "development" ? `${process.env.REACT_APP_API_URL}/api` : "/api";
 
 const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();

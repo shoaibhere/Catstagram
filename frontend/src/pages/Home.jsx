@@ -5,6 +5,7 @@ import PostCard from "../components/postCard";
 import { useAuthStore } from "../store/authStore";
 import { debounce } from "lodash";
 import { useTheme } from "../contexts/themeContext";
+import process from "process";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -36,7 +37,7 @@ const Home = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.API_URL}/api/posts/${user._id}?page=${page}&limit=10`
+        `${process.env.REACT_APP_API_URL}/api/posts/${user._id}?page=${page}&limit=10`
       );
       setLoading(false);
       if (response.data.data.length === 0) {

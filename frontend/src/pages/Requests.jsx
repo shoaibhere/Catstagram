@@ -4,6 +4,7 @@ import Layout from "../pages/Layout";
 import RequestCard from "../components/RequestCard";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../contexts/themeContext";
+import process from "process";
 
 const Requests = () => {
   const [receivedRequests, setReceivedRequests] = useState([]);
@@ -15,7 +16,7 @@ const Requests = () => {
 
   const API_URL =
     import.meta.env.MODE === "development"
-      ? `${process.env.API_URL}/api/friends`
+      ? `${process.env.REACT_APP_API_URL}/api/friends`
       : "/api/friends";
 
   useEffect(() => {

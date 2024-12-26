@@ -5,9 +5,12 @@ import { Link } from "react-router-dom";
 import Input from "../components/Input";
 import { useAuthStore } from "../store/authStore";
 import ThemeToggle from "../components/themeToggle";
+import process from "process";
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
+  console.log('Environment Variables:', process.env.REACT_APP_API_URL);
   const [password, setPassword] = useState("");
 
   const { login, isLoading, error } = useAuthStore();

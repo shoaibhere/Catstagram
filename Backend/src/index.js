@@ -46,6 +46,11 @@ app.use("/api/profile", profileRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/saved-posts", savedPostsRouter);
 app.use("/api/liked-posts", likedPostsRouter);
+// Welcome route to verify deployment
+app.get("/", (req, res) => {
+  res.status(200).send("Backend deployed successfully!");
+});
+
 
 mongoose.connection.on('error', (err) => {
   if (err.code === 11000) {

@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import axios from "axios";
+import process from 'process';
 
 const API_URL =
   import.meta.env.MODE === "development"
-    ? `${process.env.API_URL}/api/user`
+    ? `${process.env.REACT_APP_API_URL}/api/user`
     : "/api/user";
 
 axios.defaults.withCredentials = true;

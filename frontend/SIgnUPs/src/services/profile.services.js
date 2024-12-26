@@ -1,7 +1,7 @@
 import axios from "axios";
 const API_URL =
   import.meta.env.MODE === "development"
-    ? `${processes.env.API_URL}/api/profile`
+    ? `${process.env.API_URL}/api/profile`
     : "/api/profile";
 
 export const updateProfile = async (formData, id) => {

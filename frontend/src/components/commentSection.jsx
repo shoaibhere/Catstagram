@@ -3,6 +3,7 @@ import { useTheme } from '../contexts/themeContext';
 import { User } from 'lucide-react';
 import { format } from 'date-fns';
 import CommentButton from './commentButton';
+import process from 'process';
 
 const CommentSection = ({ postId, userId, onCommentCountChange }) => {
   const [comments, setComments] = useState([]);
@@ -18,7 +19,7 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/comment/${postId}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/comment/${postId}`);
       if (!response.ok) throw new Error('Failed to fetch comments');
       const data = await response.json();
       setComments(data.comments);
@@ -39,7 +40,7 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
 
   const handleAddComment = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/comment/add-comment/${postId}/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/comment/add-comment/${postId}/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +58,7 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
 
   const handleEditComment = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/comment/edit-comment/${editingCommentId}/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/comment/edit-comment/${editingCommentId}/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
 
   const handleRemoveComment = async (commentId) => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/comment/remove-comment/${commentId}/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/comment/remove-comment/${commentId}/${userId}`, {
         method: 'GET',
       });
       if (!response.ok) throw new Error('Failed to remove comment');
@@ -88,7 +89,7 @@ const CommentSection = ({ postId, userId, onCommentCountChange }) => {
 
   const startEditing = async (commentId) => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/comment/get-one/${commentId}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/comment/get-one/${commentId}`);
       if (!response.ok) throw new Error('Failed to fetch comment');
       const data = await response.json();
       setCommentText(data.comment.text);

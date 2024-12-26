@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import process from 'process';
+
 import { Link } from "react-router-dom";
 import {
   faComment,
@@ -70,7 +72,7 @@ const PostCard = ({ post, user }) => {
 
   const handleDeletePost = async () => {
     try {
-      await axios.get(`${process.env.API_URL}/api/posts/delete/${post._id}`);
+      await axios.get(`${process.env.REACT_APP_API_URL}/api/posts/delete/${post._id}`);
       window.location.reload();
     } catch (error) {
       console.error("Error deleting post:", error);

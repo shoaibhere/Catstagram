@@ -3,6 +3,7 @@ import axios from "axios";
 import PostCard from "./postCard";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../contexts/themeContext";
+import process from 'process';
 
 const UserPosts = ({ userId }) => {
   const [posts, setPosts] = useState([]);
@@ -15,7 +16,7 @@ const UserPosts = ({ userId }) => {
   useEffect(() => {
     const API_URL =
       import.meta.env.MODE === "development"
-        ? `${process.env.API_URL}`
+        ? `${process.env.REACT_APP_API_URL}`
         : "/api/posts";
 
     const fetchUserPosts = async () => {
