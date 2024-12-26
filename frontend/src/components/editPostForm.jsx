@@ -7,8 +7,6 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faSpinner, faHeart, faBookmark } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "../contexts/themeContext"; // Import theme context
-import process from 'process';
-
 
 const EditPostForm = ({ post }) => {
   const [caption, setCaption] = useState(post.caption || "");
@@ -62,7 +60,7 @@ const EditPostForm = ({ post }) => {
 
     try {
       await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/posts/edit/${post._id}`,
+        `${process.env.API_URL}/api/posts/edit/${post._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

@@ -5,8 +5,6 @@ import axios from "axios";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import process from 'process';
-
 import {
   faComment,
   faSave,
@@ -89,7 +87,7 @@ const CreatePostForm = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/posts`,
+        `${process.env.API_URL}/api/posts`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

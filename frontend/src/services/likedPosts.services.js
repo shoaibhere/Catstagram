@@ -1,9 +1,8 @@
 import axios from "axios";
-import process from 'process';
 
 const API_URL =
   import.meta.env.MODE === "development"
-    ? `${process.env.REACT_APP_API_URL}/api/liked-posts`
+    ? `${process.env.API_URL}/api/liked-posts`
     : "/api/liked-posts";
 
 export const likePost = async (userId, postId) => {

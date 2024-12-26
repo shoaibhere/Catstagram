@@ -20,9 +20,6 @@ import Layout from "./pages/Layout";
 import ChangePasswordPage from "./components/ChangePasswordModal";
 import Requests from "./pages/Requests";
 import { ThemeProvider, useTheme } from "./contexts/themeContext";
-import process from "process";
-console.log('Environment Variables:', process.env.REACT_APP_API_URL);
-
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();

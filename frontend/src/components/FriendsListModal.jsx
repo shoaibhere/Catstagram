@@ -4,8 +4,6 @@ import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../contexts/themeContext";
 import { User } from "lucide-react";
 import { Link } from "react-router-dom";
-import process from 'process';
-
 
 const FriendsListModal = ({ isOpen, onClose, userId }) => {
   const [mutualFriends, setMutualFriends] = useState([]);
@@ -15,7 +13,7 @@ const FriendsListModal = ({ isOpen, onClose, userId }) => {
   const { theme } = useTheme();
 
   const API_URL =
-    import.meta.env.MODE === "development" ? `${process.env.REACT_APP_API_URL}/` : "/";
+    import.meta.env.MODE === "development" ? `${process.env.API_URL}/` : "/";
 
   useEffect(() => {
     if (isOpen) {
