@@ -13,7 +13,7 @@ const FriendsList = () => {
 
   const API_URL =
     import.meta.env.MODE === "development"
-      ? `${process.env.API_URL}`
+      ? "http://localhost:8000"
       : "/api/friends";
 
   useEffect(() => {

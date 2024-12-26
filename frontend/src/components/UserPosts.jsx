@@ -15,7 +15,7 @@ const UserPosts = ({ userId }) => {
   useEffect(() => {
     const API_URL =
       import.meta.env.MODE === "development"
-        ? `${process.env.API_URL}`
+        ? "http://localhost:8000"
         : "/api/posts";
 
     const fetchUserPosts = async () => {

@@ -36,7 +36,7 @@ const Home = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.API_URL}/api/posts/${user._id}?page=${page}&limit=10`
+        `http://localhost:8000/api/posts/${user._id}?page=${page}&limit=10`
       );
       setLoading(false);
       if (response.data.data.length === 0) {

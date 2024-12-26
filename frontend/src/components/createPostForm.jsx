@@ -87,7 +87,7 @@ const CreatePostForm = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.API_URL}/api/posts`,
+        "http://localhost:8000/api/posts",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

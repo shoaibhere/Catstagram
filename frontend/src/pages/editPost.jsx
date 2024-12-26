@@ -13,7 +13,7 @@ const EditPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`${process.env.API_URL}/api/posts/edit/${id}`);
+        const response = await axios.get(`http://localhost:8000/api/posts/edit/${id}`);
         if (response.data.success) {
           setPost(response.data.post); // Set post data
         } else {
