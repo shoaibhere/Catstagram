@@ -18,13 +18,14 @@ const axios = require("axios");
 dotenv.config({ path: ".env.local" });
 
 const app = express();
+app.use(express.urlencoded({ extended: true })); // Parses URL-encoded body
+
 const corsOptions = {
   origin: "https://catstagram-nu.vercel.app", // Allowed frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
   credentials: true, // Allow cookies and credentials
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 };
-
 app.use(cors(corsOptions));
 
 // Handle preflight requests explicitly
@@ -32,6 +33,18 @@ app.options("*", cors(corsOptions));
 
 app.use(express.json()); //parse incoming json request
 app.use(cookieParser()); //parse incoming cookie
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: true, // True in production
+    sameSite: "none", // Lax in dev
+  }
+}));
+
+
 
 app.get("/api/catfacts", async (req, res) => {
   try {
