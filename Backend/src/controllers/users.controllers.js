@@ -117,7 +117,7 @@ const login = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
 
-    generateTokenSetCookie(res, user._id);
+    const token = generateTokenSetCookie(res, user._id);
     user.lastLogin = new Date();
     await user.save();
 
@@ -126,6 +126,7 @@ const login = async (req, res) => {
       success: true,
       message: "Logged in successfully",
       user: userResponse,
+      token:token,
     });
   } catch (error) {
     console.error("Error in login: ", error);
