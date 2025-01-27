@@ -13,10 +13,7 @@ const UserPosts = ({ userId }) => {
   const { theme } = useTheme(); // Use theme context
 
   useEffect(() => {
-    const API_URL =
-      import.meta.env.MODE === "development"
-        ? "http://localhost:8000"
-        : "/api/posts";
+    const API_URL = "https://catstagram-backend.vercel.app"
 
     const fetchUserPosts = async () => {
       try {

@@ -12,8 +12,7 @@ const FriendsListModal = ({ isOpen, onClose, userId }) => {
   const { user } = useAuthStore();
   const { theme } = useTheme();
 
-  const API_URL =
-    import.meta.env.MODE === "development" ? "http://localhost:8000/" : "/";
+  const API_URL ="https://catstagram-backend.vercel.app/"
 
   useEffect(() => {
     if (isOpen) {

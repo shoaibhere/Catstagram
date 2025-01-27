@@ -10,10 +10,7 @@ const FriendsExplore = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { theme } = useTheme();
 
-  const API_URL =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:8000"
-      : "/api/friends";
+  const API_URL ="https://catstagram-backend.vercel.app"
 
   useEffect(() => {
     fetchPotentialFriends();

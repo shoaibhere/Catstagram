@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { User, Ban } from 'lucide-react';
 import { useTheme } from "../contexts/themeContext";
 
-const API_URL = import.meta.env.MODE === "development" ? "http://localhost:8000/api" : "/api";
+const API_URL = "https://catstagram-backend.vercel.app/api"
 
 const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();

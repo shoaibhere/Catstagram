@@ -1,9 +1,6 @@
 import axios from "axios";
 
-const API_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:8000/api/liked-posts"
-    : "/api/liked-posts";
+const API_URL ="https://catstagram-backend.vercel.app/api/liked-posts"
 
 export const likePost = async (userId, postId) => {
   try {

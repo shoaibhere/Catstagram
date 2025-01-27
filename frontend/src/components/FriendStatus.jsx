@@ -6,8 +6,7 @@ const FriendProtectedContent = ({ userId, children, fallbackMessage }) => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
 
-  const API_URL =
-    import.meta.env.MODE === "development" ? "http://localhost:8000/" : "/";
+  const API_URL ="https://catstagram-backend.vercel.app/"
 
   useEffect(() => {
     const checkAccess = async () => {

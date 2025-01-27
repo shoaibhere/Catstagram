@@ -9,7 +9,7 @@ const Factsbar = () => {
   useEffect(() => {
     const fetchFacts = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/catfacts");
+        const response = await axios.get("https://catstagram-backend.vercel.app/api/catfacts");
         const allFacts = response.data.data;
         // Randomly shuffle facts and select the first 10
         const randomFacts = allFacts

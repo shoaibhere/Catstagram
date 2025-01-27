@@ -70,7 +70,7 @@ const PostCard = ({ post, user }) => {
 
   const handleDeletePost = async () => {
     try {
-      await axios.get(`http://localhost:8000/api/posts/delete/${post._id}`);
+      await axios.get(`https://catstagram-backend.vercel.app/api/posts/delete/${post._id}`);
       window.location.reload();
     } catch (error) {
       console.error("Error deleting post:", error);

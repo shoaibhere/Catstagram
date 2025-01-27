@@ -13,10 +13,7 @@ const Requests = () => {
   const { user } = useAuthStore();
   const { theme } = useTheme();
 
-  const API_URL =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:8000/api/friends"
-      : "/api/friends";
+  const API_URL ="https://catstagram-backend.vercel.app/api/friends"
 
   useEffect(() => {
     fetchRequests();

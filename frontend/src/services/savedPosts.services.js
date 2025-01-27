@@ -1,9 +1,6 @@
 import axios from "axios";
 
-const API_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:8000/api/saved-posts"
-    : "/api/saved-posts";
+const API_URL ="https://catstagram-backend.vercel.app/api/saved-posts"
 
 export const savePost = async (userId, postId) => {
   try {
