@@ -80,7 +80,7 @@ const SavedPosts = ({ user }) => {
         </div>
 
         {/* View Mode Buttons */}
-        <div className="mb-6 flex space-x-4">
+        <div className="hidden sm:flex mb-6 space-x-4">
           <button
             onClick={() => setViewMode("grid")}
             className={`px-4 py-2 rounded-md flex items-center ${

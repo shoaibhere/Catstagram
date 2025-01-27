@@ -66,7 +66,7 @@ export default function Profile() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="min-h-screen flex flex-col items-center pt-8">
         {/* Profile Header */}
         <div className={`${containerClasses} rounded-lg shadow-lg p-8 mb-8 mx-auto max-w-xl`}>
           <div className="flex flex-col md:flex-row items-center md:space-x-6">

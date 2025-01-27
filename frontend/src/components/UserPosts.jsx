@@ -45,7 +45,7 @@ const UserPosts = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-10">
+      <div className="block sm:flex justify-center items-center py-10">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
       </div>
     );
@@ -61,18 +61,12 @@ const UserPosts = ({ userId }) => {
       : "bg-gray-100 text-gray-900";
 
   return (
-    <div className={`mt-8 rounded-lg p-6 mx-[150px] ${containerClassName}`}>
-      <h2 className="text-2xl font-bold mb-6">User Posts</h2>
+    <div>
+      <h2 className="text-2xl text-center font-bold mb-6">User Posts</h2>
       {posts.length === 0 ? (
         <div className="text-center text-gray-400 py-10">No posts yet</div>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gap: "16px",
-            gridTemplateColumns: "1fr",
-          }}
-        >
+        <div className="flex flex-col space-y-6 w-full max-w-3xl">
           {posts.map((post) => (
             <PostCard key={post.id} post={post} user={user} />
           ))}
