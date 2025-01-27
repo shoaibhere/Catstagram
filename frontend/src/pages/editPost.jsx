@@ -13,7 +13,7 @@ const EditPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`https://catstagram-backend.vercel.app/api/posts/edit/${id}`);
+        const response = await axios.get(`https://catstagram-production.up.railway.app/api/posts/edit/${id}`);
         if (response.data.success) {
           setPost(response.data.post); // Set post data
         } else {

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL ="https://catstagram-backend.vercel.app/api/user";
+const API_URL ="https://catstagram-production.up.railway.app/api/user";
 axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set) => ({

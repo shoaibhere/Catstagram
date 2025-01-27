@@ -11,7 +11,7 @@ const Friends = () => {
   const [activeTab, setActiveTab] = useState("friends");
   const { user } = useAuthStore();
 
-  const API_URL = "https://catstagram-backend.vercel.app"
+  const API_URL = "https://catstagram-production.up.railway.app"
   useEffect(() => {
     if (activeTab === "friends") {
       fetchFriends();

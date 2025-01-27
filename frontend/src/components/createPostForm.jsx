@@ -87,7 +87,7 @@ const CreatePostForm = () => {
 
     try {
       const response = await axios.post(
-        "https://catstagram-backend.vercel.app/api/posts",
+        "https://catstagram-production.up.railway.app/api/posts",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

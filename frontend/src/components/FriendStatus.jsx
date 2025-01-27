@@ -6,7 +6,7 @@ const FriendProtectedContent = ({ userId, children, fallbackMessage }) => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
 
-  const API_URL ="https://catstagram-backend.vercel.app/"
+  const API_URL ="https://catstagram-production.up.railway.app/"
 
   useEffect(() => {
     const checkAccess = async () => {

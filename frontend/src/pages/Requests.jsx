@@ -13,7 +13,7 @@ const Requests = () => {
   const { user } = useAuthStore();
   const { theme } = useTheme();
 
-  const API_URL ="https://catstagram-backend.vercel.app/api/friends"
+  const API_URL ="https://catstagram-production.up.railway.app/api/friends"
 
   useEffect(() => {
     fetchRequests();

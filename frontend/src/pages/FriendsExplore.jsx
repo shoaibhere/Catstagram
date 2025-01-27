@@ -9,7 +9,7 @@ const FriendsExplore = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { theme } = useTheme();
 
-  const API_URL ="https://catstagram-backend.vercel.app"
+  const API_URL ="https://catstagram-production.up.railway.app"
 
   useEffect(() => {
     fetchPotentialFriends();

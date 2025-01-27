@@ -60,7 +60,7 @@ const EditPostForm = ({ post }) => {
 
     try {
       await axios.post(
-        `https://catstagram-backend.vercel.app/api/posts/edit/${post._id}`,
+        `https://catstagram-production.up.railway.app/api/posts/edit/${post._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

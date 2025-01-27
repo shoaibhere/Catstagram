@@ -36,7 +36,7 @@ const Home = () => {
 
     try {
       const response = await axios.get(
-        `https://catstagram-backend.vercel.app/api/posts/${user._id}?page=${page}&limit=10`
+        `https://catstagram-production.up.railway.app/api/posts/${user._id}?page=${page}&limit=10`
       );
       setLoading(false);
       if (response.data.data.length === 0) {

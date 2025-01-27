@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL ="https://catstagram-backend.vercel.app/api/profile"
+const API_URL ="https://catstagram-production.up.railway.app/api/profile"
 
 export const updateProfile = async (formData, id) => {
   try {
