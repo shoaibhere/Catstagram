@@ -1,6 +1,6 @@
 import React from "react";
 import SideNav from "../components/sideNav";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/navbar"
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../contexts/themeContext";
