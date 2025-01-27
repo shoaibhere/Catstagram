@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
-import Cookies from "js-cookie"; // Import js-cookie
 
-const API_URL = "https://catstagram-production.up.railway.app/api/user";
+const API_URL ="https://catstagram-production.up.railway.app/api/user";
 axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set) => ({
@@ -34,7 +33,6 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
@@ -43,9 +41,14 @@ export const useAuthStore = create((set) => ({
         password,
       });
 
-      // Store token and user in cookies
-      Cookies.set("token", response.data.token, { expires: 7, path: "/" }); // Save token in cookies
-      Cookies.set("user", JSON.stringify(response.data.user), { expires: 7, path: "/" }); // Save user in cookies
+      // Save user data and token to local storage
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify({
+          token: response.data.token, // Assuming the response includes a token
+          user: response.data.user,
+        })
+      );
 
       set({
         isAuthenticated: true,
@@ -55,7 +58,8 @@ export const useAuthStore = create((set) => ({
       });
     } catch (error) {
       set({
-        error: error.response?.data?.message || "Error Invalid Email or Password",
+        error:
+          error.response?.data?.message || "Error Invalid Email or Password",
         isLoading: false,
       });
       throw error;
@@ -66,10 +70,6 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       await axios.post(`${API_URL}/logout`);
-      // Remove token and user from cookies
-      Cookies.remove("token");
-      Cookies.remove("user");
-
       set({
         user: null,
         isAuthenticated: false,
@@ -81,7 +81,6 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-
   verifyEmail: async (code) => {
     set({ isLoading: true, error: null });
     try {
@@ -100,31 +99,22 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {
-      // Check if the token exists in the cookies
-      const token = Cookies.get("token");
-      if (token) {
-        const response = await axios.get(`${API_URL}/check-auth`, {
-          withCredentials: true,
-        });
-
-        set({
-          user: response.data.user,
-          isAuthenticated: true,
-          isCheckingAuth: false,
-        });
-      } else {
-        set({ isCheckingAuth: false, isAuthenticated: false });
-      }
+      const response = await axios.get(`${API_URL}/check-auth`, {
+        withCredentials: true, // Send cookies with the request
+      });
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        isCheckingAuth: false,
+      });
     } catch (error) {
       console.log("error in check auth: " + error);
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
     }
   },
-
   forgotPassword: async (email) => {
     set({ isLoading: true, error: null });
     try {
@@ -141,7 +131,6 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-
   resetPassword: async (token, password) => {
     set({ isLoading: true, error: null });
     try {
@@ -164,10 +153,7 @@ export const useAuthStore = create((set) => ({
   changePassword: async (currentPassword, newPassword) => {
     set({ isLoading: true, error: null, message: null });
     try {
-      const response = await axios.post(`${API_URL}/change-password`, {
-        currentPassword,
-        newPassword,
-      });
+      const response = await axios.post(`${API_URL}/change-password`, { currentPassword, newPassword });
       set({
         isLoading: false,
         message: "Password changed successfully",
