@@ -46,6 +46,9 @@ app.use("/api/profile", profileRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/saved-posts", savedPostsRouter);
 app.use("/api/liked-posts", likedPostsRouter);
+app.use("/",(req,res)=>{
+  res.send("Welcome to Catstagram Backend");
+});
 
 mongoose.connection.on('error', (err) => {
   if (err.code === 11000) {
