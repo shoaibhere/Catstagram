@@ -10,42 +10,39 @@ const savedPostsRouter = require("./routes/savedPosts.routes");
 const likedPostsRouter = require("./routes/likedPosts.routes.js");
 const commentRouter = require("./routes/comments.routes.js");
 const mongoose = require("mongoose");
-  
+
 const cors = require("cors");
 const axios = require("axios");
 
-// dotenv.config({ path: "./.env.local" });
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: process.env.NODE_ENV === 'production' ? ".env" : ".env.local" });
 
 const app = express();
-app.use(express.urlencoded({ extended: true })); // Parses URL-encoded body
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Limiting body size to prevent too large requests
 
 const corsOptions = {
-  origin: "https://catstagram-nu.vercel.app", // Allowed frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-  credentials: true, // Allow cookies and credentials
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  origin: process.env.FRONTEND_URL || "http://localhost:3000", // Allowed frontend URL from environment variable
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  credentials: true, 
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
 
 // Handle preflight requests explicitly
 app.options("*", cors(corsOptions));
 
-app.use(express.json()); //parse incoming json request
-app.use(cookieParser()); //parse incoming cookie
-app.use(session({
-  secret: process.env.JWT_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    httpOnly: true,
-    secure: true, // True in production
-    sameSite: "none", // Lax in dev
-  }
-}));
+app.use(express.json()); 
+app.use(cookieParser()); 
 
+// Routes
+app.use("/api/user", userRouter);
+app.use("/api/posts", postRouter);
+app.use("/api/friends", friendRoutes);
+app.use("/api/profile", profileRouter);
+app.use("/api/comment", commentRouter);
+app.use("/api/saved-posts", savedPostsRouter);
+app.use("/api/liked-posts", likedPostsRouter);
 
-
+// Cat facts route
 app.get("/api/catfacts", async (req, res) => {
   try {
     const response = await axios.get("https://catfact.ninja/facts?limit=100");
@@ -55,18 +52,16 @@ app.get("/api/catfacts", async (req, res) => {
     res.status(500).json({ error: "Error fetching cat facts" });
   }
 });
-// const jwt = require("jsonwebtoken");
-// console.log("jwt=" + jwt);
-const PORT = process.env.PORT || 8000;
-app.use("/api/user", userRouter);
-app.use("/api/posts", postRouter);
-app.use("/api/friends", friendRoutes);
-app.use("/api/profile", profileRouter);
-app.use("/api/comment", commentRouter);
-app.use("/api/saved-posts", savedPostsRouter);
-app.use("/api/liked-posts", likedPostsRouter);
-app.use("/",(req,res)=>{
+
+// Default route
+app.use("/", (req, res) => {
   res.send("Welcome to Catstagram Backend");
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err);
+  res.status(500).json({ message: "Internal Server Error", error: err.message });
 });
 
 mongoose.connection.on('error', (err) => {
@@ -76,6 +71,8 @@ mongoose.connection.on('error', (err) => {
     console.error('Database error: ', err);
   }
 });
+
+const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
   connectDB();
