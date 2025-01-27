@@ -69,7 +69,7 @@ function IntroModal() {
       }
 
       currentIndex++;
-    }, 200); // Adjusted speed (slower)
+    }, 100); // Adjusted speed (slower)
 
     return () => clearInterval(interval);
   }, []); // Empty dependency array to run only once

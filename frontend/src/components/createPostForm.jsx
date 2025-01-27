@@ -203,7 +203,7 @@ const CreatePostForm = () => {
                     icon={faHeart}
                     className="text-red-500 mr-2"
                   />
-                  <span className="text-gray-400 text-xs">1 Like</span>
+                  <span className="text-gray-400 text-xs">0 Like</span>
                 </div>
                 <div className="flex items-center">
                   <FontAwesomeIcon
