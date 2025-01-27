@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const { User } = require("../models/users.model.js");
+const { PendingUser } = require("../models/pendingUser.model.js");
 const bcryptjs = require("bcryptjs");
 const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
@@ -24,41 +25,69 @@ const signup = async (req, res) => {
       return res.status(400).json({ success: false, message: "User already exists" });
     }
 
+    // Check if the email is already pending verification
+    const pendingUser = await PendingUser.findOne({ email });
+    if (pendingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is already pending verification",
+      });
+    }
+
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
-    const user = new User({ email, password, name, verificationToken, verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000 });
-    await user.save();
 
-    generateTokenSetCookie(res, user._id);
-    await sendVerificationEmail(user.email, verificationToken);
+    // Save to a temporary collection
+    const pendingUserData = new PendingUser({
+      email,
+      password, // Consider hashing the password here
+      name,
+      verificationToken,
+      verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000, // Token expires in 24 hours
+    });
 
-    res.status(201).json({ success: true, message: "User created successfully", user: { ...user._doc, password: undefined } });
+    await pendingUserData.save();
+    await sendVerificationEmail(email, verificationToken);
+
+    res.status(201).json({
+      success: true,
+      message: "Verification email sent. Please verify your email to complete registration.",
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
 };
 
-
 const verifyEmail = async (req, res) => {
   const { code } = req.body;
+
   try {
-    const user = await User.findOne({
+    const pendingUser = await PendingUser.findOne({
       verificationToken: code,
       verificationTokenExpire: { $gt: Date.now() },
     });
 
-    if (!user) {
+    if (!pendingUser) {
       return res.status(400).json({
         success: false,
         message: "Invalid or expired verification code",
       });
     }
 
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpire = undefined;
-    await user.save();
+    // Move verified user to the main Users collection
+    const user = new User({
+      email: pendingUser.email,
+      password: pendingUser.password, // Use the already hashed password
+      name: pendingUser.name,
+      isVerified: true,
+    });
 
+    await user.save();
     await sendWelcomeEmail(user.email, user.name);
+
+    // Remove the pending user record
+    await PendingUser.deleteOne({ email: pendingUser.email });
+
+    generateTokenSetCookie(res, user._id);
 
     res.status(200).json({
       success: true,
@@ -73,6 +102,7 @@ const verifyEmail = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;

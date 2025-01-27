@@ -1,4 +1,7 @@
 const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
+dotenv.config({ path: ".env.local" });
+
 const {
   VERIFICATION_EMAIL_TEMPLATE,
   WELCOME_EMAIL_TEMPLATE,
@@ -12,8 +15,8 @@ const transporter = nodemailer.createTransport({
   port: 587, // TLS port (use 465 for SSL)
   secure: false, // Use TLS (true for SSL)
   auth: {
-    user: "8460e3001@smtp-brevo.com", // Your Brevo SMTP username (use the provided email)
-    pass: "NbCXaRcp9x1AUmfh", // Your Brevo SMTP key
+    user: process.env.EMAIL_USER, // Your Brevo SMTP username (use the provided email)
+    pass: process.env.EMAIL_PASSWORD, // Your Brevo SMTP key
   },
 });
 
