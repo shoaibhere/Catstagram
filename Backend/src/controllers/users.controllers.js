@@ -14,17 +14,7 @@ const {
 } = require("../../mailtrap/email.js");
 
 // Utility function to generate and set token in cookie
-const generateTokenSetCookie = (res, userId) => {
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-  res.cookie('token', token, {
-    httpOnly: true, // ensures that the cookie is only accessible by the server
-    secure: process.env.NODE_ENV === 'production', // set to true in production for HTTPS
-    maxAge: 24 * 60 * 60 * 1000, // 1 day expiration time
-  });
-
-  return token;
-};
 
 // Signup route
 const signup = async (req, res) => {
