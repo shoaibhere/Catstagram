@@ -12,11 +12,6 @@ const {
   sendResetPasswordEmail,
   sendResetSuccessEmail,
 } = require("../../mailtrap/email.js");
-
-// Utility function to generate and set token in cookie
-
-
-// Signup route
 const signup = async (req, res) => {
   const { email, password, name } = req.body;
 
@@ -30,6 +25,7 @@ const signup = async (req, res) => {
       return res.status(400).json({ success: false, message: "User already exists" });
     }
 
+    // Check if the email is already pending verification
     const pendingUser = await PendingUser.findOne({ email });
     if (pendingUser) {
       return res.status(400).json({
@@ -40,9 +36,10 @@ const signup = async (req, res) => {
 
     const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // Save to a temporary collection
     const pendingUserData = new PendingUser({
       email,
-      password, 
+      password, // Consider hashing the password here
       name,
       verificationToken,
       verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000, // Token expires in 24 hours
@@ -60,7 +57,6 @@ const signup = async (req, res) => {
   }
 };
 
-// Email verification route
 const verifyEmail = async (req, res) => {
   const { code } = req.body;
 
@@ -77,9 +73,10 @@ const verifyEmail = async (req, res) => {
       });
     }
 
+    // Move verified user to the main Users collection
     const user = new User({
       email: pendingUser.email,
-      password: pendingUser.password, // Use already hashed password
+      password: pendingUser.password, // Use the already hashed password
       name: pendingUser.name,
       isVerified: true,
     });
@@ -87,16 +84,17 @@ const verifyEmail = async (req, res) => {
     await user.save();
     await sendWelcomeEmail(user.email, user.name);
 
+    // Remove the pending user record
     await PendingUser.deleteOne({ email: pendingUser.email });
 
-    generateTokenSetCookie(res, user._id); // Set token as cookie
+    generateTokenSetCookie(res, user._id);
 
     res.status(200).json({
       success: true,
       message: "Email verified successfully",
       user: {
         ...user._doc,
-        password: undefined, // Don't return password
+        password: undefined,
       },
     });
   } catch (error) {
@@ -105,7 +103,7 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-// Login route
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -119,11 +117,11 @@ const login = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
 
-    generateTokenSetCookie(res, user._id); // Set token as cookie
+    generateTokenSetCookie(res, user._id);
     user.lastLogin = new Date();
     await user.save();
 
-    const userResponse = { ...user.toObject(), password: undefined };
+    const userResponse = { ...user.toObject(), password: undefined }; // Ensure password is not included in the response
     res.status(200).json({
       success: true,
       message: "Logged in successfully",
@@ -135,13 +133,12 @@ const login = async (req, res) => {
   }
 };
 
-// Logout route
+
 const logout = async (req, res) => {
-  res.clearCookie("token"); // Clears the token cookie
+  res.clearCookie("token");
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-// Forgot Password route
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
@@ -153,14 +150,16 @@ const forgotPassword = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
+    // Generate reset token
     const resetToken = crypto.randomBytes(20).toString("hex");
-    const resetTokenExpiresAt = new Date(Date.now() + 36000000); // 1 hour
+    const resetTokenExpiresAt = new Date(Date.now() + 36000000); // Adds 1 hour
 
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpire = resetTokenExpiresAt;
 
     await user.save();
 
+    // send email
     await sendResetPasswordEmail(
       user.email,
       `${process.env.CLIENT_URL}/reset-password/${resetToken}`
@@ -175,8 +174,6 @@ const forgotPassword = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
-
-// Reset Password route
 const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
@@ -191,10 +188,10 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
     }
 
-    user.password = password; // The new password
+    user.password = password; // The new password, which will be hashed by the pre-save hook
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
-    await user.save(); // The pre-save hook will hash the password
+    await user.save(); // The pre-save hook hashes the password before saving
 
     await sendResetSuccessEmail(user.email);
 
@@ -208,7 +205,6 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// Change Password route
 const changePassword = async (req, res) => {
   const token = req.cookies.token;
 
@@ -235,18 +231,17 @@ const changePassword = async (req, res) => {
     user.password = newPassword; // Set new password, which will be hashed by the pre-save hook
     await user.save();
 
-    generateTokenSetCookie(res, userId); // Optionally re-authenticate the user
+    const newToken = generateTokenSetCookie(res, userId); // Optionally re-authenticate the user
 
     res.json({
       message: "Password changed successfully",
-      token: req.cookies.token, // Send updated token
+      token: newToken,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-// Auth check route (protected route)
 const checkAuth = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select("-password");
@@ -262,11 +257,58 @@ const checkAuth = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
-
-// Block User route
 const blockUser = async (req, res) => {
+  const token = req.cookies.token; // This assumes the cookie is named 'token'
+  const { userIdToBlock } = req.body; // Assume IDs are provided in the request body
+
+  if (!token) {
+    return res.status(401).json({ message: "Authentication token is missing" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Ensure JWT_SECRET is set in your .env file
+    const userId = decoded.userId; // Extract userId from the token
+
+    // Find the current user by ID extracted from token
+    const currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Current user not found" });
+    }
+
+    // Check if the user to block exists
+    const userToBlock = await User.findById(userIdToBlock);
+    if (!userToBlock) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User to block not found" });
+    }
+
+    // Check if the user is already blocked
+    if (currentUser.blocked.includes(userIdToBlock)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User is already blocked" });
+    }
+
+    // Add the user to the blocked list
+    currentUser.blocked.push(userIdToBlock);
+    await currentUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: ` User ${userToBlock.name} blocked successfully`,
+      blocked: currentUser.blocked,
+    });
+  } catch (error) {
+    console.log("Error in blockUser: ", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+const unblockUser = async (req, res) => {
   const token = req.cookies.token;
-  const { userIdToBlock } = req.body;
+  const { userIdToUnblock } = req.body;
 
   if (!token) {
     return res.status(401).json({ message: "Authentication token is missing" });
@@ -278,33 +320,40 @@ const blockUser = async (req, res) => {
 
     const currentUser = await User.findById(userId);
     if (!currentUser) {
-      return res.status(404).json({ success: false, message: "Current user not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Current user not found" });
     }
 
-    const userToBlock = await User.findById(userIdToBlock);
-    if (!userToBlock) {
-      return res.status(404).json({ success: false, message: "User to block not found" });
+    // Check if the user is in the blocked list
+    if (!currentUser.blocked.includes(userIdToUnblock)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User is not blocked" });
     }
 
-    if (currentUser.blocked.includes(userIdToBlock)) {
-      return res.status(400).json({ success: false, message: "User is already blocked" });
-    }
-
-    currentUser.blocked.push(userIdToBlock);
+    // Remove the user from the blocked list
+    currentUser.blocked = currentUser.blocked.filter(
+      (blockedUserId) => blockedUserId.toString() !== userIdToUnblock
+    );
     await currentUser.save();
 
     res.status(200).json({
       success: true,
-      message: `User ${userToBlock.name} blocked successfully`,
+      message: `User unblocked successfully`,
       blocked: currentUser.blocked,
     });
   } catch (error) {
-    console.log("Error in blockUser: ", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.log("Error in unblockUser: ", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
+module.exports = { blockUser, unblockUser };
+
 module.exports = {
+  blockUser,
+  unblockUser,
   signup,
   verifyEmail,
   login,
@@ -313,5 +362,4 @@ module.exports = {
   resetPassword,
   changePassword,
   checkAuth,
-  blockUser,
 };
