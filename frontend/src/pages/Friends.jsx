@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import UserCard from "../components/UserCard";
 import SideNav from "../components/sideNav";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/navbar";
 import Factsbar from "../components/factsbar";
 import { useAuthStore } from "../store/authStore";
 
@@ -11,11 +11,7 @@ const Friends = () => {
   const [activeTab, setActiveTab] = useState("friends");
   const { user } = useAuthStore();
 
-  const API_URL =
-    import.meta.env.MODE === "development"
-      ? "https://catstagram-backend.vercel.app"
-      : "/api/friends";
-
+  const API_URL = "https://catstagram-backend.vercel.app"
   useEffect(() => {
     if (activeTab === "friends") {
       fetchFriends();

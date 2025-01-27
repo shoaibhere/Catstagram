@@ -17,7 +17,7 @@ import { likePost, unlikePost } from "../services/likedPosts.services";
 import axios from "axios";
 import { useTheme } from "../contexts/themeContext";
 import CommentSection from "./commentSection";
-import Modal from "./Modal";
+import Modal from "./modal";
 
 const PostCard = ({ post, user }) => {
   const [isSaved, setIsSaved] = useState(false);

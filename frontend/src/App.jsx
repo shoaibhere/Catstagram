@@ -15,7 +15,6 @@ import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore";
 import SavedPosts from "./components/SavedPosts";
 import EditPost from "./pages/editPost";
-import Layout from "./pages/Layout";
 import ChangePasswordPage from "./components/ChangePasswordModal";
 import Requests from "./pages/Requests";
 import { ThemeProvider, useTheme } from "./contexts/themeContext";

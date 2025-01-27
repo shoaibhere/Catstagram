@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import UserCard from "../components/UserCard";
-import { useAuthStore } from "../store/authStore";
 import Layout from "./Layout";
 import { useTheme } from "../contexts/themeContext";
 
