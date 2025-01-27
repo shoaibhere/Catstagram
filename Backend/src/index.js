@@ -18,13 +18,11 @@ const axios = require("axios");
 dotenv.config({ path: ".env.local" });
 
 const app = express();
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // The frontend URL
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: "https://catstagram-nu.vercel.app", 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // The frontend URL
+  credentials: true,               // Allow credentials (cookies) to be sent
+}));
 app.use(express.json()); //parse incoming json request
 app.use(cookieParser()); //parse incoming cookie
 
