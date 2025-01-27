@@ -13,7 +13,6 @@ import Profile from "./pages/Profile";
 import CreatePost from "./pages/createPost";
 import Friends from "./pages/FriendsList";
 import ExploreFriends from "./pages/FriendsExplore";
-import Website from "./pages/website";
 import SavedPosts from "./components/SavedPosts";
 import EditPost from "./pages/editPost";
 import Layout from "./pages/Layout";
@@ -39,7 +38,7 @@ const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
   if (isAuthenticated && user && user.isVerified) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -75,7 +74,7 @@ const AppContent = () => {
       <FloatingShape color={shapeColors[2]} size="w-32 h-32" top="40%" left="10%" delay={2} />
       <Routes>
         <Route
-          path="/home"
+          path="/"
           element={
             <ProtectedRoute>
                 <Home />
@@ -99,7 +98,6 @@ const AppContent = () => {
             </RedirectAuthenticatedUser>
           }
         />
-        <Route path="/" element={<Website />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route
           path="/forgot-password"

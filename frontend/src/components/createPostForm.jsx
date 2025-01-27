@@ -96,7 +96,7 @@ const CreatePostForm = () => {
 
       if (response.data.success) {
         alert("Post created successfully!");
-        navigate("/home");
+        navigate("/");
       } else {
         alert("Failed to create post: " + response.data.message);
       }

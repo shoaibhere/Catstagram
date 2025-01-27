@@ -47,7 +47,7 @@ const Navbar = () => {
               <span className="hidden md:block text-2xl font-billabong ml-2">Catstagram</span>
             </a>
             <div className="md:ml-auto flex items-center">
-              <Link to="/home" className={buttonClasses}><Home className={iconClasses}/> Home</Link>
+              <Link to="/" className={buttonClasses}><Home className={iconClasses}/> Home</Link>
               <Link to="/" className={buttonClasses}><Cat className={iconClasses}/> Website</Link>
               <button onClick={handleChangePassword} className={buttonClasses}><Lock className={iconClasses}/> Change Password</button>
               <button onClick={handleLogout} className={buttonClasses}><LogOut className={iconClasses}/> Logout</button>
