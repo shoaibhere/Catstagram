@@ -28,9 +28,7 @@ const SignUpPage = () => {
 
     // Check password validity before submitting
     if (!validatePassword(password)) {
-      setPasswordError(
-        "Password must be at least 8 characters long, contain uppercase, lowercase, a number, and a special character."
-      );
+      setPasswordError("Please Fill The Meter");
       return;
     }
 

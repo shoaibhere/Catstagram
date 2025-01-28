@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore"; // Adjust path as needed
-import { useTheme } from '../contexts/themeContext'; // Adjust path as needed
-import { X, Eye, EyeOff } from 'lucide-react';
+import { useTheme } from "../contexts/themeContext"; // Adjust path as needed
+import { X, Eye, EyeOff } from "lucide-react";
 
 const ChangePasswordModal = ({ onClose }) => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -11,18 +11,42 @@ const ChangePasswordModal = ({ onClose }) => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [validationError, setValidationError] = useState("");
   const { changePassword, isLoading, error, message } = useAuthStore();
   const { theme } = useTheme();
 
-  const modalClassName = theme === 'dark' ? "bg-gray-800 text-white" : "bg-white text-gray-800";
-  const buttonClassName = theme === 'dark' ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-700 hover:bg-blue-300";
-  const inputStyle = theme === 'dark' ? "bg-gray-700 text-white focus:ring-blue-500" : "bg-white text-gray-800 focus:ring-blue-300";
+  const modalClassName =
+    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-800";
+  const buttonClassName =
+    theme === "dark"
+      ? "bg-blue-600 hover:bg-blue-700"
+      : "bg-blue-700 hover:bg-blue-300";
+  const inputStyle =
+    theme === "dark"
+      ? "bg-gray-700 text-white focus:ring-blue-500"
+      : "bg-white text-gray-800 focus:ring-blue-300";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setValidationError("");
 
+    // Minimum password length check (e.g., at least 8 characters)
+    if (newPassword.length < 8) {
+      setValidationError("New password must be at least 8 characters long");
+      return;
+    }
+
+    // Check if new password is different from the current password
+    if (currentPassword === newPassword) {
+      setValidationError(
+        "New password must be different from the current password"
+      );
+      return;
+    }
+
+    // Confirm new password match check
     if (newPassword !== confirmNewPassword) {
-      useAuthStore.setState({ error: "New passwords do not match" });
+      setValidationError("New passwords do not match");
       return;
     }
 
@@ -38,25 +62,31 @@ const ChangePasswordModal = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className={`${modalClassName} rounded-lg p-8 w-full max-w-md relative`}>
+      <div
+        className={`${modalClassName} rounded-lg p-8 w-full max-w-md relative`}
+      >
         <button
           onClick={onClose}
           className={`absolute top-2 right-2 text-gray-400 focus:outline-none`}
         >
           <X size={24} />
         </button>
-        <h2 className="text-3xl font-bold mb-6 text-center">
-          Change Password
-        </h2>
+        <h2 className="text-3xl font-bold mb-6 text-center">Change Password</h2>
         {error && <div className="text-red-500 mb-4">{error}</div>}
         {message && <div className="text-green-500 mb-4">{message}</div>}
+        {validationError && (
+          <div className="text-red-500 mb-4">{validationError}</div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Current Password"
             type={showCurrentPassword ? "text" : "password"}
             value={currentPassword}
-            onChange={e => setCurrentPassword(e.target.value)}
-            toggleVisibility={() => setShowCurrentPassword(!showCurrentPassword)}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            toggleVisibility={() =>
+              setShowCurrentPassword(!showCurrentPassword)
+            }
             showPassword={showCurrentPassword}
             required
             inputStyle={inputStyle}
@@ -65,7 +95,7 @@ const ChangePasswordModal = ({ onClose }) => {
             label="New Password"
             type={showNewPassword ? "text" : "password"}
             value={newPassword}
-            onChange={e => setNewPassword(e.target.value)}
+            onChange={(e) => setNewPassword(e.target.value)}
             toggleVisibility={() => setShowNewPassword(!showNewPassword)}
             showPassword={showNewPassword}
             required
@@ -75,12 +105,15 @@ const ChangePasswordModal = ({ onClose }) => {
             label="Confirm New Password"
             type={showConfirmNewPassword ? "text" : "password"}
             value={confirmNewPassword}
-            onChange={e => setConfirmNewPassword(e.target.value)}
-            toggleVisibility={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            toggleVisibility={() =>
+              setShowConfirmNewPassword(!showConfirmNewPassword)
+            }
             showPassword={showConfirmNewPassword}
             required
             inputStyle={inputStyle}
           />
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -96,7 +129,16 @@ const ChangePasswordModal = ({ onClose }) => {
   );
 };
 
-const Input = ({ label, type, value, onChange, required, inputStyle, toggleVisibility, showPassword }) => (
+const Input = ({
+  label,
+  type,
+  value,
+  onChange,
+  required,
+  inputStyle,
+  toggleVisibility,
+  showPassword,
+}) => (
   <div className="relative">
     <label className="block text-sm font-medium mb-2">{label}</label>
     <input

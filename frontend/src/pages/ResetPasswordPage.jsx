@@ -9,22 +9,54 @@ import toast from "react-hot-toast";
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const { resetPassword, error, isLoading, message } = useAuthStore();
 
   const { token } = useParams();
   const navigate = useNavigate();
 
+  const validatePassword = (password) => {
+    const minLength = /.{8,}/;
+    const uppercase = /[A-Z]/;
+    const lowercase = /[a-z]/;
+    const number = /\d/;
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (!minLength.test(password)) {
+      return "Password must be at least 8 characters long.";
+    }
+    if (!uppercase.test(password)) {
+      return "Password must contain at least one uppercase letter.";
+    }
+    if (!lowercase.test(password)) {
+      return "Password must contain at least one lowercase letter.";
+    }
+    if (!number.test(password)) {
+      return "Password must contain at least one number.";
+    }
+    if (!specialChar.test(password)) {
+      return "Password must contain at least one special character.";
+    }
+
+    return null; // Password is valid
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationError = validatePassword(password);
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
+    if (validationError) {
+      setPasswordError(validationError);
       return;
     }
-    try {
-      console.log("Sending token to reset password:", token);
-      await resetPassword(token, password);
 
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      await resetPassword(token, password);
       toast.success(
         "Password reset successfully, redirecting to login page..."
       );
@@ -47,6 +79,9 @@ const ResetPasswordPage = () => {
         <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
           Reset Password
         </h2>
+        {passwordError && (
+          <p className="text-red-500 text-sm mb-4">{passwordError}</p>
+        )}
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         {message && <p className="text-green-500 text-sm mb-4">{message}</p>}
 
@@ -83,4 +118,5 @@ const ResetPasswordPage = () => {
     </motion.div>
   );
 };
+
 export default ResetPasswordPage;
