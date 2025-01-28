@@ -63,6 +63,7 @@ const FriendsExplore = () => {
               <UserCard
                 key={user._id}
                 user={user}
+                isPrivate={user.isPrivate}
                 isFriend={false}
                 onFriendUpdate={fetchPotentialFriends}
               />

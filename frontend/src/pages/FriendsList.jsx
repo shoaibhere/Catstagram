@@ -75,6 +75,7 @@ const FriendsList = () => {
                 <UserCard
                   key={friend._id}
                   user={friend}
+                  isPrivate={friend.isPrivate}
                   isFriend={true}
                   onFriendUpdate={fetchFriends}
                 />

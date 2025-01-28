@@ -6,7 +6,7 @@ import { useTheme } from "../contexts/themeContext";
 
 const API_URL = "https://catstagram-production.up.railway.app/api";
 
-const UserCard = ({ user, isFriend, onFriendUpdate }) => {
+const UserCard = ({ user,isPrivate, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -195,7 +195,7 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
               theme === "dark" ? "text-gray-400" : "text-gray-600"
             } mb-2`}
           >
-            {user.isPrivate ? "Email is private" : user.email}
+            {isPrivate ? "Email is private" : user.email}
           </p>
           <div className="flex flex-col md:flex-row gap-2 mt-4">
             <button

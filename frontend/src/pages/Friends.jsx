@@ -73,7 +73,7 @@ const Friends = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {activeTab === "friends" ? (
                 friends.map((friend) => (
-                  <UserCard key={friend._id} user={friend} isFriend={true} />
+                  <UserCard key={friend._id} isPrivate={false} user={friend} isFriend={true} />
                 ))
               ) : (
                 <div>Click on the "Friend Requests" tab to manage requests</div>
