@@ -14,9 +14,24 @@ const SignUpPage = () => {
   const navigate = useNavigate();
 
   const { signup, error, isLoading } = useAuthStore();
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+
+    // Check password validity before submitting
+    if (!validatePassword(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters long, contain uppercase, lowercase, a number, and a special character."
+      );
+      return;
+    }
+
+    setPasswordError(""); // Clear any previous error messages
     try {
       await signup(email, password, name);
       navigate("/verify-email");
@@ -32,8 +47,8 @@ const SignUpPage = () => {
       transition={{ duration: 0.5 }}
       className="max-w-md w-full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl"
     >
-      <ThemeToggle/>
-        <div className="p-8">
+      <ThemeToggle />
+      <div className="p-8">
         <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
           Create Account
         </h2>
