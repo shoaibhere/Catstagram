@@ -63,7 +63,7 @@ const UserPosts = ({ userId }) => {
 
   return (
     <div>
-      <h2 className={`text-2xl ${theme==="dark"?"text-white":"text-gray-900"}text-center font-bold mb-6`}>User Posts</h2>
+      <h2 className={`text-2xl text-gray-400 text-center font-bold mb-6`}>User Posts</h2>
       {posts.length === 0 ? (
         <div className="text-center text-gray-400 py-10">No posts yet</div>
       ) : (
