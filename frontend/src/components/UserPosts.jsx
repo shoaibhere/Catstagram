@@ -3,6 +3,7 @@ import axios from "axios";
 import PostCard from "./postCard";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../contexts/themeContext";
+import { text } from "@fortawesome/fontawesome-svg-core";
 
 const UserPosts = ({ userId }) => {
   const [posts, setPosts] = useState([]);
@@ -62,7 +63,7 @@ const UserPosts = ({ userId }) => {
 
   return (
     <div>
-      <h2 className="text-2xl text-center font-bold mb-6">User Posts</h2>
+      <h2 className={`text-2xl text-gray-400 text-center font-bold mb-6`}>User Posts</h2>
       {posts.length === 0 ? (
         <div className="text-center text-gray-400 py-10">No posts yet</div>
       ) : (
