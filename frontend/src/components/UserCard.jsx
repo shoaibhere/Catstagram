@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { User, Ban } from 'lucide-react';
+import { User, Ban } from "lucide-react";
 import { useTheme } from "../contexts/themeContext";
 
-const API_URL = "https://catstagram-production.up.railway.app/api"
+const API_URL = "https://catstagram-production.up.railway.app/api";
 
 const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const navigate = useNavigate();
@@ -17,9 +17,11 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
-        const response = await axios.get(`${API_URL}/friends/status/${user._id}`);
+        const response = await axios.get(
+          `${API_URL}/friends/status/${user._id}`
+        );
         const { friendRequestStatus, requestId, isBlocked } = response.data;
-        setRequestSent(friendRequestStatus === 'pending');
+        setRequestSent(friendRequestStatus === "pending");
         setRequestId(requestId);
         setIsBlocked(isBlocked);
       } catch (error) {
@@ -33,7 +35,9 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const handleBlockUser = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/user/block-user`, { userIdToBlock: user._id });
+      const response = await axios.post(`${API_URL}/user/block-user`, {
+        userIdToBlock: user._id,
+      });
       if (response.data.success) {
         setIsBlocked(true);
         alert(`User ${user.name} has been blocked.`);
@@ -50,7 +54,9 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
   const handleUnblockUser = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/user/unblock-user`, { userIdToUnblock: user._id });
+      const response = await axios.post(`${API_URL}/user/unblock-user`, {
+        userIdToUnblock: user._id,
+      });
       if (response.data.success) {
         setIsBlocked(false);
         alert(`User ${user.name} has been unblocked.`);
@@ -68,7 +74,9 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
     if (isLoading || requestSent || isBlocked) return;
     setIsLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/friends/request/${user._id}`);
+      const response = await axios.post(
+        `${API_URL}/friends/request/${user._id}`
+      );
       const { requestId } = response.data;
       setRequestSent(true);
       setRequestId(requestId);
@@ -135,11 +143,13 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
     : "from-green-400 to-green-500 hover:from-green-500 hover:to-green-600";
 
   return (
-    <div className={`relative w-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 ${
+    <div
+      className={`relative w-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 ${
         theme === "dark"
           ? "bg-gradient-to-br from-gray-900 via-purple-900 to-black border-purple-600"
           : "bg-white border-gray-300"
-      }`}>
+      }`}
+    >
       <button
         onClick={isBlocked ? handleUnblockUser : handleBlockUser}
         title={isBlocked ? "Unblock User" : "Block User"}
@@ -173,15 +183,19 @@ const UserCard = ({ user, isFriend, onFriendUpdate }) => {
           </div>
         )}
         <div className="flex-grow text-center md:text-left">
-          <h3 className={`text-xl font-bold ${
+          <h3
+            className={`text-xl font-bold ${
               theme === "dark" ? "text-white" : "text-gray-800"
-            }`}>
+            }`}
+          >
             <Link to={`/profile/${user._id}`}>{user.name}</Link>
           </h3>
-          <p className={`text-sm ${
+          <p
+            className={`text-sm ${
               theme === "dark" ? "text-gray-400" : "text-gray-600"
-            } mb-2`}>
-            {user.email}
+            } mb-2`}
+          >
+            {user.isPrivate ? "Email is private" : user.email}
           </p>
           <div className="flex flex-col md:flex-row gap-2 mt-4">
             <button
