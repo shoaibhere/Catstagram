@@ -59,12 +59,12 @@ const PostCard = ({ post, user }) => {
   const toggleLikePost = async () => {
     if (isLiked) {
       await unlikePost(user._id, post._id);
-      setIsLiked(false);
       setLikeCount((prev) => prev - 1);
+      setIsLiked(false);
     } else {
       await likePost(user._id, post._id);
-      setIsLiked(true);
       setLikeCount((prev) => prev + 1);
+      setIsLiked(true);
     }
   };
 
