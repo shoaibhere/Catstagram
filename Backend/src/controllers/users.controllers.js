@@ -22,11 +22,11 @@ const signup = async (req, res) => {
     }
 
     const userNameExists = await User.findOne({ name });
-     if (userNameExists) {
-       return res
-         .status(400)
-         .json({ success: false, message: "Username already exists" });
-     }
+    if (userNameExists) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Username already exists" });
+    }
     // Check if the name exceeds 15 characters
     if (name.length > 15) {
       throw new Error("Username must not exceed 15 characters");
@@ -60,7 +60,7 @@ const signup = async (req, res) => {
       password, // You should hash the password before saving it
       name,
       verificationToken,
-      verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000, // Token expires in 24 hours
+      verificationTokenExpire: Date.now() + 1 * 60 * 60 * 1000, // Token expires in 1 hours
     });
 
     await pendingUserData.save();
@@ -100,8 +100,8 @@ const verifyEmail = async (req, res) => {
       isVerified: true,
     });
     await PendingUser.deleteOne({ email: pendingUser.email });
+
     await user.save();
-    
     await sendWelcomeEmail(user.email, user.name);
 
     // Remove the pending user record

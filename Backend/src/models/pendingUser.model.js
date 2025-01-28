@@ -54,6 +54,11 @@ const pendingUserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   verificationToken: { type: String, required: true },
   verificationTokenExpire: { type: Date, required: true },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 1 * 60 * 60,
+  },
 });
 
 pendingUserSchema.pre("save", async function (next) {
