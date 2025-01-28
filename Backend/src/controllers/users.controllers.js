@@ -21,6 +21,12 @@ const signup = async (req, res) => {
       throw new Error("All fields are required");
     }
 
+    const userNameExists = await User.findOne({ name });
+     if (userNameExists) {
+       return res
+         .status(400)
+         .json({ success: false, message: "Username already exists" });
+     }
     // Check if the name exceeds 15 characters
     if (name.length > 15) {
       throw new Error("Username must not exceed 15 characters");
