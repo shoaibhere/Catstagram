@@ -164,7 +164,6 @@ const logout = async (req, res) => {
   });
   res.status(200).json({ success: true, message: "Logged out successfully" });
   
-  res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
 const forgotPassword = async (req, res) => {
