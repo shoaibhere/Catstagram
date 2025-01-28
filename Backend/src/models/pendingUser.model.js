@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const badWords = [
   "abuse",
@@ -53,6 +54,13 @@ const pendingUserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   verificationToken: { type: String, required: true },
   verificationTokenExpire: { type: Date, required: true },
+});
+
+pendingUserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // Pre-save hook to check for offensive words in the name
