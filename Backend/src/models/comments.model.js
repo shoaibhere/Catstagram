@@ -6,7 +6,6 @@ const badWords = [
   "kill",
   "dumb",
   "stupid",
-  "pussy",
   "idiot",
   "ugly",
   "loser",
