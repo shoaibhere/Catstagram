@@ -99,12 +99,12 @@ const verifyEmail = async (req, res) => {
       name: pendingUser.name,
       isVerified: true,
     });
-
+    await PendingUser.deleteOne({ email: pendingUser.email });
     await user.save();
+    
     await sendWelcomeEmail(user.email, user.name);
 
     // Remove the pending user record
-    await PendingUser.deleteOne({ email: pendingUser.email });
 
     generateTokenSetCookie(res, user._id);
 
