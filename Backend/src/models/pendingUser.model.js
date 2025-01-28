@@ -13,7 +13,6 @@ const badWords = [
   "bastard",
   "moron",
   "jerk",
-  "pussy",
   "fool",
   "nonsense",
   "crazy",
