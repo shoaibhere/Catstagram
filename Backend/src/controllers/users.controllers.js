@@ -16,13 +16,22 @@ const signup = async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
+    // Check if all fields are provided
     if (!email || !password || !name) {
       throw new Error("All fields are required");
     }
 
+    // Check if the name exceeds 15 characters
+    if (name.length > 15) {
+      throw new Error("Username must not exceed 15 characters");
+    }
+
+    // Check if the user already exists
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
-      return res.status(400).json({ success: false, message: "User already exists" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User already exists" });
     }
 
     // Check if the email is already pending verification
@@ -34,12 +43,15 @@ const signup = async (req, res) => {
       });
     }
 
-    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate verification token
+    const verificationToken = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
 
-    // Save to a temporary collection
+    // Save to a temporary collection (consider hashing the password)
     const pendingUserData = new PendingUser({
       email,
-      password, // Consider hashing the password here
+      password, // You should hash the password before saving it
       name,
       verificationToken,
       verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000, // Token expires in 24 hours
@@ -50,7 +62,8 @@ const signup = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Verification email sent. Please verify your email to complete registration.",
+      message:
+        "Verification email sent. Please verify your email to complete registration.",
     });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -103,18 +116,21 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ success: false, message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ success: false, message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     const token = generateTokenSetCookie(res, user._id);
@@ -126,14 +142,13 @@ const login = async (req, res) => {
       success: true,
       message: "Logged in successfully",
       user: userResponse,
-      token:token,
+      token: token,
     });
   } catch (error) {
     console.error("Error in login: ", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 
 const logout = async (req, res) => {
   res.clearCookie("token");
@@ -186,7 +201,9 @@ const resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired reset token" });
     }
 
     user.password = password; // The new password, which will be hashed by the pre-save hook
@@ -196,7 +213,9 @@ const resetPassword = async (req, res) => {
 
     await sendResetSuccessEmail(user.email);
 
-    res.status(200).json({ success: true, message: "Password reset successful" });
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successful" });
   } catch (error) {
     console.log("Error in resetPassword:", error);
     res.status(400).json({
