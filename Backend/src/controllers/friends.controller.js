@@ -242,7 +242,7 @@ const getPotentialFriends = async (req, res) => {
 
     const users = await User.find(
       { _id: { $nin: Array.from(requestedUserIds) } },
-      "name email profileImage" // Select only the necessary fields
+      "name email profileImage isPrivate" // Select only the necessary fields
     );
 
     res.status(200).json(users);
