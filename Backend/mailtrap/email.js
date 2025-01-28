@@ -48,7 +48,7 @@ const sendWelcomeEmail = async (email, name) => {
       from: sender,
       to: email, // Single recipient email
       subject: "Welcome to Catstagram!", // Customize as per your needs
-      html: WELCOME_EMAIL_TEMPLATE.replace("{Name}", name), // Replace with an actual template if needed
+      html: WELCOME_EMAIL_TEMPLATE.replace("{name}", name), // Replace with an actual template if needed
     });
     console.log("Welcome email sent successfully");
     return response;
