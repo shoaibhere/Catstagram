@@ -17,6 +17,10 @@ const VERIFICATION_EMAIL_TEMPLATE = `
       <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #9b59b6;">{verificationCode}</span>
     </div>
     <p>Enter this code on the verification page to complete your registration.</p>
+    <p>You can also click the link below to verify your email:</p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="https://catstagram-nu.vercel.app/verify-email" style="display: inline-block; background-color: #9b59b6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+    </div>
     <p>This code will expire in 15 minutes for security reasons.</p>
     <p>If you didn't create an account with us, please ignore this email.</p>
     <p>Best regards,<br>Catstagram Team</p>
