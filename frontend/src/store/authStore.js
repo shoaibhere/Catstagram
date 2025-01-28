@@ -70,8 +70,13 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       await axios.post(`${API_URL}/logout`);
+  
       // Remove user info and token from local storage
       localStorage.removeItem("userInfo");
+  
+      // Delete the token cookie by setting its expiration date in the past
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  
       set({
         user: null,
         isAuthenticated: false,
@@ -83,6 +88,7 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+  
   
   verifyEmail: async (code) => {
     set({ isLoading: true, error: null });
