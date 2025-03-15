@@ -7,6 +7,7 @@ export const updateProfile = async (formData, id) => {
     const response = await axios.put(
       `${API_URL}/update-profile/${id}`,
       formData,
+      
       {
         headers: {
           "Content-Type": "multipart/form-data",

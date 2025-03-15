@@ -2,12 +2,12 @@ import { create } from "zustand";
 import axios from "axios";
 
 const API_URL = "https://catstagram-production.up.railway.app/api/user";
-axios.defaults.withCredentials = false; // Disable cookies
+axios.defaults.withCredentials = true; // Enable cookies for cross-origin requests
 
 export const useAuthStore = create((set) => ({
   user: JSON.parse(localStorage.getItem("userInfo"))?.user || null,
-  token: localStorage.getItem("token") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
+  token: localStorage.getItem("token") || getCookie("token"),
+  isAuthenticated: !!(localStorage.getItem("token") || getCookie("token")),
   isLoading: false,
   error: null,
   message: null,
@@ -17,11 +17,13 @@ export const useAuthStore = create((set) => ({
     try {
       const response = await axios.post(`${API_URL}/signup`, { email, password, name });
 
-      // Store token and user info in localStorage
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("userInfo", JSON.stringify({ user: response.data.user }));
+      const token = response.data.token;
+      const user = response.data.user;
 
-      set({ user: response.data.user, token: response.data.token, isAuthenticated: true, isLoading: false });
+      storeToken(token);
+      localStorage.setItem("userInfo", JSON.stringify({ user }));
+
+      set({ user, token, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ error: error.response?.data?.message || "Error signing up", isLoading: false });
     }
@@ -32,18 +34,20 @@ export const useAuthStore = create((set) => ({
     try {
       const response = await axios.post(`${API_URL}/login`, { email, password });
 
-      // Store token and user info in localStorage
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("userInfo", JSON.stringify({ user: response.data.user }));
+      const token = response.data.token;
+      const user = response.data.user;
 
-      set({ isAuthenticated: true, user: response.data.user, token: response.data.token, isLoading: false });
+      storeToken(token);
+      localStorage.setItem("userInfo", JSON.stringify({ user }));
+
+      set({ user, token, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ error: error.response?.data?.message || "Invalid Email or Password", isLoading: false });
     }
   },
 
   checkAuth: () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || getCookie("token");
     const user = JSON.parse(localStorage.getItem("userInfo"))?.user;
 
     if (token && user) {
@@ -56,6 +60,7 @@ export const useAuthStore = create((set) => ({
   logout: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
+    deleteCookie("token");
 
     set({ user: null, token: null, isAuthenticated: false });
   },
@@ -83,7 +88,7 @@ export const useAuthStore = create((set) => ({
   changePassword: async (currentPassword, newPassword) => {
     set({ isLoading: true, error: null, message: null });
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || getCookie("token");
       const response = await axios.post(
         `${API_URL}/change-password`,
         { currentPassword, newPassword },
@@ -97,3 +102,18 @@ export const useAuthStore = create((set) => ({
 
   clearMessages: () => set({ error: null, message: null }),
 }));
+
+// Utility functions for handling cookies
+function storeToken(token) {
+  document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=None;`;
+  localStorage.setItem("token", token);
+}
+
+function getCookie(name) {
+  const cookie = document.cookie.split("; ").find((row) => row.startsWith(name + "="));
+  return cookie ? cookie.split("=")[1] : null;
+}
+
+function deleteCookie(name) {
+  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=None;`;
+}
