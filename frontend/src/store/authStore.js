@@ -1,179 +1,97 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL ="https://catstagram-production.up.railway.app/api/user";
-axios.defaults.withCredentials = true;
+const API_URL = "https://catstagram-production.up.railway.app/api/user";
+axios.defaults.withCredentials = false; // Disable cookies
 
 export const useAuthStore = create((set) => ({
-  user: null,
-  isAuthenticated: false,
-  error: null,
+  user: JSON.parse(localStorage.getItem("userInfo"))?.user || null,
+  token: localStorage.getItem("token") || null,
+  isAuthenticated: !!localStorage.getItem("token"),
   isLoading: false,
-  isCheckingAuth: true,
+  error: null,
   message: null,
 
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/signup`, {
-        email,
-        password,
-        name,
-      });
-      set({
-        user: response.data.user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      const response = await axios.post(`${API_URL}/signup`, { email, password, name });
+
+      // Store token and user info in localStorage
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userInfo", JSON.stringify({ user: response.data.user }));
+
+      set({ user: response.data.user, token: response.data.token, isAuthenticated: true, isLoading: false });
     } catch (error) {
-      set({
-        error: error.response.data.message || "Error signing up",
-        isLoading: false,
-      });
-      throw error;
+      set({ error: error.response?.data?.message || "Error signing up", isLoading: false });
     }
   },
+
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/login`, {
-        email,
-        password,
-      });
+      const response = await axios.post(`${API_URL}/login`, { email, password });
 
-      // Save user data and token to local storage
-      localStorage.setItem(
-        "userInfo",
-        JSON.stringify({
-          token: response.data.token, // Assuming the response includes a token
-          user: response.data.user,
-        })
-      );
+      // Store token and user info in localStorage
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userInfo", JSON.stringify({ user: response.data.user }));
 
-      set({
-        isAuthenticated: true,
-        user: response.data.user,
-        error: null,
-        isLoading: false,
-      });
+      set({ isAuthenticated: true, user: response.data.user, token: response.data.token, isLoading: false });
     } catch (error) {
-      set({
-        error:
-          error.response?.data?.message || "Error Invalid Email or Password",
-        isLoading: false,
-      });
-      throw error;
+      set({ error: error.response?.data?.message || "Invalid Email or Password", isLoading: false });
     }
   },
 
-  logout: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      await axios.post(`${API_URL}/logout`);
-  
-      // Remove user info and token from local storage
-      localStorage.removeItem("userInfo");
-  
-      // Delete the token cookie by setting its expiration date in the past
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  
-      set({
-        user: null,
-        isAuthenticated: false,
-        error: null,
-        isLoading: false,
-      });
-    } catch (error) {
-      set({ error: "Error logging out", isLoading: false });
-      throw error;
+  checkAuth: () => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("userInfo"))?.user;
+
+    if (token && user) {
+      set({ user, token, isAuthenticated: true });
+    } else {
+      set({ user: null, token: null, isAuthenticated: false });
     }
   },
-  
-  
-  verifyEmail: async (code) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await axios.post(`${API_URL}/verify-email`, { code });
-      set({
-        user: response.data.user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-      return response.data;
-    } catch (error) {
-      set({
-        error: error.response.data.message || "Error verifying email",
-        isLoading: false,
-      });
-      throw error;
-    }
+
+  logout: () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+
+    set({ user: null, token: null, isAuthenticated: false });
   },
-  checkAuth: async () => {
-    set({ isCheckingAuth: true, error: null });
-    try {
-      const response = await axios.get(`${API_URL}/check-auth`, {
-        withCredentials: true, // Send cookies with the request
-      });
-      set({
-        user: response.data.user,
-        isAuthenticated: true,
-        isCheckingAuth: false,
-      });
-    } catch (error) {
-      console.log("error in check auth: " + error);
-      set({ error: null, isCheckingAuth: false, isAuthenticated: false });
-    }
-  },
+
   forgotPassword: async (email) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/forgot-password`, {
-        email,
-      });
+      const response = await axios.post(`${API_URL}/forgot-password`, { email });
       set({ message: response.data.message, isLoading: false });
     } catch (error) {
-      set({
-        isLoading: false,
-        error:
-          error.response.data.message || "Error sending reset password email",
-      });
-      throw error;
+      set({ error: error.response?.data?.message || "Error sending reset password email", isLoading: false });
     }
   },
+
   resetPassword: async (token, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/reset-password/${token}`, {
-        password,
-      });
-      console.log("Request URL:", `${API_URL}/reset-password/${token}`);
-      console.log("Request data:", { password });
+      const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
       set({ message: response.data.message, isLoading: false });
     } catch (error) {
-      console.error(error.message);
-      set({
-        isLoading: false,
-        error: error.response.data.message || "Error resetting password",
-      });
-      throw error;
+      set({ error: error.response?.data?.message || "Error resetting password", isLoading: false });
     }
   },
 
   changePassword: async (currentPassword, newPassword) => {
     set({ isLoading: true, error: null, message: null });
     try {
-      const response = await axios.post(`${API_URL}/change-password`, { currentPassword, newPassword });
-      set({
-        isLoading: false,
-        message: "Password changed successfully",
-        error: null,
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${API_URL}/change-password`,
+        { currentPassword, newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      set({ message: "Password changed successfully", isLoading: false });
     } catch (error) {
-      set({
-        isLoading: false,
-        error: error.response?.data?.message || "Failed to change password",
-        message: null,
-      });
+      set({ error: error.response?.data?.message || "Failed to change password", isLoading: false });
     }
   },
 
