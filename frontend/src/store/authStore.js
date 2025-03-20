@@ -15,7 +15,11 @@ export const useAuthStore = create((set) => ({
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/signup`, { email, password, name });
+      const response = await axios.post(`${API_URL}/signup`, {
+        email,
+        password,
+        name,
+      });
 
       const token = response.data.token;
       const user = response.data.user;
@@ -25,14 +29,20 @@ export const useAuthStore = create((set) => ({
 
       set({ user, token, isAuthenticated: true, isLoading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error signing up", isLoading: false });
+      set({
+        error: error.response?.data?.message || "Error signing up",
+        isLoading: false,
+      });
     }
   },
 
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
+      const response = await axios.post(`${API_URL}/login`, {
+        email,
+        password,
+      });
 
       const token = response.data.token;
       const user = response.data.user;
@@ -42,7 +52,10 @@ export const useAuthStore = create((set) => ({
 
       set({ user, token, isAuthenticated: true, isLoading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Invalid Email or Password", isLoading: false });
+      set({
+        error: error.response?.data?.message || "Invalid Email or Password",
+        isLoading: false,
+      });
     }
   },
 
@@ -68,20 +81,49 @@ export const useAuthStore = create((set) => ({
   forgotPassword: async (email) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/forgot-password`, { email });
+      const response = await axios.post(`${API_URL}/forgot-password`, {
+        email,
+      });
       set({ message: response.data.message, isLoading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error sending reset password email", isLoading: false });
+      set({
+        error:
+          error.response?.data?.message || "Error sending reset password email",
+        isLoading: false,
+      });
     }
   },
 
   resetPassword: async (token, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
+      const response = await axios.post(`${API_URL}/reset-password/${token}`, {
+        password,
+      });
       set({ message: response.data.message, isLoading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Error resetting password", isLoading: false });
+      set({
+        error: error.response?.data?.message || "Error resetting password",
+        isLoading: false,
+      });
+    }
+  },
+  verifyEmail: async (code) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/verify-email`, { code });
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        error: error.response.data.message || "Error verifying email",
+        isLoading: false,
+      });
+      throw error;
     }
   },
 
@@ -96,7 +138,10 @@ export const useAuthStore = create((set) => ({
       );
       set({ message: "Password changed successfully", isLoading: false });
     } catch (error) {
-      set({ error: error.response?.data?.message || "Failed to change password", isLoading: false });
+      set({
+        error: error.response?.data?.message || "Failed to change password",
+        isLoading: false,
+      });
     }
   },
 
@@ -105,12 +150,16 @@ export const useAuthStore = create((set) => ({
 
 // Utility functions for handling cookies
 function storeToken(token) {
-  document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=None;`;
+  document.cookie = `token=${token}; path=/; max-age=${
+    7 * 24 * 60 * 60
+  }; secure; samesite=None;`;
   localStorage.setItem("token", token);
 }
 
 function getCookie(name) {
-  const cookie = document.cookie.split("; ").find((row) => row.startsWith(name + "="));
+  const cookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(name + "="));
   return cookie ? cookie.split("=")[1] : null;
 }
 
