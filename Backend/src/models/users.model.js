@@ -22,13 +22,7 @@ const signupSchema = new mongoose.Schema({
       },
 }, { timestamps: true });
 
-// Hash the password before saving a User
-signupSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-});
+
 signupSchema.index({ email: 1 }, { unique: true });
 
 // Optionally, index lastLogin to quickly query recently active users
