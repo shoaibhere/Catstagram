@@ -18,6 +18,10 @@ import EditPost from "./pages/editPost";
 import ChangePasswordPage from "./components/ChangePasswordModal";
 import Requests from "./pages/Requests";
 import { ThemeProvider, useTheme } from "./contexts/themeContext";
+import ChatPage from "./pages/ChatPage";
+import CreateGroupChat from "./pages/CreateGroupChat";
+import ChatMessage from "./pages/ChatMessage";
+import GroupChatSettings from "./pages/GroupChatSettings";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -143,6 +147,38 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <EditPost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chats"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat/:chatId"
+          element={
+            <ProtectedRoute>
+              <ChatMessage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/group-settings/:chatId"
+          element={
+            <ProtectedRoute>
+              <GroupChatSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-group"
+          element={
+            <ProtectedRoute>
+              <CreateGroupChat />
             </ProtectedRoute>
           }
         />

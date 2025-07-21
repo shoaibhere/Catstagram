@@ -7,6 +7,7 @@ import ChangePasswordModal from "./ChangePasswordModal";  // Ensure this is the 
 import {
   LogOut,
   Users,
+  MessageCircleMore,
   Lock,
   Menu as HamburgerIcon, // Added hamburger icon import
   X as CloseIcon,
@@ -50,25 +51,30 @@ const Navbar = () => {
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <a className="flex flex-shrink-0 items-center mr-4" href="/">
+            <div className="flex items-center justify-between gap-10">
+             {/* Mobile Hamburger Icon */}
+            <div className="md:hidden flex items-center justify-center">
+              <button onClick={toggleMobileMenu} className={iconClasses}>
+                {isMobileMenuOpen ? <CloseIcon className="w-6 h-6"/> : <HamburgerIcon className="w-8 h-8"/>}
+              </button>
+            </div>
+            
+            <Link className="flex flex-shrink-0 items-center justify-center mr-4" to="/">
               <img className="h-10 w-auto rounded-full" src={logo} alt="Catstagram"/>
               <span className="text-2xl font-billabong ml-2">Catstagram</span>
-            </a>
+            </Link>
+
+            <Link to="/chats" className={`w-14 h-14 sm:hidden ${buttonClasses}`}><MessageCircleMore className={`w-full h-full sm:hidden ${iconClasses}`}/></Link>
+            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex md:ml-auto items-center">
             <Link to="/friends" className={buttonClasses}><Users className={iconClasses}/> My Friends</Link>
+            <Link to="/chats" className={buttonClasses}><MessageCircleMore className={iconClasses}/> Chats</Link>
             <Link to="/friend-requests" className={buttonClasses}><UserPlus className={iconClasses}/>Friend Requests</Link>
               <button onClick={handleChangePassword} className={buttonClasses}><Lock className={iconClasses}/> Change Password</button>
               <button onClick={handleLogout} className={buttonClasses}><LogOut className={iconClasses}/> Logout</button>
               <ThemeToggle className="top-0 right-0"/>
-            </div>
-
-            {/* Mobile Hamburger Icon */}
-            <div className="md:hidden flex items-center">
-              <button onClick={toggleMobileMenu} className={iconClasses}>
-                {isMobileMenuOpen ? <CloseIcon className="w-6 h-6"/> : <HamburgerIcon className="w-6 h-6"/>}
-              </button>
             </div>
           </div>
         </div>
@@ -83,6 +89,7 @@ const Navbar = () => {
           <button className={buttonClasses} onClick={() => { handleLogout(); toggleMobileMenu(); }}><LogOut className={iconClasses}/> Logout</button>
           <button className={buttonClasses}> <span className="pr-4">Change Theme </span><ThemeToggle/></button>
         </div>  
+        
       )}
 
       {/* Change Password Modal */}
